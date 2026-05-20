@@ -19,6 +19,7 @@ class ProductRequest extends FormRequest
             'description' => 'nullable|string',
             'price' => 'nullable|numeric',
             'note' => 'nullable|string',
+            'type' => 'required|in:subscription,one_time',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', 
             'attachments.*' => 'file|max:10240',
             

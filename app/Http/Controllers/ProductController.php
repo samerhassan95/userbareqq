@@ -36,6 +36,10 @@ class ProductController extends BaseController
             'description' => 'nullable|string',
             'price' => 'nullable|numeric',
             'note' => 'nullable|string',
+            'type' => 'required|in:subscription,one_time',
+            'product_role' => 'required|in:one_time,strategy',
+            'monthly_price' => 'required_if:product_role,strategy|nullable|numeric',
+            'yearly_price' => 'required_if:product_role,strategy|nullable|numeric',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'attachments.*' => 'file|max:10240',
             'addons' => 'array',
@@ -66,7 +70,7 @@ class ProductController extends BaseController
             }
         }
     
-        // Handle addons
+        // Handle addons (features for one_time products)
         if (!empty($validatedData['addons'])) {
             $product->addons()->attach($validatedData['addons']);
         }
@@ -74,25 +78,23 @@ class ProductController extends BaseController
         // Send notifications
         $template = NotificationTemplate::where('type', 'new_product')->first();
     
-        if (!$template) {
-            return response()->json(['message' => 'Notification template not found.'], 400);
-        }
-    
-        $title = $template->title;
-        $message = str_replace('{product_name}', $product->name, $template->message);
-    
-        $clients = Client::whereNotNull('device_token')->get();
-    
-        if ($clients->isNotEmpty()) {
-            foreach ($clients as $client) {
-                $this->firebaseService->sendNotification($client->device_token, $title, $message, [
-                    'notification_type' => $template->type
-                ]);
-                $this->notificationRepository->createNotification($client, $title, $message, $client->device_token, $template->type);
+        if ($template) {
+            $title = $template->title;
+            $message = str_replace('{product_name}', $product->name, $template->message);
+        
+            $clients = Client::whereNotNull('device_token')->get();
+        
+            if ($clients->isNotEmpty()) {
+                foreach ($clients as $client) {
+                    $this->firebaseService->sendNotification($client->device_token, $title, $message, [
+                        'notification_type' => $template->type
+                    ]);
+                    $this->notificationRepository->createNotification($client, $title, $message, $client->device_token, $template->type);
+                }
             }
         }
     
-        return response()->json(new ProductResource($product->load(['attachments', 'addons', 'media'])), 201);
+        return response()->json(new ProductResource($product->load(['attachments', 'addons', 'media', 'strategyTips'])), 201);
     }
     
     public function update(Request $request, $id)
@@ -108,6 +110,10 @@ class ProductController extends BaseController
             'description' => 'nullable|string',
             'price' => 'nullable|numeric',
             'note' => 'nullable|string',
+            'type' => 'nullable|in:subscription,one_time',
+            'product_role' => 'nullable|in:one_time,strategy',
+            'monthly_price' => 'nullable|numeric',
+            'yearly_price' => 'nullable|numeric',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'attachments.*' => 'file|max:10240',
             'addons' => 'array',
@@ -145,7 +151,7 @@ class ProductController extends BaseController
             $product->addons()->sync($validatedData['addons']);
         }
     
-        return response()->json(new ProductResource($product->load(['attachments', 'addons', 'media'])), 200);
+        return response()->json(new ProductResource($product->load(['attachments', 'addons', 'media', 'strategyTips'])), 200);
     }
 
 
@@ -163,9 +169,9 @@ private function resolveImage($image, string $device = 'web'): ?string
 
 public function show($id)
 {
-    $device = request()->input('device', 'web'); // 👈 no need for Request $request
+    $device = request()->input('device', 'web');
 
-    $product = Product::with(['media', 'attachments', 'addons'])->find($id);
+    $product = Product::with(['media', 'attachments', 'addons', 'strategyTips'])->find($id);
 
     if (!$product) {
         return response()->json([
@@ -183,6 +189,7 @@ public function show($id)
         'image'            => $this->resolveImage($product->image, $device),
         'background_image' => $product->background_image,
         'type'             => $product->type,
+        'product_role'     => $product->product_role ?? 'one_time',
         'created_at'       => $product->created_at,
         'updated_at'       => $product->updated_at,
         'media'            => $product->media->map(function ($media) {
@@ -198,15 +205,32 @@ public function show($id)
                 'file_path' => asset($attachment->file_path),
             ];
         }),
-        'addons'           => $product->addons->map(function ($addon) {
-            return [
-                'id'          => $addon->id,
-                'name'        => $addon->name,
-                'price'       => $addon->price,
-                'description' => $this->localizedText($addon->description),
-            ];
-        }),
     ];
+
+    // Add role-specific fields
+    if ($product->product_role === 'strategy') {
+        $data['monthly_price'] = $product->monthly_price;
+        $data['yearly_price'] = $product->yearly_price;
+        $data['strategy_tips'] = $product->strategyTips->map(function ($tip) {
+            return [
+                'id'        => $tip->id,
+                'text'      => $tip->text,
+                'platforms' => $tip->platforms ?? [],
+            ];
+        });
+    } else {
+        // One-time product - use addons as features
+        $data['features'] = $product->addons->map(function ($addon) {
+            return [
+                'id'           => $addon->id,
+                'name'         => $addon->name,
+                'price'        => $addon->price,
+                'description'  => $this->localizedText($addon->description),
+                'feature_type' => 'general',
+            ];
+        });
+        $data['addons'] = $data['features']; // Keep for backward compatibility
+    }
 
     return response()->json([
         'status' => true,
@@ -238,15 +262,19 @@ public function ourProducts(Request $request)
 {
     $search = $request->search;
     $device = $request->input('device', 'web');
+    $productRole = $request->input('product_role'); // Filter by product_role
 
-    $products = Product::with(['category:id,name', 'addons'])
+    $products = Product::with(['category:id,name', 'addons', 'strategyTips'])
         ->when($search, function ($q) use ($search) {
             $q->where('name', 'LIKE', "%{$search}%");
         })
-        ->select('id', 'name', 'category_id', 'price', 'description', 'background_image', 'type', 'image')
+        ->when($productRole, function ($q) use ($productRole) {
+            $q->where('product_role', $productRole);
+        })
+        ->select('id', 'name', 'category_id', 'price', 'description', 'background_image', 'type', 'image', 'product_role', 'monthly_price', 'yearly_price')
         ->get()
         ->map(function ($item) use ($device) {
-            return [
+            $data = [
                 'id'               => $item->id,
                 'name'             => $item->name,
                 'price'            => $item->price,
@@ -255,7 +283,16 @@ public function ourProducts(Request $request)
                 'category_name'    => $item->category->name ?? null,
                 'background_image' => $item->background_image,
                 'type'             => $item->type,
+                'product_role'     => $item->product_role ?? 'one_time',
             ];
+
+            // Add role-specific fields
+            if ($item->product_role === 'strategy') {
+                $data['monthly_price'] = $item->monthly_price;
+                $data['yearly_price'] = $item->yearly_price;
+            }
+
+            return $data;
         });
 
     $sliders = Slider::with([

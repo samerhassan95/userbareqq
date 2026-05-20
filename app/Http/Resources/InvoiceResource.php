@@ -20,8 +20,11 @@ class InvoiceResource extends JsonResource
             'project_id' => $this->project_id,
             'status' => $this->status,
             'payment_method' => $this->payment_method,
+            'gateway' => $this->gateway ?? 'opay',
             'payment_proof' => $this->payment_proof ? asset($this->payment_proof) : null,
             'due_date' => $this->due_date,
+            'amount' => $this->amount,
+            'order_no' => $this->order_no,
         ];
     
     }

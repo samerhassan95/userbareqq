@@ -38,7 +38,7 @@ class EmployeeAuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'nullable|email|unique:employees,email',
             // 'intro' => 'nullable|string|max:1000',
-            'role' => 'required|in:ui_ux,front_end,back_end,tester,mobile',
+            'role' => 'required|in:user,admin,designer,marketer',
             'device_token' => 'nullable|string|max:255',
         ]);
 
@@ -154,7 +154,7 @@ class EmployeeAuthController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'cover_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'intro' => 'nullable|string|max:1000',
-            'role' => 'sometimes|required|in:ui_ux,front_end,back_end,tester,mobile',
+            'role' => 'sometimes|required|in:user,admin,designer,marketer',
             'join_date' => 'nullable|date',
             'birth_date' => 'nullable|date',
             'graduation_year' => 'nullable|integer|min:1900|max:' . date('Y'),

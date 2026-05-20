@@ -4,11 +4,10 @@ namespace App\Enum;
 
 class RoleEnum
 {
-    public const FRONTEND_DEVELOPER = 1;
-    public const BACKEND_DEVELOPER = 2;
-    public const MOBILE_DEVELOPER = 3;
-    public const TESTER = 4;
-    public const UI_UX_DESIGNER = 5;
+    public const USER = 1;
+    public const ADMIN = 2;
+    public const DESIGNER = 3;
+    public const MARKETER = 4;
 
     /**
      * Get all available roles.
@@ -18,11 +17,10 @@ class RoleEnum
     public static function getList(): array
     {
         return [
-            self::FRONTEND_DEVELOPER => 'Frontend Developer',
-            self::BACKEND_DEVELOPER => 'Backend Developer',
-            self::MOBILE_DEVELOPER => 'Mobile Developer',
-            self::TESTER => 'Tester',
-            self::UI_UX_DESIGNER => 'UI/UX Designer',
+            self::USER => 'User',
+            self::ADMIN => 'Admin',
+            self::DESIGNER => 'Designer',
+            self::MARKETER => 'Marketer',
         ];
     }
 

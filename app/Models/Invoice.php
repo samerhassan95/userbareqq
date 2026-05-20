@@ -10,24 +10,24 @@ class Invoice extends Model
     use HasFactory;
 
     protected $fillable = [
-        'milestone_id',
-        'project_id',
-        'status',
-        'payment_method',
-        'payment_proof',
-        'due_date',
+        'client_id',
+        'product_id',
         'amount',
         'reference',
-        'order_no'
+        'status',
+        'payment_method',
+        'gateway',
+        'payment_proof',
+        'due_date',
     ];
 
-    public function milestone()
+    public function client()
     {
-        return $this->belongsTo(Milestone::class);
+        return $this->belongsTo(Client::class);
     }
 
-    public function project()
+    public function product()
     {
-        return $this->belongsTo(Project::class);
+        return $this->belongsTo(Product::class);
     }
 }

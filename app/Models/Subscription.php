@@ -10,36 +10,21 @@ class Subscription extends Model
 {
     use HasFactory;
 
-    // The name of the table created in the migration
-    protected $table = 'subscription_apps';
+    protected $table = 'subscriptions';
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'client_id',
-        'app_name',
+        'product_id',
         'status',
+        'billing_cycle',
         'starts_at',
-        'ends_at',
-        'plan_name',
-        'price',
+        'expires_at',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
         'starts_at' => 'datetime',
-        'ends_at' => 'datetime',
-        'price' => 'decimal:2',
+        'expires_at' => 'datetime',
     ];
-
-    // --- Relationships ---
 
     /**
      * Get the client that owns the subscription.
@@ -48,6 +33,25 @@ class Subscription extends Model
     {
         return $this->belongsTo(Client::class);
     }
+
+    /**
+     * Get the product that the subscription is for.
+     */
+    public function product(): BelongsTo
+    {
+        return $this->belongsTo(Product::class);
+    }
+
+    /**
+     * Check if subscription is active.
+     */
+    public function isActive(): bool
+    {
+        return $this->status === 'active' &&
+               ($this->expires_at === null || $this->expires_at->isFuture());
+    }
+}
+
 
     // --- Helper Scopes (Optional but Recommended) ---
 

@@ -1,0 +1,57 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class ProductOrder extends Model
+{
+    use HasFactory;
+
+    protected $table = 'product_orders';
+
+    protected $fillable = [
+        'client_id',
+        'product_id',
+        'product_role',
+        'feature_id',
+        'feature_name',
+        'duration',
+        'total_price',
+        'status',
+        'invoice_id',
+        'subscription_id',
+        'admin_notes',
+        'deliverable_url',
+    ];
+
+    protected $casts = [
+        'total_price' => 'decimal:2',
+    ];
+
+    public function client()
+    {
+        return $this->belongsTo(Client::class);
+    }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
+
+    public function feature()
+    {
+        return $this->belongsTo(Addon::class, 'feature_id');
+    }
+
+    public function invoice()
+    {
+        return $this->belongsTo(Invoice::class);
+    }
+
+    public function subscription()
+    {
+        return $this->belongsTo(Subscription::class);
+    }
+}

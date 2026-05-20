@@ -7,47 +7,46 @@ use App\Http\Resources\InvoiceResource;
 use App\Models\Admin;
 use App\Models\Client;
 use App\Models\Invoice;
-use App\Models\Milestone;
-use App\Models\Project;
-use App\Repositories\InvoiceRepositoryInterface;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Spatie\QueryBuilder\QueryBuilder;
 use App\Services\FirebaseService;
+use App\Services\OpayService;
 use Illuminate\Support\Facades\Log;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 
 class InvoiceController extends BaseController
 {
-    private $repository;
     private $firebaseService;
+    private $opayService;
 
-    public function __construct(InvoiceRepositoryInterface $repository, FirebaseService $firebaseService)
+    public function __construct(FirebaseService $firebaseService, OpayService $opayService)
     {
-        parent::__construct($repository);
-        $this->repository = $repository;
         $this->firebaseService = $firebaseService;
+        $this->opayService = $opayService;
     }
 
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'milestone_id' => 'required|exists:milestones,id',
-            'project_id' => 'required|exists:projects,id',
-            'amount' => 'nullable|numeric|min:0',
+            'client_id' => 'required|exists:clients,id',
+            'product_id' => 'required|exists:products,id',
+            'amount' => 'required|numeric|min:0',
             'due_date' => 'required|date|after:today',
+            'gateway' => 'nullable|in:opay',
         ]);
 
-        $milestone = Milestone::findOrFail($validated['milestone_id']);
-
         $invoice = Invoice::create([
-            'milestone_id' => $validated['milestone_id'],
-            'project_id' => $validated['project_id'],
-            'amount' => $validated['amount'] ?? $milestone->amount,
+            'client_id' => $validated['client_id'],
+            'product_id' => $validated['product_id'],
+            'amount' => $validated['amount'],
             'due_date' => $validated['due_date'],
             'status' => 'unpaid',
+            'gateway' => $validated['gateway'] ?? 'opay',
+            'reference' => 'INV-' . time() . '-' . rand(100, 999),
         ]);
 
         $this->sendInvoiceNotification($invoice);
@@ -62,7 +61,7 @@ class InvoiceController extends BaseController
 
     private function sendInvoiceNotification(Invoice $invoice)
     {
-        $client = $invoice->project->client;
+        $client = $invoice->client;
 
         if (!$client || !$client->device_token) {
             Log::warning('Client not found or has no device token for invoice notification.', [
@@ -90,7 +89,7 @@ class InvoiceController extends BaseController
                 'invoice_id' => $invoice->id,
                 'notification_type' => 'invoice_created',
             ];
-            $this->firebaseService->sendNotification($client->device_token, $title, $message,$dataPayload );
+            $this->firebaseService->sendNotification($client->device_token, $title, $message, $dataPayload);
 
             app(\App\Repositories\NotificationRepository::class)->createNotification($client, $title, $message, $client->device_token, 'invoice_created');
 
@@ -158,7 +157,7 @@ class InvoiceController extends BaseController
     //         'data' => $invoiceData
     //     ], 200);
     // }
-    
+
     public function getInvoicesForProject($projectId, Request $request)
 {
     $project = Project::find($projectId);
@@ -264,8 +263,46 @@ class InvoiceController extends BaseController
         ]
     ], 200);
 }
-    
-    
+
+    public function initiatePayment(Request $request, $invoiceId)
+    {
+        $invoice = Invoice::findOrFail($invoiceId);
+        $gateway = $request->input('gateway', $invoice->gateway ?? 'opay');
+
+        if ($gateway !== 'opay') {
+            return response()->json([
+                'status' => false,
+                'message' => 'Unsupported payment gateway.',
+            ], 422);
+        }
+
+        $paymentData = $this->opayService->initiatePayment($invoice);
+        if (!$paymentData) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Payment gateway integration failed.',
+            ], 400);
+        }
+
+        $invoice->update([
+            'gateway' => $gateway,
+            'order_no' => $paymentData['order_no'],
+            'reference' => $invoice->reference ?? ('INV-' . $invoice->id . '-' . time()),
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Payment link generated successfully.',
+            'data' => [
+                'invoice_id' => $invoice->id,
+                'gateway' => $gateway,
+                'order_no' => $paymentData['order_no'],
+                'payment_link' => $paymentData['payment_link'],
+            ],
+        ]);
+    }
+
+
     public function getInvoiceStatusCounts()
     {
         $user = auth()->user();
@@ -416,10 +453,10 @@ public function getInvoiceDetails(Request $request, $invoiceId)
 
     $search = $request->project_name;
 
-  
+
     $allProjectIds = Project::where('client_id', $user->id)->pluck('id');
 
-  
+
     $allInvoices = Invoice::whereIn('project_id', $allProjectIds)->get();
 
     $cards = [
@@ -432,7 +469,7 @@ public function getInvoiceDetails(Request $request, $invoiceId)
     ];
 
 
-   
+
     $projectsQuery = Project::where('client_id', $user->id);
 
     if ($search) {
@@ -486,8 +523,49 @@ public function getInvoiceDetails(Request $request, $invoiceId)
     ]);
 }
 
+    /**
+     * Upload payment proof (offline payment)
+     * POST /api/client/invoices/{invoiceId}/upload-payment-proof
+     */
+    public function uploadPaymentProof(Request $request, $invoiceId)
+    {
+        $request->validate([
+            'payment_proof' => 'required|file|mimes:jpeg,png,jpg,pdf|max:5120', // 5MB max
+        ]);
 
+        $invoice = Invoice::find($invoiceId);
 
+        if (!$invoice) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Invoice not found.',
+            ], 404);
+        }
 
+        // Check if client owns this invoice
+        $client = auth()->user();
+        if ($invoice->client_id !== $client->id) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Unauthorized.',
+            ], 403);
+        }
 
+        // Upload payment proof
+        $filePath = \App\Services\ImageService::upload($request->file('payment_proof'), 'payment_proofs');
+
+        $invoice->update([
+            'payment_proof' => $filePath,
+            'payment_method' => 'bank_transfer',
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Payment proof uploaded successfully. Waiting for admin approval.',
+            'data' => [
+                'invoice_id' => $invoice->id,
+                'payment_proof' => asset($filePath),
+            ],
+        ]);
+    }
 }

@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\TopicGalleryRequest;
 use App\Http\Resources\TopicGalleryResource;
 use App\Models\TopicGallery;
-use App\Models\Project;
 use App\Repositories\TopicGalleryRepositoryInterface;
 use Illuminate\Http\Request;
 

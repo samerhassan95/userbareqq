@@ -15,7 +15,10 @@ class MeetingResource extends JsonResource
             'end_time' => $this->end_time,
             'jitsi_url' => $this->jitsi_url,
             'status' => $this->status,
-            'project' => new ProjectResource($this->project),
+            'project' => $this->project ? [
+                'id' => $this->project->id,
+                'name' => $this->project->name,
+            ] : null,
             'description' => $this->description,
             'meeting_date' => $this->date, 
             'meeting_name' => $this->meeting_name,

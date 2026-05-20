@@ -1,0 +1,15 @@
+{
+  "method": "POST",
+  "url": "https://back.codgoo.com/codgoo/public/api/employee/register",
+  "headers": {
+    "Content-Type": "application/json",
+    "Accept": "application/json"
+  },
+  "body": {
+    "device_token": "postman_test_123",
+    "phone": "01099999993",
+    "password": "123456",
+    "name": "Postman Test Employee",
+    "role": "front_end"
+  }
+}

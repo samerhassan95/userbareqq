@@ -11,21 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('clients', function (Blueprint $table) {
+        Schema::create('designers', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('admin_id');
             $table->string('username')->unique();
-            $table->string('name');
-            $table->string('email');
+            $table->string('email')->unique();
             $table->string('phone')->unique();
             $table->string('password');
             $table->string('photo')->nullable();
-            $table->string('company_name')->nullable();
-            $table->string('website')->nullable();
-            $table->string('address')->nullable();
-            $table->string('city')->nullable();
-            $table->string('country')->nullable();
+            $table->text('bio')->nullable();
+            $table->enum('role', ['user', 'admin', 'designer', 'marketer'])->default('designer');
             $table->rememberToken();
             $table->timestamps();
+
+            $table->foreign('admin_id')->references('id')->on('admins')->cascadeOnDelete();
         });
     }
 
@@ -34,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('clients');
+        Schema::dropIfExists('designers');
     }
 };

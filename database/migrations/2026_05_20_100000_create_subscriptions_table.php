@@ -11,17 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('invoices', function (Blueprint $table) {
+        Schema::create('subscriptions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('client_id')->constrained()->cascadeOnDelete();
             $table->foreignId('product_id')->constrained()->cascadeOnDelete();
-            $table->decimal('amount', 10, 2);
-            $table->string('reference')->nullable();
-            $table->enum('status', ['paid', 'unpaid', 'canceled'])->default('unpaid');
-            $table->enum('payment_method', ['bank_transfer', 'online'])->nullable();
-            $table->enum('gateway', ['opay'])->default('opay')->nullable();
-            $table->string('payment_proof')->nullable();
-            $table->date('due_date');
+            $table->enum('status', ['active', 'expired', 'canceled'])->default('active');
+            $table->enum('billing_cycle', ['monthly', 'once'])->default('monthly');
+            $table->timestamp('starts_at');
+            $table->timestamp('expires_at')->nullable();
             $table->timestamps();
         });
     }
@@ -31,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('invoices');
+        Schema::dropIfExists('subscriptions');
     }
 };

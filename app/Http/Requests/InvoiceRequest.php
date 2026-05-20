@@ -24,9 +24,10 @@ class InvoiceRequest extends FormRequest
         return [
             
             'milestone_id' => 'required|exists:milestones,id',
-            'project_id' => 'required|exists:projects,id',
+            'project_id' => 'nullable|exists:projects,id',
             'status' => 'required|in:paid,unpaid',
             'payment_method' => 'nullable|in:bank_transfer,online',
+            'gateway' => 'nullable|in:opay',
             'payment_proof' => 'nullable|image|max:2048',
             'due_date' => 'required|date',
         ];

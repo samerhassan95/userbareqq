@@ -4,10 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\MeetingRequest;
 use App\Http\Resources\MeetingResource;
-use App\Http\Resources\ProjectResource;
 use App\Models\AvailableSlot;
 use App\Models\Meeting;
-use App\Models\Project;
 use App\Models\Task;
 use App\Repositories\MeetingRepositoryInterface;
 use App\Services\FirebaseService;
@@ -35,8 +33,8 @@ class MeetingController extends Controller
     public function index()
     {
         try {
-            $meetings = Meeting::with(['project'])->get();
-            
+            $meetings = Meeting::all();
+
             return response()->json([
                 'status' => true,
                 'message' => 'Meetings retrieved successfully.',
@@ -58,7 +56,7 @@ class MeetingController extends Controller
     {
         try {
             $meeting = Meeting::with(['project'])->findOrFail($id);
-            
+
             return response()->json([
                 'status' => true,
                 'message' => 'Meeting retrieved successfully.',
@@ -116,7 +114,7 @@ public function store(MeetingRequest $request)
             ], 404);
         }
     }
-    
+
 
 $slot = AvailableSlot::findOrFail($validated['slot_id']);
 
@@ -132,16 +130,16 @@ $slot = AvailableSlot::findOrFail($validated['slot_id']);
             });
         })
         ->exists();
-        
-        
+
+
         if ($overlappingMeeting) {
         return response()->json([
             'status' => false,
             'message' => 'This time slot is already booked. Please choose another time.'
         ], 409); // 409 Conflict
     }
-    
-    
+
+
     // 4️⃣ Create meeting
     $meeting = $this->repository->create([
         'slot_id'      => $validated['slot_id'],
@@ -199,7 +197,7 @@ $slot = AvailableSlot::findOrFail($validated['slot_id']);
 
         foreach ($admins as $admin) {
             try {
-                
+
                 $dataPayload = [
                     'meeting_id' => $meeting->id,
                     'notification_type' => 'meeting_created',
@@ -271,7 +269,10 @@ $slot = AvailableSlot::findOrFail($validated['slot_id']);
             'status' => true,
             'data' => [
                 'meeting' => new MeetingResource($meeting),
-                'project' => new ProjectResource($meeting->project),
+                'project' => $meeting->project ? [
+                    'id' => $meeting->project->id,
+                    'name' => $meeting->project->name,
+                ] : null,
             ],
         ]);
     }
@@ -405,7 +406,7 @@ public function update(MeetingRequest $request, $id)
 
 public function getClientMeetings(Request $request)
 {
-    $user = auth()->user(); 
+    $user = auth()->user();
 
     $query = Meeting::with(['project', 'employees:id,name,image'])
         ->where('client_id', $user->id);
@@ -457,7 +458,7 @@ public function getClientMeetings(Request $request)
                 'notes' => $meeting->notes,
                 'can_add_notes' => $canAddNotes,
                 'has_notes' => !empty($meeting->notes),
-                
+
 
                 // Optional employee info
                 'team' => $meeting->employees->map(function ($emp) {
@@ -526,7 +527,7 @@ public function saveNotes(Request $request, Meeting $meeting)
             'logs',
             'client:id,name',
             'slot',
-            'employees:id,name,image' 
+            'employees:id,name,image'
         ])
             ->where('client_id', $user->id)
             ->find($id);

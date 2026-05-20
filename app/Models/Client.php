@@ -35,11 +35,6 @@ class Client extends Authenticatable implements JWTSubject
         return $this->morphMany(Attachment::class, 'uploadedBy');
     }
 
-    public function projects()
-    {
-        return $this->hasMany(Project::class, 'client_id');
-    }
-
     public function ticketReplies()
     {
         return $this->morphMany(TicketReply::class, 'creator');
@@ -57,24 +52,16 @@ class Client extends Authenticatable implements JWTSubject
 
     public function subscriptions()
     {
-        return $this->hasMany(\App\Models\Subscription::class, 'client_id');
+        return $this->hasMany(Subscription::class, 'client_id');
     }
 
-    public function getActiveAppScopes(): array
+    public function invoices()
     {
-        $activeApps = $this->subscriptions()
-            ->active()
-            ->pluck('app_name')
-            ->unique()
-            ->toArray();
+        return $this->hasMany(Invoice::class, 'client_id');
+    }
 
-        $scopes = [];
-
-        foreach ($activeApps as $app) {
-            $scopes[] = "app:{$app}:read";
-            $scopes[] = "app:{$app}:write";
-        }
-
-        return $scopes;
+    public function socialCredentials()
+    {
+        return $this->hasMany(ClientSocialCredential::class, 'client_id');
     }
 }
