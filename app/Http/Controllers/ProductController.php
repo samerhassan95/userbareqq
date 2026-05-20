@@ -55,58 +55,71 @@ class ProductController extends BaseController
             ], 422);
         }
     
-        $productData = collect($validatedData)->except(['attachments', 'image', 'addons', 'media'])->toArray();
-    
-        if ($request->hasFile('image')) {
-            $imagePath = ImageService::upload($request->file('image'), 'product_images');
-            $productData['image'] = $imagePath;
-        }
-    
-        $product = Product::create($productData);
-    
-        if ($request->hasFile('attachments')) {
-            foreach ($request->file('attachments') as $file) {
-                $path = ImageService::upload($file, 'attachments');
-                $product->attachments()->create(['file_path' => $path]);
-            }
-        }
-    
-        if ($request->hasFile('media')) {
-            foreach ($request->file('media') as $file) {
-                $path = ImageService::upload($file, 'product_media');
-                $product->media()->create(['file_path' => $path, 'type' => 'image']); 
-            }
-        }
-    
-        // Handle addons (features for one_time products)
-        if (!empty($validatedData['addons'])) {
-            $product->addons()->attach($validatedData['addons']);
-        }
-    
-        // Send notifications
-        $template = NotificationTemplate::where('type', 'new_product')->first();
-    
-        if ($template) {
-            $title = $template->title;
-            $message = str_replace('{product_name}', $product->name, $template->message);
+        try {
+            $productData = collect($validatedData)->except(['attachments', 'image', 'addons', 'media'])->toArray();
         
-            $clients = Client::whereNotNull('device_token')->get();
+            if ($request->hasFile('image')) {
+                $imagePath = ImageService::upload($request->file('image'), 'product_images');
+                $productData['image'] = $imagePath;
+            }
         
-            if ($clients->isNotEmpty()) {
-                foreach ($clients as $client) {
-                    $this->firebaseService->sendNotification($client->device_token, $title, $message, [
-                        'notification_type' => $template->type
-                    ]);
-                    $this->notificationRepository->createNotification($client, $title, $message, $client->device_token, $template->type);
+            $product = Product::create($productData);
+        
+            if ($request->hasFile('attachments')) {
+                foreach ($request->file('attachments') as $file) {
+                    $path = ImageService::upload($file, 'attachments');
+                    $product->attachments()->create(['file_path' => $path]);
                 }
             }
+        
+            if ($request->hasFile('media')) {
+                foreach ($request->file('media') as $file) {
+                    $path = ImageService::upload($file, 'product_media');
+                    $product->media()->create(['file_path' => $path, 'type' => 'image']); 
+                }
+            }
+        
+            // Handle addons (features for one_time products)
+            if (!empty($validatedData['addons'])) {
+                $product->addons()->attach($validatedData['addons']);
+            }
+        
+            // Send notifications (skip if fails)
+            try {
+                $template = NotificationTemplate::where('type', 'new_product')->first();
+            
+                if ($template) {
+                    $title = $template->title;
+                    $message = str_replace('{product_name}', $product->name, $template->message);
+                
+                    $clients = Client::whereNotNull('device_token')->get();
+                
+                    if ($clients->isNotEmpty()) {
+                        foreach ($clients as $client) {
+                            $this->firebaseService->sendNotification($client->device_token, $title, $message, [
+                                'notification_type' => $template->type
+                            ]);
+                            $this->notificationRepository->createNotification($client, $title, $message, $client->device_token, $template->type);
+                        }
+                    }
+                }
+            } catch (\Exception $e) {
+                \Log::warning('Failed to send product notification: ' . $e->getMessage());
+            }
+        
+            return response()->json([
+                'status' => true,
+                'message' => 'Product created successfully',
+                'data' => new ProductResource($product->load(['attachments', 'addons', 'media', 'strategyTips', 'category'])),
+            ], 201);
+        } catch (\Exception $e) {
+            \Log::error('Product creation failed: ' . $e->getMessage());
+            return response()->json([
+                'status' => false,
+                'message' => 'Failed to create product',
+                'error' => $e->getMessage(),
+            ], 500);
         }
-    
-        return response()->json([
-            'status' => true,
-            'message' => 'Product created successfully',
-            'data' => new ProductResource($product->load(['attachments', 'addons', 'media', 'strategyTips', 'category'])),
-        ], 201);
     }
     
     public function update(Request $request, $id)
