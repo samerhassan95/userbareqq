@@ -19,7 +19,7 @@ class ClientSocialCredentialResource extends JsonResource
             'platform' => $this->platform,
             'platform_name' => ucfirst($this->platform),
             'username' => $this->username,
-            'has_password' => !empty($this->password),
+            'has_password' => !empty($this->getAttributes()['password'] ?? ''),
             'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
             'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
         ];
