@@ -31,21 +31,29 @@ class ProductController extends BaseController
 
     public function store(Request $request)
     {
-        $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'price' => 'nullable|numeric',
-            'note' => 'nullable|string',
-            'type' => 'required|in:subscription,one_time',
-            'product_role' => 'required|in:one_time,strategy',
-            'monthly_price' => 'required_if:product_role,strategy|nullable|numeric',
-            'yearly_price' => 'required_if:product_role,strategy|nullable|numeric',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'attachments.*' => 'file|max:10240',
-            'addons' => 'array',
-            'addons.*' => 'exists:addons,id',
-            'media.*' => 'file|max:10240', 
-        ]);
+        try {
+            $validatedData = $request->validate([
+                'name' => 'required|string|max:255',
+                'description' => 'nullable|string',
+                'price' => 'nullable|numeric',
+                'note' => 'nullable|string',
+                'type' => 'required|in:subscription,one_time',
+                'product_role' => 'required|in:one_time,strategy',
+                'monthly_price' => 'required_if:product_role,strategy|nullable|numeric',
+                'yearly_price' => 'required_if:product_role,strategy|nullable|numeric',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'attachments.*' => 'file|max:10240',
+                'addons' => 'array',
+                'addons.*' => 'exists:addons,id',
+                'media.*' => 'file|max:10240', 
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation error',
+                'errors' => $e->errors(),
+            ], 422);
+        }
     
         $productData = collect($validatedData)->except(['attachments', 'image', 'addons', 'media'])->toArray();
     
@@ -94,7 +102,11 @@ class ProductController extends BaseController
             }
         }
     
-        return response()->json(new ProductResource($product->load(['attachments', 'addons', 'media', 'strategyTips'])), 201);
+        return response()->json([
+            'status' => true,
+            'message' => 'Product created successfully',
+            'data' => new ProductResource($product->load(['attachments', 'addons', 'media', 'strategyTips', 'category'])),
+        ], 201);
     }
     
     public function update(Request $request, $id)
