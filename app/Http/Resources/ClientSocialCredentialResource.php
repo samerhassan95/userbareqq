@@ -17,9 +17,11 @@ class ClientSocialCredentialResource extends JsonResource
         return [
             'id' => $this->id,
             'platform' => $this->platform,
-            'username' => $this->username,
-            'password' => $this->password, // Already decrypted by model accessor
-            'updated_at' => $this->updated_at?->toISOString(),
+            'platform_name' => ucfirst($this->platform),
+            'email' => $this->email,
+            'has_password' => !empty($this->password),
+            'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
+            'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
         ];
     }
 }

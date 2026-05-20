@@ -10,20 +10,33 @@ class ProductOrderResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'order_id' => $this->id,
-            'product_id' => $this->product_id,
-            'product_name' => $this->product->name ?? null,
-            'product_role' => $this->product_role,
-            'feature_id' => $this->feature_id,
-            'feature_name' => $this->feature_name,
+            'id' => $this->id,
+            'order_number' => 'ORD-' . str_pad($this->id, 6, '0', STR_PAD_LEFT),
+            'product' => [
+                'id' => $this->product_id,
+                'name' => $this->product->name ?? 'N/A',
+                'role' => $this->product_role,
+                'role_label' => $this->product_role === 'one_time' ? 'One Time Purchase' : 'Strategy Subscription',
+            ],
+            'selected_feature' => $this->feature_id ? [
+                'id' => $this->feature_id,
+                'name' => $this->feature_name,
+            ] : null,
             'duration' => $this->duration,
-            'total_price' => $this->total_price,
+            'duration_label' => $this->duration ? ucfirst($this->duration) : null,
+            'total_price' => (float) $this->total_price,
+            'currency' => 'EGP',
             'status' => $this->status,
-            'invoice_id' => $this->invoice_id,
+            'status_label' => ucfirst(str_replace('_', ' ', $this->status)),
+            'payment' => [
+                'invoice_id' => $this->invoice_id,
+                'payment_status' => $this->invoice ? $this->invoice->status : 'pending',
+            ],
             'subscription_id' => $this->subscription_id,
             'deliverable_url' => $this->deliverable_url,
-            'created_at' => $this->created_at?->toISOString(),
-            'updated_at' => $this->updated_at?->toISOString(),
+            'has_deliverable' => !empty($this->deliverable_url),
+            'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
+            'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
         ];
     }
 }
