@@ -65,13 +65,6 @@ class ProductController extends BaseController
         
             $product = Product::create($productData);
         
-            if ($request->hasFile('attachments')) {
-                foreach ($request->file('attachments') as $file) {
-                    $path = ImageService::upload($file, 'attachments');
-                    $product->attachments()->create(['file_path' => $path]);
-                }
-            }
-        
             if ($request->hasFile('media')) {
                 foreach ($request->file('media') as $file) {
                     $path = ImageService::upload($file, 'product_media');
@@ -110,7 +103,7 @@ class ProductController extends BaseController
             return response()->json([
                 'status' => true,
                 'message' => 'Product created successfully',
-                'data' => new ProductResource($product->load(['attachments', 'addons', 'media', 'strategyTips', 'category'])),
+                'data' => new ProductResource($product->load(['addons', 'media', 'strategyTips', 'category'])),
             ], 201);
         } catch (\Exception $e) {
             \Log::error('Product creation failed: ' . $e->getMessage());
