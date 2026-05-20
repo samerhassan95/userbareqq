@@ -21,12 +21,13 @@ class FirebaseService
     {
         $credentialsPath = config('firebase.credentials');
 
-        // Handle both absolute and relative paths
+        // If Firebase is not configured, skip initialization
         if (!$credentialsPath) {
-            throw new \Exception("Firebase credentials path not configured");
+            \Log::warning('Firebase credentials not configured. Firebase features will be disabled.');
+            return;
         }
 
-        // If path is not absolute, make it relative to base path
+        // Handle both absolute and relative paths
         if (!file_exists($credentialsPath)) {
             $basePath = base_path($credentialsPath);
             if (file_exists($basePath)) {
@@ -37,22 +38,22 @@ class FirebaseService
                 if (file_exists($storagePath)) {
                     $credentialsPath = $storagePath;
                 } else {
-                    throw new \Exception(
-                        "Firebase credentials file not found at: {$credentialsPath}, {$basePath}, or {$storagePath}"
-                    );
+                    \Log::warning("Firebase credentials file not found. Firebase features will be disabled.");
+                    return;
                 }
             }
         }
 
-        $factory = (new Factory)->withServiceAccount($credentialsPath);
-
-        $this->messaging = $factory->createMessaging();
-
-        $this->firestore = new FirestoreClient([
-            'keyFilePath' => $credentialsPath,
-             'transport' => 'rest',
-            
-        ]);
+        try {
+            $factory = (new Factory)->withServiceAccount($credentialsPath);
+            $this->messaging = $factory->createMessaging();
+            $this->firestore = new FirestoreClient([
+                'keyFilePath' => $credentialsPath,
+                'transport' => 'rest',
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Firebase initialization failed: ' . $e->getMessage());
+        }
     }
 
     public function getAllChats()
@@ -127,6 +128,11 @@ class FirebaseService
 
     public function sendNotification($deviceToken, $title, $message, $type = null, $extraData = [])
     {
+        if (!$this->messaging) {
+            \Log::warning('Firebase messaging not initialized. Skipping notification.');
+            return;
+        }
+
         try {
             $notification = Notification::create($title, $message);
 
