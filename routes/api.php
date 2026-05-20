@@ -4,7 +4,12 @@ use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Client\ClientAuthController;
 use App\Http\Controllers\Employee\EmployeeAuthController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\UniversalAuthController;
 use Illuminate\Support\Facades\Route;
+
+// Universal Login & Logout (All Roles)
+Route::post('login', [UniversalAuthController::class, 'login']);
+Route::post('logout', [UniversalAuthController::class, 'logout']);
 
 Route::prefix('admin')->group(function () {
     Route::post('register', [AdminAuthController::class, 'register']);
