@@ -193,14 +193,13 @@ public function login(Request $request)
     $validator = Validator::make(
         $request->all(),
         [
-            'email' => 'required|email',
+            'username' => 'required|string',
             'password' => 'required|min:6',
             'device_token' => 'nullable|string',
             'device' => 'nullable|string',
         ],
         [
-            'email.required' => 'Email is required.',
-            'email.email' => 'Please enter a valid email.',
+            'username.required' => 'Username is required.',
             'password.required' => 'Password is required.',
             'password.min' => 'Password must be at least 6 characters.',
         ]
@@ -218,88 +217,52 @@ public function login(Request $request)
     $invalidCredentialsResponse = response()->json([
         'status' => false,
         'code' => 401,
-        'message' => 'Invalid email or password.',
+        'message' => 'Invalid username or password.',
         'data' => null,
     ], 401);
     
-    // ================= Client =================
-    $client = Client::where('email', $request->email)->first();
-    if ($client) {
-        try {
-            // Set TTL: 10 years for mobile, default for web
-            if ($request->device === 'mobile') {
-                auth('client')->factory()->setTTL(525600 * 10); // 10 years in minutes
-            }
-            
-            if (!$token = auth('client')->attempt([
-                'email' => $request->email,
-                'password' => $request->password
-            ])) {
-                return $invalidCredentialsResponse;
-            }
-            
-            $client->update(['device_token' => $request->device_token]);
-            
-            return response()->json([
-                'status' => true,
-                'code' => 200,
-                'message' => 'Client login successful.',
-                'data' => [
-                    ...$client->toArray(),
-                    'token' => $token,
-                    'photo' => $client->photo ? asset($client->photo) : null,
-                    'type' => 'client',
-                ],
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => false,
-                'code' => 500,
-                'message' => 'Server error, please try again later.',
-                'data' => null,
-            ], 500);
-        }
+    // ================= Admin Login =================
+    $admin = Admin::where('username', $request->username)->first();
+    
+    if (!$admin) {
+        return $invalidCredentialsResponse;
     }
     
-    // ================= Admin =================
-    $admin = Admin::where('email', $request->email)->first();
-    if ($admin) {
-        try {
-            // Set TTL: 10 years for mobile, default for web
-            if ($request->device === 'mobile') {
-                auth('admin')->factory()->setTTL(525600 * 10); // 10 years in minutes
-            }
-            
-            if (!$token = auth('admin')->attempt([
-                'email' => $request->email,
-                'password' => $request->password
-            ])) {
-                return $invalidCredentialsResponse;
-            }
-            
+    try {
+        // Set TTL: 10 years for mobile, default for web
+        if ($request->device === 'mobile') {
+            auth('admin')->factory()->setTTL(525600 * 10); // 10 years in minutes
+        }
+        
+        if (!$token = auth('admin')->attempt([
+            'username' => $request->username,
+            'password' => $request->password
+        ])) {
+            return $invalidCredentialsResponse;
+        }
+        
+        if ($request->device_token) {
             $admin->update(['device_token' => $request->device_token]);
-            
-            return response()->json([
-                'status' => true,
-                'code' => 200,
-                'message' => 'Admin login successful.',
-                'data' => [
-                    ...$admin->toArray(),
-                    'token' => $token,
-                    'type' => 'admin',
-                ],
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => false,
-                'code' => 500,
-                'message' => 'Server error, please try again later.',
-                'data' => null,
-            ], 500);
         }
+        
+        return response()->json([
+            'status' => true,
+            'code' => 200,
+            'message' => 'Admin login successful.',
+            'data' => [
+                ...$admin->toArray(),
+                'token' => $token,
+                'type' => 'admin',
+            ],
+        ], 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => false,
+            'code' => 500,
+            'message' => 'Server error, please try again later.',
+            'data' => null,
+        ], 500);
     }
-    
-    return $invalidCredentialsResponse;
 }
 
 
