@@ -19,6 +19,16 @@ class Admin extends Authenticatable implements JWTSubject
     protected $guarded = [];
     protected $table = 'admins';
 
+    /**
+     * Get the name of the unique identifier for the user.
+     *
+     * @return string
+     */
+    public function getAuthIdentifierName()
+    {
+        return 'username';
+    }
+
     public function getJWTIdentifier()
     {
         return $this->getKey();
