@@ -14,7 +14,7 @@ Route::apiResource('products', ProductController::class)->only(['index', 'show']
 ]);
 Route::get('our-products', [ProductController::class, 'ourProducts']);
 
-Route::middleware(['client', 'jwt.auth'])->group(function () {
+Route::middleware(['client'])->group(function () {
     Route::get('profile', [ClientAuthController::class, 'getProfile']);
     Route::post('update-profile', [ClientAuthController::class, 'updateProfile']);
     Route::post('change-password', [ClientAuthController::class, 'changePassword']);
