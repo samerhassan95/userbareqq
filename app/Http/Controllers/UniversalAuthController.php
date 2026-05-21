@@ -135,18 +135,28 @@ class UniversalAuthController extends Controller
             // Update device token
             if ($deviceToken) {
                 $user->update(['device_token' => $deviceToken]);
+                $user->refresh(); // Reload to get updated device_token
             }
 
             // Prepare response - all user fields at root level
             $userData = $user->toArray();
             
-            // Add photo URL for clients
-            if ($role === 'client' && $user->photo) {
-                $userData['photo'] = asset($user->photo);
+            // Add full photo URL if exists
+            if (isset($userData['photo']) && $userData['photo']) {
+                $userData['photo'] = asset($userData['photo']);
+            } else {
+                $userData['photo'] = null;
             }
             
-            // Hide password in response
-            $userData['password'] = null;
+            // Ensure all nullable fields are present
+            $userData['password'] = null; // Hide password
+            $userData['company_name'] = $userData['company_name'] ?? null;
+            $userData['website'] = $userData['website'] ?? null;
+            $userData['address'] = $userData['address'] ?? null;
+            $userData['city'] = $userData['city'] ?? null;
+            $userData['country'] = $userData['country'] ?? null;
+            $userData['name'] = $userData['name'] ?? null;
+            $userData['email'] = $userData['email'] ?? null;
             
             // Add token and type to user data
             $userData['token'] = $token;
