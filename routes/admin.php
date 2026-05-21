@@ -33,6 +33,8 @@ Route::middleware('admin')->group(function () {
     Route::get('invoices', [InvoiceController::class, 'getAllInvoices']);
     Route::post('invoices', [InvoiceController::class, 'store']);
     Route::get('invoices/{invoiceId}', [InvoiceController::class, 'getInvoiceDetails']);
+    Route::put('invoices/{invoiceId}', [InvoiceController::class, 'update']);
+    Route::delete('invoices/{invoiceId}', [InvoiceController::class, 'destroy']);
     Route::post('invoices/{invoiceId}/pay', [InvoiceController::class, 'initiatePayment']);
 
     // Product Orders Management

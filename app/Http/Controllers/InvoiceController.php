@@ -80,6 +80,81 @@ class InvoiceController extends Controller
         ], 201);
     }
 
+    /**
+     * Update invoice (Admin only)
+     * PUT /api/admin/invoices/{invoiceId}
+     */
+    public function update(Request $request, $invoiceId)
+    {
+        $invoice = Invoice::find($invoiceId);
+
+        if (!$invoice) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Invoice not found.',
+            ], 404);
+        }
+
+        $validated = $request->validate([
+            'amount' => 'nullable|numeric|min:0',
+            'status' => 'nullable|in:paid,unpaid,cancelled',
+            'due_date' => 'nullable|date',
+            'payment_method' => 'nullable|in:bank_transfer,opay,cash',
+        ]);
+
+        $invoice->update($validated);
+        $invoice->load(['client', 'product']);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Invoice updated successfully!',
+            'data' => [
+                'id' => $invoice->id,
+                'invoice_number' => 'INV-' . str_pad($invoice->id, 6, '0', STR_PAD_LEFT),
+                'client' => [
+                    'id' => $invoice->client_id,
+                    'name' => $invoice->client->name,
+                    'email' => $invoice->client->email,
+                ],
+                'product' => [
+                    'id' => $invoice->product_id,
+                    'name' => $invoice->product->name,
+                ],
+                'amount' => (float) $invoice->amount,
+                'amount_formatted' => number_format($invoice->amount, 2),
+                'currency' => 'EGP',
+                'status' => $invoice->status,
+                'payment_method' => $invoice->payment_method,
+                'due_date' => $invoice->due_date ? Carbon::parse($invoice->due_date)->format('d-m-Y') : null,
+                'updated_at' => $invoice->updated_at->format('d-m-Y H:i'),
+            ],
+        ], 200);
+    }
+
+    /**
+     * Delete invoice (Admin only)
+     * DELETE /api/admin/invoices/{invoiceId}
+     */
+    public function destroy($invoiceId)
+    {
+        $invoice = Invoice::find($invoiceId);
+
+        if (!$invoice) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Invoice not found.',
+            ], 404);
+        }
+
+        $invoiceNumber = 'INV-' . str_pad($invoice->id, 6, '0', STR_PAD_LEFT);
+        $invoice->delete();
+
+        return response()->json([
+            'status' => true,
+            'message' => "Invoice {$invoiceNumber} deleted successfully!",
+        ], 200);
+    }
+
 
     private function sendInvoiceNotification(Invoice $invoice)
     {
