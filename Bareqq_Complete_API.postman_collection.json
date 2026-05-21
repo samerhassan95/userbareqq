@@ -614,7 +614,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"product_id\": 1,\n    \"product_role\": \"one_time\",\n    \"feature_id\": 5,\n    \"feature_name\": \"Premium Feature\"\n}"
+							"raw": "{\n    \"product_id\": 1,\n    \"product_role\": \"one_time\",\n    \"total_price\": \"1100\",\n    \"feature_id\": 2,\n    \"feature_name\": \"Social Media Post\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/client/product-orders",
@@ -639,7 +639,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"product_id\": 2,\n    \"product_role\": \"strategy\",\n    \"duration\": \"month\"\n}"
+							"raw": "{\n    \"product_id\": 2,\n    \"product_role\": \"strategy\",\n    \"total_price\": \"2000\",\n    \"duration\": \"month\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/client/product-orders",
@@ -664,7 +664,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"product_id\": 2,\n    \"product_role\": \"strategy\",\n    \"duration\": \"year\"\n}"
+							"raw": "{\n    \"product_id\": 2,\n    \"product_role\": \"strategy\",\n    \"total_price\": \"20000\",\n    \"duration\": \"year\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/client/product-orders",
