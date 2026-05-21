@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Log;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 
-class InvoiceController extends BaseController
+class InvoiceController extends Controller
 {
     private $firebaseService;
     private $opayService;
