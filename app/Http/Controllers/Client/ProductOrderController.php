@@ -31,7 +31,7 @@ class ProductOrderController extends Controller
         $validated = $request->validated();
 
         // Get product
-        $product = Product::find($validated['product_id']);
+        $product = Product::with(['addons', 'strategyTips'])->find($validated['product_id']);
         
         if (!$product) {
             return ResponseHelper::error(__('Product not found'), [], 404);
@@ -54,11 +54,35 @@ class ProductOrderController extends Controller
             'status' => 'pending_payment',
         ];
 
+        $featureDetails = null;
+        $durationDetails = null;
+
         if ($validated['product_role'] === 'one_time') {
             $orderData['feature_id'] = $validated['feature_id'];
             $orderData['feature_name'] = $validated['feature_name'] ?? null;
+            
+            // Get feature details
+            $feature = $product->addons()->find($validated['feature_id']);
+            if ($feature) {
+                $featureDetails = [
+                    'id' => $feature->id,
+                    'name' => $feature->name,
+                    'price' => (float) $feature->price,
+                ];
+            }
         } else {
             $orderData['duration'] = $validated['duration'];
+            
+            // Get duration details
+            $durationDetails = [
+                'duration' => $validated['duration'],
+                'duration_label' => $validated['duration'] === 'month' ? 'Monthly' : 'Yearly',
+                'price' => (float) $calculatedPrice,
+                'starts_at' => Carbon::now()->format('Y-m-d'),
+                'ends_at' => $validated['duration'] === 'month' 
+                    ? Carbon::now()->addMonth()->format('Y-m-d')
+                    : Carbon::now()->addYear()->format('Y-m-d'),
+            ];
         }
 
         $order = $this->orderRepository->create($orderData);
@@ -76,11 +100,55 @@ class ProductOrderController extends Controller
         // Link invoice to order
         $this->orderRepository->attachInvoice($order->id, $invoice->id);
 
-        return ResponseHelper::success([
-            'order_id' => $order->id,
-            'invoice_id' => $invoice->id,
-            'payment_url' => null, // Offline payment
-        ], __('Order created successfully. Please upload payment proof.'), 201);
+        // Build comprehensive response
+        $responseData = [
+            'order' => [
+                'id' => $order->id,
+                'order_number' => 'ORD-' . str_pad($order->id, 6, '0', STR_PAD_LEFT),
+                'status' => $order->status,
+                'status_label' => $this->getStatusLabel($order->status),
+                'total_price' => (float) $order->total_price,
+                'currency' => 'EGP',
+                'created_at' => $order->created_at->format('Y-m-d H:i:s'),
+            ],
+            'product' => [
+                'id' => $product->id,
+                'name' => $product->name,
+                'product_role' => $product->product_role,
+                'product_role_label' => $product->product_role === 'one_time' ? 'One-Time Service' : 'Strategy Package',
+            ],
+            'invoice' => [
+                'id' => $invoice->id,
+                'invoice_number' => 'INV-' . str_pad($invoice->id, 6, '0', STR_PAD_LEFT),
+                'amount' => (float) $invoice->amount,
+                'status' => $invoice->status,
+                'status_label' => ucfirst($invoice->status),
+                'due_date' => $invoice->due_date->format('Y-m-d'),
+                'payment_method' => $invoice->payment_method,
+            ],
+            'next_steps' => [
+                'step_1' => 'Upload payment proof to the invoice',
+                'step_2' => 'Wait for admin approval',
+                'step_3' => $validated['product_role'] === 'one_time' 
+                    ? 'Admin will deliver your selected feature'
+                    : 'Your subscription will be activated',
+            ],
+        ];
+
+        // Add role-specific details
+        if ($validated['product_role'] === 'one_time') {
+            $responseData['selected_feature'] = $featureDetails;
+        } else {
+            $responseData['subscription_details'] = $durationDetails;
+            $responseData['included_tips_count'] = $product->strategyTips->count();
+        }
+
+        return response()->json([
+            'status' => true,
+            'code' => 201,
+            'message' => 'Order created successfully! Please upload payment proof to complete your order.',
+            'data' => $responseData,
+        ], 201);
     }
 
     /**
@@ -142,5 +210,22 @@ class ProductOrderController extends Controller
             
             return $basePrice;
         }
+    }
+
+    /**
+     * Get status label in human-readable format
+     */
+    private function getStatusLabel($status)
+    {
+        $labels = [
+            'pending_payment' => 'Pending Payment',
+            'paid' => 'Paid - Awaiting Delivery',
+            'in_progress' => 'In Progress',
+            'delivered' => 'Delivered',
+            'completed' => 'Completed',
+            'cancelled' => 'Cancelled',
+        ];
+
+        return $labels[$status] ?? ucfirst(str_replace('_', ' ', $status));
     }
 }
