@@ -19,6 +19,7 @@ return [
     'product_deleted' => 'Product deleted successfully',
     'product_not_found' => 'Product not found',
     'products_retrieved' => 'Products retrieved successfully',
+    'Product not found' => 'Product not found',
     
     // Orders
     'order_created' => 'Order created successfully! Please upload payment proof to complete your order.',
@@ -47,6 +48,13 @@ return [
     'tip_created' => 'Strategy tip created successfully',
     'tip_updated' => 'Strategy tip updated successfully',
     'tip_deleted' => 'Strategy tip deleted successfully',
+    'Strategy tips retrieved successfully' => 'Strategy tips retrieved successfully',
+    'Only strategy products can have tips' => 'Only strategy products can have tips',
+    'Strategy tip created successfully' => 'Strategy tip created successfully',
+    'Strategy tip not found' => 'Strategy tip not found',
+    'Strategy tip updated successfully' => 'Strategy tip updated successfully',
+    'Strategy tip deleted successfully' => 'Strategy tip deleted successfully',
+    'Tips reordered successfully' => 'Tips reordered successfully',
     
     // Credentials
     'credential_saved' => 'Credential saved successfully',

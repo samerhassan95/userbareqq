@@ -12,7 +12,7 @@ class ProductStrategyTipResource extends JsonResource
         return [
             'id' => $this->id,
             'product_id' => $this->product_id,
-            'text' => $this->text,
+            'text' => \App\Helpers\TranslationHelper::getTranslatedField($this, 'text'),
             'platforms' => $this->platforms ?? [],
             'platform_names' => collect($this->platforms ?? [])->map(fn($p) => ucfirst($p))->toArray(),
             'sort_order' => $this->sort_order ?? 0,

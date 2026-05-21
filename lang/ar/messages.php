@@ -19,6 +19,7 @@ return [
     'product_deleted' => 'تم حذف المنتج بنجاح',
     'product_not_found' => 'المنتج غير موجود',
     'products_retrieved' => 'تم استرجاع المنتجات بنجاح',
+    'Product not found' => 'المنتج غير موجود',
     
     // Orders
     'order_created' => 'تم إنشاء الطلب بنجاح! يرجى رفع إثبات الدفع لإكمال طلبك.',
@@ -47,6 +48,13 @@ return [
     'tip_created' => 'تم إنشاء النصيحة بنجاح',
     'tip_updated' => 'تم تحديث النصيحة بنجاح',
     'tip_deleted' => 'تم حذف النصيحة بنجاح',
+    'Strategy tips retrieved successfully' => 'تم استرجاع النصائح الاستراتيجية بنجاح',
+    'Only strategy products can have tips' => 'فقط المنتجات الاستراتيجية يمكن أن تحتوي على نصائح',
+    'Strategy tip created successfully' => 'تم إنشاء النصيحة الاستراتيجية بنجاح',
+    'Strategy tip not found' => 'النصيحة الاستراتيجية غير موجودة',
+    'Strategy tip updated successfully' => 'تم تحديث النصيحة الاستراتيجية بنجاح',
+    'Strategy tip deleted successfully' => 'تم حذف النصيحة الاستراتيجية بنجاح',
+    'Tips reordered successfully' => 'تم إعادة ترتيب النصائح بنجاح',
     
     // Credentials
     'credential_saved' => 'تم حفظ بيانات الاعتماد بنجاح',
