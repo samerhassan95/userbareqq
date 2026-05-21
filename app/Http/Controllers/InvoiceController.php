@@ -349,10 +349,11 @@ class InvoiceController extends BaseController
     {
         $client = auth()->user();
 
-        // Fetch invoices for the client
-        $invoices = Invoice::whereHas('project', function ($query) use ($client) {
-            $query->where('client_id', $client->id);
-        })->with('project.client')->get();
+        // Fetch invoices for the client (now linked to products, not projects)
+        $invoices = Invoice::where('client_id', $client->id)
+            ->with(['product', 'client'])
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         if ($invoices->isEmpty()) {
             return response()->json([
@@ -371,12 +372,16 @@ class InvoiceController extends BaseController
 
             return [
                 'id' => $invoice->id,
-                'invoice_id' => 'INV-' . $invoice->id,
+                'invoice_number' => 'INV-' . str_pad($invoice->id, 6, '0', STR_PAD_LEFT),
+                'product_name' => $invoice->product ? $invoice->product->name : 'N/A',
                 'client_name' => auth()->user()->name,
                 'created_at' => $invoice->created_at->format('d-m-Y'),
                 'amount' => number_format($invoice->amount, 2),
-                'due_date'=>$invoice->due_date,
-                'status' => ucfirst($status), // Overdue or Paid/Unpaid
+                'currency' => 'EGP',
+                'due_date' => $invoice->due_date ? Carbon::parse($invoice->due_date)->format('d-m-Y') : null,
+                'status' => ucfirst($status),
+                'payment_method' => $invoice->payment_method ?? 'N/A',
+                'has_payment_proof' => !empty($invoice->payment_proof),
             ];
         });
 
@@ -390,10 +395,12 @@ class InvoiceController extends BaseController
 
 public function getInvoiceDetails(Request $request, $invoiceId)
 {
-    $invoice = Invoice::with([
-        'milestone.tasks',
-        'project'
-    ])->find($invoiceId);
+    $client = auth()->user();
+    
+    $invoice = Invoice::with(['product', 'client'])
+        ->where('id', $invoiceId)
+        ->where('client_id', $client->id)
+        ->first();
 
     if (!$invoice) {
         return response()->json([
@@ -411,22 +418,27 @@ public function getInvoiceDetails(Request $request, $invoiceId)
 
     $formattedInvoice = [
         'id' => $invoice->id,
-        'invoice_id' => 'INV-' . $invoice->id,
+        'invoice_number' => 'INV-' . str_pad($invoice->id, 6, '0', STR_PAD_LEFT),
         'status' => ucfirst($status),
+        'status_label' => $status === 'overdue' ? 'Overdue' : ucfirst($invoice->status),
         'created_at' => $invoice->created_at->format('d-m-Y'),
-        'due_date' => $invoice->due_date,
-        'payment_type' => $invoice->payment_method ?? 'N/A',
-        'amount' => number_format($invoice->amount, 2),
-        'tasks' => $invoice->milestone
-            ? $invoice->milestone->tasks->map(function ($task) {
-                return [
-                    'task_id' => $task->id,
-                    'task_name' => $task->label,
-                    'status' => ucfirst($task->status),
-                    'created_at' => $task->created_at->format('d-m-Y'),
-                ];
-            })->toArray()
-            : []
+        'due_date' => $invoice->due_date ? Carbon::parse($invoice->due_date)->format('d-m-Y') : null,
+        'payment_method' => $invoice->payment_method ?? 'N/A',
+        'amount' => (float) $invoice->amount,
+        'amount_formatted' => number_format($invoice->amount, 2),
+        'currency' => 'EGP',
+        'product' => [
+            'id' => $invoice->product_id,
+            'name' => $invoice->product ? $invoice->product->name : 'N/A',
+            'type' => $invoice->product ? $invoice->product->product_role : null,
+        ],
+        'client' => [
+            'id' => $invoice->client_id,
+            'name' => $invoice->client ? $invoice->client->name : 'N/A',
+            'email' => $invoice->client ? $invoice->client->email : 'N/A',
+        ],
+        'payment_proof' => $invoice->payment_proof ? asset($invoice->payment_proof) : null,
+        'has_payment_proof' => !empty($invoice->payment_proof),
     ];
 
     // ✅ If PDF requested
