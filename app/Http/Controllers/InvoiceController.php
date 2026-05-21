@@ -36,7 +36,7 @@ class InvoiceController extends Controller
             'product_id' => 'required|exists:products,id',
             'amount' => 'required|numeric|min:0',
             'due_date' => 'required|date|after:today',
-            'gateway' => 'nullable|in:opay',
+            'payment_method' => 'nullable|in:bank_transfer,opay,cash',
         ]);
 
         $invoice = Invoice::create([
@@ -45,16 +45,38 @@ class InvoiceController extends Controller
             'amount' => $validated['amount'],
             'due_date' => $validated['due_date'],
             'status' => 'unpaid',
-            'gateway' => $validated['gateway'] ?? 'opay',
+            'payment_method' => $validated['payment_method'] ?? 'bank_transfer',
             'reference' => 'INV-' . time() . '-' . rand(100, 999),
         ]);
+
+        // Load relationships
+        $invoice->load(['client', 'product']);
 
         $this->sendInvoiceNotification($invoice);
 
         return response()->json([
             'status' => true,
             'message' => 'Invoice created successfully!',
-            'data' => new InvoiceResource($invoice),
+            'data' => [
+                'id' => $invoice->id,
+                'invoice_number' => 'INV-' . str_pad($invoice->id, 6, '0', STR_PAD_LEFT),
+                'client' => [
+                    'id' => $invoice->client_id,
+                    'name' => $invoice->client->name,
+                    'email' => $invoice->client->email,
+                ],
+                'product' => [
+                    'id' => $invoice->product_id,
+                    'name' => $invoice->product->name,
+                ],
+                'amount' => (float) $invoice->amount,
+                'amount_formatted' => number_format($invoice->amount, 2),
+                'currency' => 'EGP',
+                'status' => $invoice->status,
+                'payment_method' => $invoice->payment_method,
+                'due_date' => Carbon::parse($invoice->due_date)->format('d-m-Y'),
+                'created_at' => $invoice->created_at->format('d-m-Y H:i'),
+            ],
         ], 201);
     }
 
