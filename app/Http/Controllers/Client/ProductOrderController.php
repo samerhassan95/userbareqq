@@ -27,24 +27,47 @@ class ProductOrderController extends Controller
      */
     public function store(CreateProductOrderRequest $request)
     {
+        // Debug: Log request
+        \Log::info('Product order request received', [
+            'user_id' => auth()->id(),
+            'data' => $request->all()
+        ]);
+
         try {
             $client = auth()->user();
+            
+            if (!$client) {
+                \Log::error('No authenticated user found');
+                return ResponseHelper::error('Unauthenticated', [], 401);
+            }
+            
             $validated = $request->validated();
+
+            \Log::info('Request validated', ['validated' => $validated]);
 
             // Get product
             $product = Product::with(['addons', 'strategyTips'])->find($validated['product_id']);
             
             if (!$product) {
-                return ResponseHelper::error(__('Product not found'), [], 404);
+                \Log::error('Product not found', ['product_id' => $validated['product_id']]);
+                return ResponseHelper::error('Product not found', [], 404);
             }
+
+            \Log::info('Product found', ['product' => $product->toArray()]);
 
             // Verify product_role matches
             if ($product->product_role !== $validated['product_role']) {
-                return ResponseHelper::error(__('Product role mismatch'), [], 422);
+                \Log::error('Product role mismatch', [
+                    'expected' => $product->product_role,
+                    'received' => $validated['product_role']
+                ]);
+                return ResponseHelper::error('Product role mismatch', [], 422);
             }
 
             // Calculate price server-side
             $calculatedPrice = $this->calculatePrice($product, $validated);
+            
+            \Log::info('Price calculated', ['price' => $calculatedPrice]);
 
             // Create order
             $orderData = [
@@ -86,7 +109,11 @@ class ProductOrderController extends Controller
                 ];
             }
 
+            \Log::info('Creating order', ['orderData' => $orderData]);
+
             $order = $this->orderRepository->create($orderData);
+            
+            \Log::info('Order created', ['order_id' => $order->id]);
 
             // Create invoice
             $invoice = Invoice::create([
@@ -97,6 +124,8 @@ class ProductOrderController extends Controller
                 'payment_method' => 'bank_transfer',
                 'due_date' => Carbon::now()->addDays(7),
             ]);
+
+            \Log::info('Invoice created', ['invoice_id' => $invoice->id]);
 
             // Link invoice to order
             $this->orderRepository->attachInvoice($order->id, $invoice->id);
@@ -143,6 +172,8 @@ class ProductOrderController extends Controller
                 $responseData['subscription_details'] = $durationDetails;
                 $responseData['included_tips_count'] = $product->strategyTips->count();
             }
+
+            \Log::info('Returning success response');
 
             return ResponseHelper::success(
                 $responseData,
