@@ -187,73 +187,69 @@ private function resolveImage($image, string $device = 'web'): ?string
 
 public function show($id)
 {
-    $device = request()->input('device', 'web');
+    try {
+        $device = request()->input('device', 'web');
 
-    $product = Product::with(['media', 'attachments', 'addons', 'strategyTips'])->find($id);
+        $product = Product::with(['addons', 'strategyTips', 'category'])->find($id);
 
-    if (!$product) {
+        if (!$product) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Product not found.',
+            ], 404);
+        }
+
+        $data = [
+            'id'               => $product->id,
+            'name'             => $product->name,
+            'description'      => $this->localizedText($product->description),
+            'price'            => $product->price,
+            'note'             => $product->note,
+            'image'            => $this->resolveImage($product->image, $device),
+            'background_image' => $product->background_image,
+            'type'             => $product->type,
+            'product_role'     => $product->product_role ?? 'one_time',
+            'category_name'    => $product->category->name ?? null,
+            'created_at'       => $product->created_at,
+            'updated_at'       => $product->updated_at,
+        ];
+
+        // Add role-specific fields
+        if ($product->product_role === 'strategy') {
+            $data['monthly_price'] = $product->monthly_price;
+            $data['yearly_price'] = $product->yearly_price;
+            $data['strategy_tips'] = $product->strategyTips->map(function ($tip) {
+                return [
+                    'id'        => $tip->id,
+                    'text'      => $tip->text,
+                    'platforms' => $tip->platforms ?? [],
+                ];
+            });
+        } else {
+            // One-time product - use addons as features
+            $data['features'] = $product->addons->map(function ($addon) {
+                return [
+                    'id'           => $addon->id,
+                    'name'         => $addon->name,
+                    'price'        => $addon->price,
+                    'description'  => $this->localizedText($addon->description),
+                    'feature_type' => 'general',
+                ];
+            });
+        }
+
+        return response()->json([
+            'status' => true,
+            'data'   => $data,
+        ], 200);
+    } catch (\Exception $e) {
+        \Log::error('Product show failed: ' . $e->getMessage());
         return response()->json([
             'status' => false,
-            'message' => 'Product not found.',
-        ], 404);
+            'message' => 'Failed to retrieve product',
+            'error' => $e->getMessage(),
+        ], 500);
     }
-
-    $data = [
-        'id'               => $product->id,
-        'name'             => $product->name,
-        'description'      => $this->localizedText($product->description),
-        'price'            => $product->price,
-        'note'             => $product->note,
-        'image'            => $this->resolveImage($product->image, $device),
-        'background_image' => $product->background_image,
-        'type'             => $product->type,
-        'product_role'     => $product->product_role ?? 'one_time',
-        'created_at'       => $product->created_at,
-        'updated_at'       => $product->updated_at,
-        'media'            => $product->media->map(function ($media) {
-            return [
-                'id'        => $media->id,
-                'file_path' => $media->file_path ? asset($media->file_path) : null,
-                'type'      => $media->type,
-            ];
-        }),
-        'attachments'      => $product->attachments->map(function ($attachment) {
-            return [
-                'id'        => $attachment->id,
-                'file_path' => asset($attachment->file_path),
-            ];
-        }),
-    ];
-
-    // Add role-specific fields
-    if ($product->product_role === 'strategy') {
-        $data['monthly_price'] = $product->monthly_price;
-        $data['yearly_price'] = $product->yearly_price;
-        $data['strategy_tips'] = $product->strategyTips->map(function ($tip) {
-            return [
-                'id'        => $tip->id,
-                'text'      => $tip->text,
-                'platforms' => $tip->platforms ?? [],
-            ];
-        });
-    } else {
-        // One-time product - use addons as features
-        $data['features'] = $product->addons->map(function ($addon) {
-            return [
-                'id'           => $addon->id,
-                'name'         => $addon->name,
-                'price'        => $addon->price,
-                'description'  => $this->localizedText($addon->description),
-                'feature_type' => 'general',
-            ];
-        });
-        $data['addons'] = $data['features']; // Keep for backward compatibility
-    }
-
-    return response()->json([
-        'status' => true,
-        'data'   => $data,
-    ], 200);
 }
 
 public function deleteMedia($productId, $mediaId)
