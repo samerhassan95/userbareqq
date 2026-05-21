@@ -198,13 +198,29 @@ class ProductOrderController extends Controller
      */
     public function index()
     {
-        $client = auth()->user();
-        $orders = $this->orderRepository->getClientOrders($client->id);
-        
-        return ResponseHelper::success(
-            ProductOrderResource::collection($orders),
-            __('Orders retrieved successfully')
-        );
+        try {
+            $client = auth()->user();
+            
+            \Log::info('Fetching orders for client', ['client_id' => $client->id]);
+            
+            $orders = $this->orderRepository->getClientOrders($client->id);
+            
+            \Log::info('Orders fetched', ['count' => $orders->count()]);
+            
+            return ResponseHelper::success(
+                ProductOrderResource::collection($orders),
+                'Orders retrieved successfully'
+            );
+        } catch (\Exception $e) {
+            \Log::error('Failed to fetch orders: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
+            
+            return ResponseHelper::error(
+                'Failed to retrieve orders: ' . $e->getMessage(),
+                [],
+                500
+            );
+        }
     }
 
     /**
@@ -213,17 +229,39 @@ class ProductOrderController extends Controller
      */
     public function show($id)
     {
-        $client = auth()->user();
-        $order = $this->orderRepository->findById($id);
+        try {
+            $client = auth()->user();
+            
+            \Log::info('Fetching order', ['order_id' => $id, 'client_id' => $client->id]);
+            
+            $order = $this->orderRepository->findById($id);
 
-        if (!$order || $order->client_id !== $client->id) {
-            return ResponseHelper::error(__('Order not found'), [], 404);
+            if (!$order || $order->client_id !== $client->id) {
+                \Log::warning('Order not found or unauthorized', [
+                    'order_id' => $id,
+                    'client_id' => $client->id,
+                    'order_exists' => $order ? true : false,
+                    'order_client_id' => $order ? $order->client_id : null
+                ]);
+                return ResponseHelper::error('Order not found', [], 404);
+            }
+
+            \Log::info('Order found', ['order' => $order->toArray()]);
+
+            return ResponseHelper::success(
+                new ProductOrderResource($order),
+                'Order retrieved successfully'
+            );
+        } catch (\Exception $e) {
+            \Log::error('Failed to fetch order: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
+            
+            return ResponseHelper::error(
+                'Failed to retrieve order: ' . $e->getMessage(),
+                [],
+                500
+            );
         }
-
-        return ResponseHelper::success(
-            new ProductOrderResource($order),
-            __('Order retrieved successfully')
-        );
     }
 
     /**
