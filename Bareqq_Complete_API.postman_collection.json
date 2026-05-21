@@ -27,7 +27,12 @@
 			"type": "string"
 		},
 		{
-			"key": "employee_token",
+			"key": "designer_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "marketer_token",
 			"value": "",
 			"type": "string"
 		}
@@ -48,6 +53,180 @@
 		]
 	},
 	"item": [
+		{
+			"name": "Universal Login (All Roles)",
+			"item": [
+				{
+					"name": "Universal Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    var type = jsonData.data.type;",
+									"    var token = jsonData.data.token;",
+									"    ",
+									"    // Save token based on type",
+									"    if (type === 'admin') {",
+									"        pm.collectionVariables.set('admin_token', token);",
+									"    } else if (type === 'client') {",
+									"        pm.collectionVariables.set('client_token', token);",
+									"    } else if (type === 'designer') {",
+									"        pm.collectionVariables.set('designer_token', token);",
+									"    } else if (type === 'marketer') {",
+									"        pm.collectionVariables.set('marketer_token', token);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"identifier\": \"testadmin\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/login",
+							"host": ["{{base_url}}"],
+							"path": ["login"]
+						}
+					}
+				},
+				{
+					"name": "Universal Login - Client",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set('client_token', jsonData.data.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"identifier\": \"test@client.com\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/login",
+							"host": ["{{base_url}}"],
+							"path": ["login"]
+						}
+					}
+				},
+				{
+					"name": "Universal Login - Designer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set('designer_token', jsonData.data.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"identifier\": \"testdesigner\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/login",
+							"host": ["{{base_url}}"],
+							"path": ["login"]
+						}
+					}
+				},
+				{
+					"name": "Universal Login - Marketer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set('marketer_token', jsonData.data.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"identifier\": \"testmarketer\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/login",
+							"host": ["{{base_url}}"],
+							"path": ["login"]
+						}
+					}
+				},
+				{
+					"name": "Universal Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/logout",
+							"host": ["{{base_url}}"],
+							"path": ["logout"]
+						}
+					}
+				}
+			]
+		},
 		{
 			"name": "Authentication",
 			"item": [
@@ -324,7 +503,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"platform\": \"facebook\",\n    \"email\": \"myemail@facebook.com\",\n    \"password\": \"myFacebookPassword123\"\n}"
+							"raw": "{\n    \"platform\": \"facebook\",\n    \"username\": \"myemail@facebook.com\",\n    \"password\": \"myFacebookPassword123\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/client/credentials",
@@ -349,7 +528,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"newemail@facebook.com\",\n    \"password\": \"newPassword456\"\n}"
+							"raw": "{\n    \"platform\": \"facebook\",\n    \"username\": \"newemail@facebook.com\",\n    \"password\": \"newPassword456\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/client/credentials/facebook",
@@ -420,7 +599,7 @@
 			"name": "Client - Product Orders",
 			"item": [
 				{
-					"name": "Create Order",
+					"name": "Create One-Time Order",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -435,7 +614,57 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"product_id\": 1,\n    \"selected_addon_id\": 5,\n    \"duration\": \"monthly\",\n    \"payment_proof\": \"base64_encoded_image\"\n}"
+							"raw": "{\n    \"product_id\": 1,\n    \"product_role\": \"one_time\",\n    \"feature_id\": 5,\n    \"feature_name\": \"Premium Feature\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/client/product-orders",
+							"host": ["{{base_url}}"],
+							"path": ["client", "product-orders"]
+						}
+					}
+				},
+				{
+					"name": "Create Strategy Order (Monthly)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{client_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"product_id\": 2,\n    \"product_role\": \"strategy\",\n    \"duration\": \"month\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/client/product-orders",
+							"host": ["{{base_url}}"],
+							"path": ["client", "product-orders"]
+						}
+					}
+				},
+				{
+					"name": "Create Strategy Order (Yearly)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{client_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"product_id\": 2,\n    \"product_role\": \"strategy\",\n    \"duration\": \"year\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/client/product-orders",
@@ -525,15 +754,17 @@
 							{
 								"key": "Authorization",
 								"value": "Bearer {{client_token}}"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
 							}
 						],
 						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"payment_proof\": \"base64_encoded_image\"\n}"
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "payment_proof",
+									"type": "file",
+									"src": []
+								}
+							]
 						},
 						"url": {
 							"raw": "{{base_url}}/client/invoices/1/upload-payment-proof",
@@ -826,15 +1057,17 @@
 							{
 								"key": "Authorization",
 								"value": "Bearer {{admin_token}}"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
 							}
 						],
 						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"deliverable_url\": \"https://example.com/deliverable.zip\"\n}"
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "deliverable",
+									"type": "file",
+									"src": []
+								}
+							]
 						},
 						"url": {
 							"raw": "{{base_url}}/admin/product-orders/1/upload-deliverable",
@@ -849,7 +1082,7 @@
 			"name": "Admin - Strategy Tips",
 			"item": [
 				{
-					"name": "Get All Tips",
+					"name": "Get All Tips for Product",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -881,7 +1114,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"title\": \"Strategy Tip Title\",\n    \"description\": \"Tip description\",\n    \"content\": \"Detailed content\"\n}"
+							"raw": "{\n    \"text\": \"Post consistently at peak engagement times for your audience\",\n    \"platforms\": [\"facebook\", \"instagram\"],\n    \"sort_order\": 1\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/admin/products/1/strategy-tips",
@@ -906,7 +1139,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"title\": \"Updated Title\",\n    \"content\": \"Updated content\"\n}"
+							"raw": "{\n    \"text\": \"Updated tip: Use video content for higher engagement\",\n    \"platforms\": [\"tiktok\", \"instagram\"],\n    \"sort_order\": 2\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/admin/strategy-tips/1",
@@ -948,7 +1181,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"order\": [3, 1, 2]\n}"
+							"raw": "{\n    \"tips\": [\n        {\"id\": 3, \"sort_order\": 1},\n        {\"id\": 1, \"sort_order\": 2},\n        {\"id\": 2, \"sort_order\": 3}\n    ]\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/admin/products/1/strategy-tips/reorder",

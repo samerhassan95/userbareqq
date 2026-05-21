@@ -137,23 +137,26 @@ class UniversalAuthController extends Controller
                 $user->update(['device_token' => $deviceToken]);
             }
 
-            // Prepare response
+            // Prepare response - all user fields at root level
             $userData = $user->toArray();
             
-            // Add photo for clients
+            // Add photo URL for clients
             if ($role === 'client' && $user->photo) {
                 $userData['photo'] = asset($user->photo);
             }
+            
+            // Hide password in response
+            $userData['password'] = null;
+            
+            // Add token and type to user data
+            $userData['token'] = $token;
+            $userData['type'] = $role;
 
             return response()->json([
                 'status' => true,
+                'code' => 200,
                 'message' => 'Login successful',
-                'data' => [
-                    'user' => $userData,
-                    'token' => $token,
-                    'role' => $role,
-                    'permissions' => $this->getRolePermissions($role),
-                ],
+                'data' => $userData,
             ], 200);
 
         } catch (\Exception $e) {
@@ -163,40 +166,6 @@ class UniversalAuthController extends Controller
                 'error' => $e->getMessage(),
             ], 500);
         }
-    }
-
-    /**
-     * Get role-specific permissions
-     */
-    private function getRolePermissions($role)
-    {
-        $permissions = [
-            'admin' => [
-                'manage_products',
-                'manage_orders',
-                'manage_users',
-                'manage_invoices',
-                'view_analytics',
-            ],
-            'client' => [
-                'view_products',
-                'create_orders',
-                'view_orders',
-                'manage_profile',
-            ],
-            'designer' => [
-                'view_projects',
-                'upload_designs',
-                'manage_portfolio',
-            ],
-            'marketer' => [
-                'view_campaigns',
-                'manage_content',
-                'view_analytics',
-            ],
-        ];
-
-        return $permissions[$role] ?? [];
     }
 
     /**
