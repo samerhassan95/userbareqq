@@ -34,9 +34,12 @@ class ProductController extends BaseController
         try {
             $validatedData = $request->validate([
                 'name' => 'required|string|max:255',
+                'name_ar' => 'required|string|max:255',
                 'description' => 'nullable|string',
+                'description_ar' => 'nullable|string',
                 'price' => 'nullable|numeric',
                 'note' => 'nullable|string',
+                'note_ar' => 'nullable|string',
                 'type' => 'required|in:subscription,one_time',
                 'product_role' => 'required|in:one_time,strategy',
                 'monthly_price' => 'required_if:product_role,strategy|nullable|numeric',
@@ -50,7 +53,7 @@ class ProductController extends BaseController
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'status' => false,
-                'message' => 'Validation error',
+                'message' => __('messages.validation_error'),
                 'errors' => $e->errors(),
             ], 422);
         }
@@ -102,14 +105,14 @@ class ProductController extends BaseController
         
             return response()->json([
                 'status' => true,
-                'message' => 'Product created successfully',
+                'message' => __('messages.product_created'),
                 'data' => new ProductResource($product->load(['addons', 'media', 'strategyTips', 'category'])),
             ], 201);
         } catch (\Exception $e) {
             \Log::error('Product creation failed: ' . $e->getMessage());
             return response()->json([
                 'status' => false,
-                'message' => 'Failed to create product',
+                'message' => __('messages.error'),
                 'error' => $e->getMessage(),
             ], 500);
         }
@@ -125,9 +128,12 @@ class ProductController extends BaseController
     
         $validatedData = $request->validate([
             'name' => 'nullable|string|max:255',
+            'name_ar' => 'nullable|string|max:255',
             'description' => 'nullable|string',
+            'description_ar' => 'nullable|string',
             'price' => 'nullable|numeric',
             'note' => 'nullable|string',
+            'note_ar' => 'nullable|string',
             'type' => 'nullable|in:subscription,one_time',
             'product_role' => 'nullable|in:one_time,strategy',
             'monthly_price' => 'nullable|numeric',
@@ -195,20 +201,20 @@ public function show($id)
         if (!$product) {
             return response()->json([
                 'status' => false,
-                'message' => 'Product not found.',
+                'message' => __('messages.product_not_found'),
             ], 404);
         }
 
         $data = [
             'id'               => $product->id,
-            'name'             => $product->name,
-            'description'      => $this->localizedText($product->description),
-            'note'             => $product->note,
+            'name'             => \App\Helpers\TranslationHelper::getTranslatedField($product, 'name'),
+            'description'      => \App\Helpers\TranslationHelper::getTranslatedField($product, 'description'),
+            'note'             => \App\Helpers\TranslationHelper::getTranslatedField($product, 'note'),
             'image'            => $this->resolveImage($product->image, $device),
             'background_image' => $product->background_image,
             'type'             => $product->type,
             'product_role'     => $product->product_role ?? 'one_time',
-            'category_name'    => $product->category->name ?? null,
+            'category_name'    => $product->category ? \App\Helpers\TranslationHelper::getTranslatedField($product->category, 'name') : null,
             'created_at'       => $product->created_at,
             'updated_at'       => $product->updated_at,
         ];
@@ -220,22 +226,13 @@ public function show($id)
             $data['strategy_tips'] = $product->strategyTips->map(function ($tip) {
                 return [
                     'id'        => $tip->id,
-                    'text'      => $tip->text,
+                    'text'      => \App\Helpers\TranslationHelper::getTranslatedField($tip, 'text'),
                     'platforms' => $tip->platforms ?? [],
                 ];
             });
         } else {
-            // One-time product
+            // One-time product - just the base price
             $data['price'] = (float) $product->price;
-            $data['features'] = $product->addons->map(function ($addon) {
-                return [
-                    'id'           => $addon->id,
-                    'name'         => $addon->name,
-                    'price'        => (float) $addon->price,
-                    'description'  => $this->localizedText($addon->description),
-                    'feature_type' => 'general',
-                ];
-            });
         }
 
         return response()->json([
@@ -246,7 +243,7 @@ public function show($id)
         \Log::error('Product show failed: ' . $e->getMessage());
         return response()->json([
             'status' => false,
-            'message' => 'Failed to retrieve product',
+            'message' => __('messages.error'),
             'error' => $e->getMessage(),
         ], 500);
     }
@@ -278,23 +275,24 @@ public function ourProducts(Request $request)
     $device = $request->input('device', 'web');
     $productRole = $request->input('product_role'); // Filter by product_role
 
-    $products = Product::with(['category:id,name', 'addons', 'strategyTips'])
+    $products = Product::with(['category:id,name,name_ar', 'addons', 'strategyTips'])
         ->when($search, function ($q) use ($search) {
-            $q->where('name', 'LIKE', "%{$search}%");
+            $q->where('name', 'LIKE', "%{$search}%")
+              ->orWhere('name_ar', 'LIKE', "%{$search}%");
         })
         ->when($productRole, function ($q) use ($productRole) {
             $q->where('product_role', $productRole);
         })
-        ->select('id', 'name', 'category_id', 'price', 'description', 'background_image', 'type', 'image', 'product_role', 'monthly_price', 'yearly_price')
+        ->select('id', 'name', 'name_ar', 'category_id', 'price', 'description', 'description_ar', 'background_image', 'type', 'image', 'product_role', 'monthly_price', 'yearly_price')
         ->get()
         ->map(function ($item) use ($device) {
             $data = [
                 'id'               => $item->id,
-                'name'             => $item->name,
+                'name'             => \App\Helpers\TranslationHelper::getTranslatedField($item, 'name'),
                 'price'            => $item->price,
-                'description'      => $this->localizedText($item->description),
+                'description'      => \App\Helpers\TranslationHelper::getTranslatedField($item, 'description'),
                 'image'            => $this->resolveImage($item->image, $device),
-                'category_name'    => $item->category->name ?? null,
+                'category_name'    => $item->category ? \App\Helpers\TranslationHelper::getTranslatedField($item->category, 'name') : null,
                 'background_image' => $item->background_image,
                 'type'             => $item->type,
                 'product_role'     => $item->product_role ?? 'one_time',
@@ -311,8 +309,8 @@ public function ourProducts(Request $request)
 
     $sliders = Slider::with([
             'product' => function ($q) {
-                $q->select('id', 'name', 'category_id', 'price', 'description')
-                  ->with(['category:id,name']);
+                $q->select('id', 'name', 'name_ar', 'category_id', 'price', 'description', 'description_ar')
+                  ->with(['category:id,name,name_ar']);
             }
         ])
         ->get()
@@ -331,7 +329,7 @@ public function ourProducts(Request $request)
                 'image'   => $firstImage,
                 'product' => $product ? [
                     'id'   => $product->id,
-                    'name' => $product->name,
+                    'name' => \App\Helpers\TranslationHelper::getTranslatedField($product, 'name'),
                 ] : null,
             ];
         });

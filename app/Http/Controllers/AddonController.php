@@ -58,8 +58,10 @@ public function index(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'icon' => 'nullable|image|mimes:jpg,jpeg,png,svg|max:2048', // Use 'image' validation for icons
+            'name_ar' => 'required|string|max:255',
+            'icon' => 'nullable|image|mimes:jpg,jpeg,png,svg|max:2048',
             'description' => 'nullable|string',
+            'description_ar' => 'nullable|string',
             'price' => 'nullable|numeric|min:0',
         ]);
 

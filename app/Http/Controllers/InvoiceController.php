@@ -56,7 +56,7 @@ class InvoiceController extends Controller
 
         return response()->json([
             'status' => true,
-            'message' => 'Invoice created successfully!',
+            'message' => __('messages.invoice_created'),
             'data' => [
                 'id' => $invoice->id,
                 'invoice_number' => 'INV-' . str_pad($invoice->id, 6, '0', STR_PAD_LEFT),
@@ -107,7 +107,7 @@ class InvoiceController extends Controller
 
         return response()->json([
             'status' => true,
-            'message' => 'Invoice updated successfully!',
+            'message' => __('messages.invoice_updated'),
             'data' => [
                 'id' => $invoice->id,
                 'invoice_number' => 'INV-' . str_pad($invoice->id, 6, '0', STR_PAD_LEFT),
@@ -151,7 +151,7 @@ class InvoiceController extends Controller
 
         return response()->json([
             'status' => true,
-            'message' => "Invoice {$invoiceNumber} deleted successfully!",
+            'message' => __('messages.invoice_deleted') . " {$invoiceNumber}",
         ], 200);
     }
 
@@ -319,7 +319,7 @@ class InvoiceController extends Controller
 
         return response()->json([
             'status' => true,
-            'message' => 'Invoices retrieved successfully.',
+            'message' => __('messages.invoices_retrieved'),
             'data' => [
                 'summary' => $summary,
                 'invoices' => $invoiceData
@@ -418,7 +418,7 @@ class InvoiceController extends Controller
         if ($invoices->isEmpty()) {
             return response()->json([
                 'status' => false,
-                'message' => 'No invoices found.',
+                'message' => __('messages.no_invoices_found'),
                 'data' => []
             ], 404);
         }
@@ -447,7 +447,7 @@ class InvoiceController extends Controller
 
         return response()->json([
             'status' => true,
-            'message' => 'Invoices retrieved successfully.',
+            'message' => __('messages.invoices_retrieved'),
             'data' => $formattedInvoices
         ], 200);
     }
@@ -465,7 +465,7 @@ public function getInvoiceDetails(Request $request, $invoiceId)
     if (!$invoice) {
         return response()->json([
             'status' => false,
-            'message' => 'Invoice not found.',
+            'message' => __('messages.invoice_not_found'),
             'data' => []
         ], 404);
     }
@@ -513,7 +513,7 @@ public function getInvoiceDetails(Request $request, $invoiceId)
     // ✅ Default JSON response
     return response()->json([
         'status' => true,
-        'message' => 'Invoice details retrieved successfully.',
+        'message' => __('messages.invoices_retrieved'),
         'data' => $formattedInvoice
     ], 200);
 }

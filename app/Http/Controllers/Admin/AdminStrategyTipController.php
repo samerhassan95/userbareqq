@@ -49,6 +49,7 @@ class AdminStrategyTipController extends Controller
 
         $validated = $request->validate([
             'text' => 'required|string',
+            'text_ar' => 'required|string',
             'platforms' => 'nullable|array',
             'platforms.*' => 'in:facebook,instagram,twitter,tiktok,linkedin',
             'sort_order' => 'nullable|integer',
@@ -57,6 +58,7 @@ class AdminStrategyTipController extends Controller
         $tip = ProductStrategyTip::create([
             'product_id' => $productId,
             'text' => $validated['text'],
+            'text_ar' => $validated['text_ar'],
             'platforms' => $validated['platforms'] ?? [],
             'sort_order' => $validated['sort_order'] ?? 0,
         ]);
@@ -82,6 +84,7 @@ class AdminStrategyTipController extends Controller
 
         $validated = $request->validate([
             'text' => 'nullable|string',
+            'text_ar' => 'nullable|string',
             'platforms' => 'nullable|array',
             'platforms.*' => 'in:facebook,instagram,twitter,tiktok,linkedin',
             'sort_order' => 'nullable|integer',

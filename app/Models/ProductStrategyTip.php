@@ -14,6 +14,7 @@ class ProductStrategyTip extends Model
     protected $fillable = [
         'product_id',
         'text',
+        'text_ar',
         'platforms',
         'sort_order',
     ];

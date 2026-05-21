@@ -8,7 +8,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Addon extends Model
 {
     use HasFactory;
-    protected $guarded = [];
+    
+    protected $fillable = [
+        'name',
+        'name_ar',
+        'description',
+        'description_ar',
+        'price',
+    ];
 
     
     public function products()

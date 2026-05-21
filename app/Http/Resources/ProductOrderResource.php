@@ -10,16 +10,6 @@ class ProductOrderResource extends JsonResource
     public function toArray(Request $request): array
     {
         try {
-            // Build feature data safely
-            $featureData = null;
-            if ($this->feature_id) {
-                $featureData = [
-                    'id' => $this->feature_id,
-                    'name' => $this->feature_name ?? ($this->feature ? $this->feature->name : 'N/A'),
-                    'price' => $this->feature ? (float) $this->feature->price : 0,
-                ];
-            }
-
             // Build subscription data safely
             $subscriptionData = null;
             if ($this->subscription_id && $this->subscription) {
@@ -46,7 +36,6 @@ class ProductOrderResource extends JsonResource
                     'role' => $this->product_role,
                     'role_label' => $this->product_role === 'one_time' ? 'One Time Purchase' : 'Strategy Subscription',
                 ],
-                'selected_feature' => $featureData,
                 'duration' => $this->duration,
                 'duration_label' => $this->duration ? ucfirst($this->duration) : null,
                 'total_price' => (float) $this->total_price,

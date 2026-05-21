@@ -78,23 +78,9 @@ class ProductOrderController extends Controller
                 'status' => 'pending_payment',
             ];
 
-            $featureDetails = null;
             $durationDetails = null;
 
-            if ($validated['product_role'] === 'one_time') {
-                $orderData['feature_id'] = $validated['feature_id'];
-                $orderData['feature_name'] = $validated['feature_name'] ?? null;
-                
-                // Get feature details
-                $feature = $product->addons()->find($validated['feature_id']);
-                if ($feature) {
-                    $featureDetails = [
-                        'id' => $feature->id,
-                        'name' => $feature->name,
-                        'price' => (float) $feature->price,
-                    ];
-                }
-            } else {
+            if ($validated['product_role'] === 'strategy') {
                 $orderData['duration'] = $validated['duration'];
                 
                 // Get duration details
@@ -166,9 +152,7 @@ class ProductOrderController extends Controller
             ];
 
             // Add role-specific details
-            if ($validated['product_role'] === 'one_time') {
-                $responseData['selected_feature'] = $featureDetails;
-            } else {
+            if ($validated['product_role'] === 'strategy') {
                 $responseData['subscription_details'] = $durationDetails;
                 $responseData['included_tips_count'] = $product->strategyTips->count();
             }
@@ -177,7 +161,7 @@ class ProductOrderController extends Controller
 
             return ResponseHelper::success(
                 $responseData,
-                'Order created successfully! Please upload payment proof to complete your order.',
+                __('messages.order_created'),
                 201
             );
         } catch (\Exception $e) {
@@ -209,7 +193,7 @@ class ProductOrderController extends Controller
             
             return ResponseHelper::success(
                 ProductOrderResource::collection($orders),
-                'Orders retrieved successfully'
+                __('messages.orders_retrieved')
             );
         } catch (\Exception $e) {
             \Log::error('Failed to fetch orders: ' . $e->getMessage());
@@ -250,7 +234,7 @@ class ProductOrderController extends Controller
 
             return ResponseHelper::success(
                 new ProductOrderResource($order),
-                'Order retrieved successfully'
+                __('messages.orders_retrieved')
             );
         } catch (\Exception $e) {
             \Log::error('Failed to fetch order: ' . $e->getMessage());
@@ -277,17 +261,8 @@ class ProductOrderController extends Controller
                 return $product->yearly_price ?? $product->price;
             }
         } else {
-            // One-time product
-            $basePrice = $product->price;
-            
-            if (isset($data['feature_id'])) {
-                $feature = $product->addons()->find($data['feature_id']);
-                if ($feature) {
-                    $basePrice += $feature->price;
-                }
-            }
-            
-            return $basePrice;
+            // One-time product - just the base price
+            return $product->price;
         }
     }
 

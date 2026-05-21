@@ -17,6 +17,12 @@
 			"type": "string"
 		},
 		{
+			"key": "lang",
+			"value": "en",
+			"type": "string",
+			"description": "Language: en or ar"
+		},
+		{
 			"key": "client_token",
 			"value": "",
 			"type": "string"
@@ -57,7 +63,7 @@
 			"name": "Universal Login (All Roles)",
 			"item": [
 				{
-					"name": "Universal Login",
+					"name": "Universal Login - Admin",
 					"event": [
 						{
 							"listen": "test",
@@ -90,6 +96,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "en",
+								"description": "Language: en or ar"
 							}
 						],
 						"body": {
@@ -104,7 +115,7 @@
 					}
 				},
 				{
-					"name": "Universal Login - Client",
+					"name": "Universal Login - Client (Email)",
 					"event": [
 						{
 							"listen": "test",
@@ -125,6 +136,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "en",
+								"description": "Language: en or ar"
 							}
 						],
 						"body": {
@@ -139,7 +155,7 @@
 					}
 				},
 				{
-					"name": "Universal Login - Designer",
+					"name": "Universal Login - Designer (Email)",
 					"event": [
 						{
 							"listen": "test",
@@ -160,11 +176,16 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "en",
+								"description": "Language: en or ar"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"identifier\": \"testdesigner\",\n    \"password\": \"password123\"\n}"
+							"raw": "{\n    \"identifier\": \"designer@example.com\",\n    \"password\": \"password123\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/login",
@@ -174,7 +195,7 @@
 					}
 				},
 				{
-					"name": "Universal Login - Marketer",
+					"name": "Universal Login - Marketer (Email)",
 					"event": [
 						{
 							"listen": "test",
@@ -195,11 +216,16 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "en",
+								"description": "Language: en or ar"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"identifier\": \"testmarketer\",\n    \"password\": \"password123\"\n}"
+							"raw": "{\n    \"identifier\": \"marketer@example.com\",\n    \"password\": \"password123\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/login",
@@ -567,6 +593,11 @@
 							{
 								"key": "Authorization",
 								"value": "Bearer {{client_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}",
+								"description": "Language: en or ar"
 							}
 						],
 						"url": {
@@ -584,6 +615,11 @@
 							{
 								"key": "Authorization",
 								"value": "Bearer {{client_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}",
+								"description": "Language: en or ar"
 							}
 						],
 						"url": {
@@ -610,11 +646,16 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}",
+								"description": "Language: en or ar"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"product_id\": 1,\n    \"product_role\": \"one_time\",\n    \"total_price\": \"1100\",\n    \"feature_id\": 2,\n    \"feature_name\": \"Social Media Post\"\n}"
+							"raw": "{\n    \"product_id\": 1,\n    \"product_role\": \"one_time\",\n    \"total_price\": \"1000\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/client/product-orders",
@@ -635,6 +676,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}",
+								"description": "Language: en or ar"
 							}
 						],
 						"body": {
@@ -660,6 +706,11 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}",
+								"description": "Language: en or ar"
 							}
 						],
 						"body": {
@@ -681,6 +732,11 @@
 							{
 								"key": "Authorization",
 								"value": "Bearer {{client_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}",
+								"description": "Language: en or ar"
 							}
 						],
 						"url": {
@@ -698,6 +754,11 @@
 							{
 								"key": "Authorization",
 								"value": "Bearer {{client_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}",
+								"description": "Language: en or ar"
 							}
 						],
 						"url": {
@@ -720,6 +781,11 @@
 							{
 								"key": "Authorization",
 								"value": "Bearer {{client_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}",
+								"description": "Language: en or ar"
 							}
 						],
 						"url": {
@@ -737,6 +803,11 @@
 							{
 								"key": "Authorization",
 								"value": "Bearer {{client_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}",
+								"description": "Language: en or ar"
 							}
 						],
 						"url": {
@@ -786,6 +857,11 @@
 							{
 								"key": "Authorization",
 								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}",
+								"description": "Language: en or ar"
 							}
 						],
 						"url": {
@@ -807,11 +883,16 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}",
+								"description": "Language: en or ar"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"New Product\",\n    \"description\": \"Product description\",\n    \"price\": 1000,\n    \"product_role\": \"one_time\",\n    \"category_id\": 1\n}"
+							"raw": "{\n    \"name\": \"New Product\",\n    \"name_ar\": \"منتج جديد\",\n    \"description\": \"Product description\",\n    \"description_ar\": \"وصف المنتج\",\n    \"note\": \"Important note\",\n    \"note_ar\": \"ملاحظة مهمة\",\n    \"price\": 1000,\n    \"product_role\": \"one_time\",\n    \"category_id\": 1\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/admin/products",
@@ -832,11 +913,16 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}",
+								"description": "Language: en or ar"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Updated Product\",\n    \"price\": 1500\n}"
+							"raw": "{\n    \"name\": \"Updated Product\",\n    \"name_ar\": \"منتج محدث\",\n    \"price\": 1500\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/admin/products/1",
@@ -875,6 +961,11 @@
 							{
 								"key": "Authorization",
 								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}",
+								"description": "Language: en or ar"
 							}
 						],
 						"url": {
@@ -896,11 +987,16 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}",
+								"description": "Language: en or ar"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"New Addon\",\n    \"description\": \"Addon description\",\n    \"price\": 500\n}"
+							"raw": "{\n    \"name\": \"New Addon\",\n    \"name_ar\": \"إضافة جديدة\",\n    \"description\": \"Addon description\",\n    \"description_ar\": \"وصف الإضافة\",\n    \"price\": 500\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/admin/addons",
@@ -921,11 +1017,16 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}",
+								"description": "Language: en or ar"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Updated Addon\",\n    \"price\": 600\n}"
+							"raw": "{\n    \"name\": \"Updated Addon\",\n    \"name_ar\": \"إضافة محدثة\",\n    \"price\": 600\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/admin/addons/1",
@@ -1089,6 +1190,11 @@
 							{
 								"key": "Authorization",
 								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}",
+								"description": "Language: en or ar"
 							}
 						],
 						"url": {
@@ -1110,11 +1216,16 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}",
+								"description": "Language: en or ar"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"text\": \"Post consistently at peak engagement times for your audience\",\n    \"platforms\": [\"facebook\", \"instagram\"],\n    \"sort_order\": 1\n}"
+							"raw": "{\n    \"text\": \"Post consistently at peak engagement times for your audience\",\n    \"text_ar\": \"انشر بانتظام في أوقات الذروة لجمهورك\",\n    \"platforms\": [\"facebook\", \"instagram\"],\n    \"sort_order\": 1\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/admin/products/1/strategy-tips",
@@ -1135,11 +1246,16 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}",
+								"description": "Language: en or ar"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"text\": \"Updated tip: Use video content for higher engagement\",\n    \"platforms\": [\"tiktok\", \"instagram\"],\n    \"sort_order\": 2\n}"
+							"raw": "{\n    \"text\": \"Updated tip: Use video content for higher engagement\",\n    \"text_ar\": \"نصيحة محدثة: استخدم محتوى الفيديو لزيادة التفاعل\",\n    \"platforms\": [\"tiktok\", \"instagram\"],\n    \"sort_order\": 2\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/admin/strategy-tips/1",
@@ -1203,6 +1319,11 @@
 							{
 								"key": "Authorization",
 								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}",
+								"description": "Language: en or ar"
 							}
 						],
 						"url": {
