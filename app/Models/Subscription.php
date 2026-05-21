@@ -50,10 +50,6 @@ class Subscription extends Model
         return $this->status === 'active' &&
                ($this->expires_at === null || $this->expires_at->isFuture());
     }
-}
-
-
-    // --- Helper Scopes (Optional but Recommended) ---
 
     /**
      * Scope a query to only include active subscriptions.
@@ -61,14 +57,17 @@ class Subscription extends Model
     public function scopeActive($query)
     {
         return $query->where('status', 'active')
-                     ->where('ends_at', '>', now());
+                     ->where(function($q) {
+                         $q->whereNull('expires_at')
+                           ->orWhere('expires_at', '>', now());
+                     });
     }
 
     /**
-     * Scope a query to filter by a specific application name.
+     * Scope a query to filter by a specific product.
      */
-    public function scopeForApp($query, string $appName)
+    public function scopeForProduct($query, int $productId)
     {
-        return $query->where('app_name', $appName);
+        return $query->where('product_id', $productId);
     }
 }
