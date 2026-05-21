@@ -203,7 +203,6 @@ public function show($id)
             'id'               => $product->id,
             'name'             => $product->name,
             'description'      => $this->localizedText($product->description),
-            'price'            => $product->price,
             'note'             => $product->note,
             'image'            => $this->resolveImage($product->image, $device),
             'background_image' => $product->background_image,
@@ -216,8 +215,8 @@ public function show($id)
 
         // Add role-specific fields
         if ($product->product_role === 'strategy') {
-            $data['monthly_price'] = $product->monthly_price;
-            $data['yearly_price'] = $product->yearly_price;
+            $data['monthly_price'] = (float) $product->monthly_price;
+            $data['yearly_price'] = (float) $product->yearly_price;
             $data['strategy_tips'] = $product->strategyTips->map(function ($tip) {
                 return [
                     'id'        => $tip->id,
@@ -226,12 +225,13 @@ public function show($id)
                 ];
             });
         } else {
-            // One-time product - use addons as features
+            // One-time product
+            $data['price'] = (float) $product->price;
             $data['features'] = $product->addons->map(function ($addon) {
                 return [
                     'id'           => $addon->id,
                     'name'         => $addon->name,
-                    'price'        => $addon->price,
+                    'price'        => (float) $addon->price,
                     'description'  => $this->localizedText($addon->description),
                     'feature_type' => 'general',
                 ];

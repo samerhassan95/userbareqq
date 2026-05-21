@@ -1224,11 +1224,15 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"client_id\": 1,\n    \"amount\": 5000,\n    \"description\": \"Invoice description\",\n    \"due_date\": \"2026-06-01\"\n}"
+							"raw": "{\n    \"client_id\": 2,\n    \"product_id\": 1,\n    \"amount\": 5000,\n    \"due_date\": \"2026-06-01\",\n    \"payment_method\": \"bank_transfer\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/admin/invoices",
@@ -1249,6 +1253,10 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
 							}
 						],
 						"body": {
@@ -1256,9 +1264,9 @@
 							"raw": "{\n    \"amount\": 6000,\n    \"status\": \"paid\"\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/admin/invoices/1",
+							"raw": "{{base_url}}/admin/invoices/5",
 							"host": ["{{base_url}}"],
-							"path": ["admin", "invoices", "1"]
+							"path": ["admin", "invoices", "5"]
 						}
 					}
 				},
@@ -1270,12 +1278,16 @@
 							{
 								"key": "Authorization",
 								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/admin/invoices/1",
+							"raw": "{{base_url}}/admin/invoices/5",
 							"host": ["{{base_url}}"],
-							"path": ["admin", "invoices", "1"]
+							"path": ["admin", "invoices", "5"]
 						}
 					}
 				}
