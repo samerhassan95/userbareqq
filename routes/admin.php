@@ -29,7 +29,10 @@ Route::middleware('admin')->group(function () {
     Route::get('specific-product-media/{productId}', [ProductMediaController::class, 'getAllMediaForProduct']);
     Route::delete('products/{product}/media/{media}', [ProductController::class, 'deleteMedia']);
 
-    Route::apiResource('invoices', InvoiceController::class);
+    // Invoice Management
+    Route::get('invoices', [InvoiceController::class, 'getAllInvoices']);
+    Route::post('invoices', [InvoiceController::class, 'store']);
+    Route::get('invoices/{invoiceId}', [InvoiceController::class, 'getInvoiceDetails']);
     Route::post('invoices/{invoiceId}/pay', [InvoiceController::class, 'initiatePayment']);
 
     // Product Orders Management
