@@ -55,6 +55,12 @@ Route::middleware('admin')->group(function () {
     Route::delete('strategy-tips/{id}', [AdminStrategyTipController::class, 'destroy']);
     Route::post('products/{productId}/strategy-tips/reorder', [AdminStrategyTipController::class, 'reorder']);
 
+    // Strategy Works Management
+    Route::get('product-orders/{orderId}/works', [\App\Http\Controllers\Admin\AdminStrategyWorkController::class, 'index']);
+    Route::post('product-orders/{orderId}/works', [\App\Http\Controllers\Admin\AdminStrategyWorkController::class, 'store']);
+    Route::put('strategy-works/{id}', [\App\Http\Controllers\Admin\AdminStrategyWorkController::class, 'update']);
+    Route::delete('strategy-works/{id}', [\App\Http\Controllers\Admin\AdminStrategyWorkController::class, 'destroy']);
+
     // Clients Management
     Route::get('clients', [AdminClientController::class, 'index']);
     Route::get('clients/{id}', [AdminClientController::class, 'show']);

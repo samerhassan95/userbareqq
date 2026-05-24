@@ -51,6 +51,9 @@ class StrategyWorkController extends Controller
                 ->get();
 
             $data = $works->map(function ($work) {
+                // Get posts for this work
+                $posts = $work->posts()->get();
+                
                 return [
                     'id' => $work->id,
                     'title' => \App\Helpers\TranslationHelper::getTranslatedField($work, 'title'),
@@ -63,6 +66,18 @@ class StrategyWorkController extends Controller
                     'post_type' => $work->post_type,
                     'attachments' => $work->attachments ?? [],
                     'notes' => $work->notes,
+                    'posts' => $posts->map(function ($post) {
+                        return [
+                            'id' => $post->id,
+                            'title' => \App\Helpers\TranslationHelper::getTranslatedField($post, 'title'),
+                            'description' => \App\Helpers\TranslationHelper::getTranslatedField($post, 'description'),
+                            'image' => $post->image ? asset('posts/' . $post->image) : null,
+                            'status' => $post->status,
+                            'is_approved' => $post->is_approved,
+                            'approved_at' => $post->approved_at ? $post->approved_at->format('Y-m-d H:i:s') : null,
+                        ];
+                    })->toArray(),
+                    'posts_count' => $posts->count(),
                     'created_at' => $work->created_at->format('Y-m-d H:i:s'),
                 ];
             });
