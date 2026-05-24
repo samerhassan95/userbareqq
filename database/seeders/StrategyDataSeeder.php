@@ -68,13 +68,22 @@ class StrategyDataSeeder extends Seeder
     private function addSampleWorks($order)
     {
         $platforms = ['facebook', 'instagram', 'twitter', 'linkedin', 'tiktok'];
-        $postTypes = ['image', 'video', 'text', 'carousel'];
+        $postTypes = ['image', 'video', 'text', 'carousel', 'reel', 'story'];
         $statuses = ['pending', 'in_progress', 'completed'];
 
         // Create 10 sample works
         for ($i = 0; $i < 10; $i++) {
             $date = Carbon::now()->addDays($i);
             $postNumber = $i + 1;
+            
+            // Randomly select 1-3 platforms
+            $selectedPlatforms = [];
+            $platformCount = rand(1, 3);
+            $shuffledPlatforms = $platforms;
+            shuffle($shuffledPlatforms);
+            for ($j = 0; $j < $platformCount; $j++) {
+                $selectedPlatforms[] = $shuffledPlatforms[$j];
+            }
             
             StrategyWork::create([
                 'product_order_id' => $order->id,
@@ -84,7 +93,7 @@ class StrategyDataSeeder extends Seeder
                 'description_ar' => "محتوى جذاب ليوم " . $date->format('l'),
                 'scheduled_date' => $date->format('Y-m-d'),
                 'scheduled_time' => '10:00:00',
-                'platforms' => array_rand(array_flip($platforms), rand(1, 3)),
+                'platforms' => $selectedPlatforms,
                 'status' => $statuses[array_rand($statuses)],
                 'post_type' => $postTypes[array_rand($postTypes)],
                 'attachments' => [],
