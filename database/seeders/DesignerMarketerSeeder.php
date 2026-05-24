@@ -17,16 +17,20 @@ class DesignerMarketerSeeder extends Seeder
         // Create Designers
         $designers = [
             [
-                'name' => 'Ahmed Designer',
+                'username' => 'ahmed_designer',
                 'email' => 'designer1@bareqq.com',
                 'phone' => '01000000001',
                 'password' => Hash::make('123456'),
+                'role' => 'designer',
+                'admin_id' => 1, // Assuming admin with ID 1 exists
             ],
             [
-                'name' => 'Sara Designer',
+                'username' => 'sara_designer',
                 'email' => 'designer2@bareqq.com',
                 'phone' => '01000000002',
                 'password' => Hash::make('123456'),
+                'role' => 'designer',
+                'admin_id' => 1,
             ],
         ];
 
@@ -35,22 +39,26 @@ class DesignerMarketerSeeder extends Seeder
                 ['email' => $designer['email']],
                 $designer
             );
-            $this->command->info("Created designer: {$designer['name']}");
+            $this->command->info("Created designer: {$designer['username']}");
         }
 
         // Create Marketers
         $marketers = [
             [
-                'name' => 'Mohamed Marketer',
+                'username' => 'mohamed_marketer',
                 'email' => 'marketer1@bareqq.com',
                 'phone' => '01000000003',
                 'password' => Hash::make('123456'),
+                'role' => 'marketer',
+                'admin_id' => 1,
             ],
             [
-                'name' => 'Fatima Marketer',
+                'username' => 'fatima_marketer',
                 'email' => 'marketer2@bareqq.com',
                 'phone' => '01000000004',
                 'password' => Hash::make('123456'),
+                'role' => 'marketer',
+                'admin_id' => 1,
             ],
         ];
 
@@ -59,7 +67,7 @@ class DesignerMarketerSeeder extends Seeder
                 ['email' => $marketer['email']],
                 $marketer
             );
-            $this->command->info("Created marketer: {$marketer['name']}");
+            $this->command->info("Created marketer: {$marketer['username']}");
         }
 
         $this->command->info('Designers and Marketers seeded successfully!');
