@@ -16,13 +16,13 @@ class UpdatePostsImagesSeeder extends Seeder
 
         // الصور الموجودة على السيرفر
         $availableImages = [
-            'Screenshot (42).png',
-            'Screenshot (43) - Copying.png',
-            'Screenshot (43).png',
-            'Screenshot (44) - Copying.png',
-            'Screenshot (44).png',
-            'Screenshot (45).png',
-            'Screenshot (46).png',
+            'Screenshot-42.png',
+            'Screenshot-43-Copy.png',
+            'Screenshot-43.png',
+            'Screenshot-44-Copy.png',
+            'Screenshot-44.png',
+            'Screenshot-45.png',
+            'Screenshot-46.png',
         ];
 
         // جلب كل البوستات
