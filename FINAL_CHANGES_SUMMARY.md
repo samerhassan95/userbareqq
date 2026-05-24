@@ -10,10 +10,18 @@
 - ✅ تحديث جميع Resources
 - ✅ إضافة ملفات الترجمة (en/ar)
 
-### 2. تحديثات Postman Collection
+### 2. إضافة Email للـ Admins ✨ NEW
+- ✅ إضافة عمود `email` لجدول admins
+- ✅ تحديث Admin model ليدعم email
+- ✅ تحديث UniversalAuthController ليدعم تسجيل الدخول بالإيميل للـ admins
+- ✅ إنشاء seeder لإضافة emails للـ admins الموجودين
+- ✅ الآن الـ admins يمكنهم تسجيل الدخول بـ: username, phone, أو email
+
+### 3. تحديثات Postman Collection
 - ✅ إضافة متغير `lang` (en/ar)
 - ✅ إضافة `Accept-Language` header لجميع الطلبات
 - ✅ تحديث Universal Login ليستخدم **email** للـ clients
+- ✅ إضافة مثال لتسجيل دخول Admin بالإيميل
 - ✅ إضافة الحقول العربية لجميع endpoints الخاصة بالإنشاء/التحديث
 - ✅ إزالة `feature_id` و `feature_name` من One-Time Orders
 
@@ -41,33 +49,37 @@
 
 ### ملفات جديدة:
 1. `database/migrations/2026_05_21_120000_add_arabic_translations_to_tables.php`
-2. `database/seeders/ArabicTranslationsSeeder.php`
-3. `app/Http/Middleware/SetLocale.php`
-4. `app/Helpers/TranslationHelper.php`
-5. `lang/en/messages.php`
-6. `lang/ar/messages.php`
-7. `LOCALIZATION_GUIDE.md`
-8. `LOCALIZATION_SUMMARY.md`
-9. `FINAL_CHANGES_SUMMARY.md`
-10. `deploy_localization.sh`
+2. `database/migrations/2026_05_21_130000_add_email_to_admins_table.php` ✨ NEW
+3. `database/seeders/ArabicTranslationsSeeder.php`
+4. `database/seeders/AddEmailToAdminsSeeder.php` ✨ NEW
+5. `app/Http/Middleware/SetLocale.php`
+6. `app/Helpers/TranslationHelper.php`
+7. `lang/en/messages.php`
+8. `lang/ar/messages.php`
+9. `LOCALIZATION_GUIDE.md`
+10. `LOCALIZATION_SUMMARY.md`
+11. `FINAL_CHANGES_SUMMARY.md`
+12. `deploy_localization.sh`
 
 ### ملفات معدلة:
 1. `app/Http/Kernel.php` - تسجيل middleware
-2. `app/Http/Controllers/ProductController.php` - ترجمة
-3. `app/Http/Controllers/Client/ProductOrderController.php` - ترجمة + إزالة features
-4. `app/Http/Controllers/InvoiceController.php` - ترجمة + إصلاحات
-5. `app/Http/Controllers/AddonController.php` - ترجمة
-6. `app/Http/Controllers/Admin/AdminStrategyTipController.php` - ترجمة
-7. `app/Http/Resources/ProductOrderResource.php` - إزالة features
-8. `app/Http/Resources/ProductStrategyTipResource.php` - ترجمة
-9. `app/Models/Product.php` - إضافة `_ar` fields
-10. `app/Models/Addon.php` - إضافة `_ar` fields
-11. `app/Models/Category.php` - إضافة `_ar` fields
-12. `app/Models/ProductStrategyTip.php` - إضافة `_ar` fields
-13. `app/Models/Subscription.php` - إصلاح syntax error
-14. `routes/client.php` - إزالة duplicate middleware
-15. `routes/admin.php` - تحديث invoice routes
-16. `Bareqq_Complete_API.postman_collection.json` - تحديثات شاملة
+2. `app/Http/Controllers/UniversalAuthController.php` - دعم email للـ admins ✨
+3. `app/Models/Admin.php` - إضافة email للـ fillable ✨
+4. `app/Http/Controllers/ProductController.php` - ترجمة
+5. `app/Http/Controllers/Client/ProductOrderController.php` - ترجمة + إزالة features
+6. `app/Http/Controllers/InvoiceController.php` - ترجمة + إصلاحات
+7. `app/Http/Controllers/AddonController.php` - ترجمة
+8. `app/Http/Controllers/Admin/AdminStrategyTipController.php` - ترجمة
+9. `app/Http/Resources/ProductOrderResource.php` - إزالة features
+10. `app/Http/Resources/ProductStrategyTipResource.php` - ترجمة
+11. `app/Models/Product.php` - إضافة `_ar` fields
+12. `app/Models/Addon.php` - إضافة `_ar` fields
+13. `app/Models/Category.php` - إضافة `_ar` fields
+14. `app/Models/ProductStrategyTip.php` - إضافة `_ar` fields
+15. `app/Models/Subscription.php` - إصلاح syntax error
+16. `routes/client.php` - إزالة duplicate middleware
+17. `routes/admin.php` - تحديث invoice routes
+18. `Bareqq_Complete_API.postman_collection.json` - تحديثات شاملة + مثال admin email ✨
 
 ---
 
@@ -129,6 +141,16 @@ curl -X GET "https://user.bareqq.com/api/client/our-products" \
 
 ### 3. اختبار Universal Login بالإيميل
 ```bash
+# Admin login with email
+curl -X POST "https://user.bareqq.com/api/login" \
+  -H "Content-Type: application/json" \
+  -H "API-Password: Nf:upZTg^7A?Hj" \
+  -d '{
+    "identifier": "admin@bareqq.com",
+    "password": "password123"
+  }'
+
+# Client login with email
 curl -X POST "https://user.bareqq.com/api/login" \
   -H "Content-Type: application/json" \
   -H "API-Password: Nf:upZTg^7A?Hj" \
@@ -181,7 +203,9 @@ curl -X POST "https://user.bareqq.com/api/admin/products" \
 ### 1. Universal Login
 - ✅ يستخدم **email** للـ clients
 - ✅ يستخدم **username** للـ admins
-- ✅ يقبل phone للـ admins أيضاً
+- ✅ يقبل **phone** للـ admins أيضاً
+- ✅ يقبل **email** للـ admins أيضاً ✨ NEW
+- ✅ الآن جميع المستخدمين يمكنهم تسجيل الدخول بالإيميل
 
 ### 2. الترجمة
 - ✅ تلقائية بناءً على `Accept-Language` header

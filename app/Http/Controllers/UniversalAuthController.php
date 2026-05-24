@@ -57,10 +57,11 @@ class UniversalAuthController extends Controller
             $guard = 'client';
         }
 
-        // Check Admin (username or phone)
+        // Check Admin (username, phone, or email)
         if (!$user) {
             $admin = Admin::where('username', $identifier)
                 ->orWhere('phone', $identifier)
+                ->orWhere('email', $identifier)
                 ->first();
             
             if ($admin) {
@@ -148,21 +149,11 @@ class UniversalAuthController extends Controller
                 $userData['photo'] = null;
             }
             
-            // Ensure all nullable fields are present based on role
+            // Ensure all nullable fields are present
             $userData['password'] = null; // Hide password
-            
-            // Common fields for all roles
             $userData['name'] = $userData['name'] ?? null;
+            $userData['email'] = $userData['email'] ?? null;
             $userData['phone'] = $userData['phone'] ?? null;
-            
-            // Email field - admins don't have email, only clients/designers/marketers
-            if ($role === 'admin') {
-                $userData['email'] = null; // Admins don't have email
-            } else {
-                $userData['email'] = $userData['email'] ?? null;
-            }
-            
-            // Optional fields
             $userData['company_name'] = $userData['company_name'] ?? null;
             $userData['website'] = $userData['website'] ?? null;
             $userData['address'] = $userData['address'] ?? null;

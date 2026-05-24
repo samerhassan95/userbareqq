@@ -18,6 +18,20 @@ class Admin extends Authenticatable implements JWTSubject
 
     protected $guarded = [];
     protected $table = 'admins';
+    
+    protected $fillable = [
+        'username',
+        'email',
+        'phone',
+        'password',
+        'name',
+        'device_token',
+    ];
+
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
 
     public function getJWTIdentifier()
     {
