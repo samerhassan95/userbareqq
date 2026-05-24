@@ -807,6 +807,58 @@
 							"path": ["client", "product-orders", "1"]
 						}
 					}
+				},
+				{
+					"name": "Get Strategy Works (All)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{client_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}",
+								"description": "Language: en or ar"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/client/product-orders/7/works",
+							"host": ["{{base_url}}"],
+							"path": ["client", "product-orders", "7", "works"],
+							"query": []
+						}
+					}
+				},
+				{
+					"name": "Get Strategy Works (By Date)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{client_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}",
+								"description": "Language: en or ar"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/client/product-orders/7/works?date=2026-05-22",
+							"host": ["{{base_url}}"],
+							"path": ["client", "product-orders", "7", "works"],
+							"query": [
+								{
+									"key": "date",
+									"value": "2026-05-22",
+									"description": "Filter by date (YYYY-MM-DD)"
+								}
+							]
+						}
+					}
 				}
 			]
 		},

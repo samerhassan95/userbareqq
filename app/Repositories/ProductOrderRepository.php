@@ -20,13 +20,28 @@ class ProductOrderRepository implements ProductOrderRepositoryInterface
 
     public function findById($id)
     {
-        return $this->model->with(['product', 'feature', 'invoice', 'subscription', 'client'])->find($id);
+        return $this->model->with([
+            'product.strategyTips', 
+            'feature', 
+            'invoice', 
+            'subscription', 
+            'client',
+            'teamMembers.member',
+            'strategyWorks'
+        ])->find($id);
     }
 
     public function getClientOrders($clientId)
     {
         return $this->model->where('client_id', $clientId)
-            ->with(['product', 'feature', 'invoice', 'subscription'])
+            ->with([
+                'product.strategyTips', 
+                'feature', 
+                'invoice', 
+                'subscription',
+                'teamMembers.member',
+                'strategyWorks'
+            ])
             ->orderBy('created_at', 'desc')
             ->get();
     }

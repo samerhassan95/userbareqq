@@ -3,6 +3,7 @@
 use App\Http\Controllers\Client\ClientAuthController;
 use App\Http\Controllers\Client\ClientSocialCredentialController;
 use App\Http\Controllers\Client\ProductOrderController;
+use App\Http\Controllers\Client\StrategyWorkController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
@@ -36,4 +37,7 @@ Route::middleware(['client'])->group(function () {
     Route::post('product-orders', [ProductOrderController::class, 'store']);
     Route::get('my-orders', [ProductOrderController::class, 'index']);
     Route::get('product-orders/{id}', [ProductOrderController::class, 'show']);
+    
+    // Strategy Works Routes
+    Route::get('product-orders/{orderId}/works', [StrategyWorkController::class, 'index']);
 });

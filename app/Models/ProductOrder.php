@@ -54,4 +54,20 @@ class ProductOrder extends Model
     {
         return $this->belongsTo(Subscription::class);
     }
+
+    /**
+     * Get the strategy team members
+     */
+    public function teamMembers()
+    {
+        return $this->hasMany(StrategyTeamMember::class);
+    }
+
+    /**
+     * Get the strategy works/posts
+     */
+    public function strategyWorks()
+    {
+        return $this->hasMany(StrategyWork::class);
+    }
 }
