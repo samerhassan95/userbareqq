@@ -9,6 +9,8 @@ class PostFeedback extends Model
 {
     use HasFactory;
 
+    protected $table = 'post_feedbacks';
+
     protected $fillable = [
         'post_id',
         'client_id',
