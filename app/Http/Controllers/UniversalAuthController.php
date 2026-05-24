@@ -148,15 +148,26 @@ class UniversalAuthController extends Controller
                 $userData['photo'] = null;
             }
             
-            // Ensure all nullable fields are present
+            // Ensure all nullable fields are present based on role
             $userData['password'] = null; // Hide password
+            
+            // Common fields for all roles
+            $userData['name'] = $userData['name'] ?? null;
+            $userData['phone'] = $userData['phone'] ?? null;
+            
+            // Email field - admins don't have email, only clients/designers/marketers
+            if ($role === 'admin') {
+                $userData['email'] = null; // Admins don't have email
+            } else {
+                $userData['email'] = $userData['email'] ?? null;
+            }
+            
+            // Optional fields
             $userData['company_name'] = $userData['company_name'] ?? null;
             $userData['website'] = $userData['website'] ?? null;
             $userData['address'] = $userData['address'] ?? null;
             $userData['city'] = $userData['city'] ?? null;
             $userData['country'] = $userData['country'] ?? null;
-            $userData['name'] = $userData['name'] ?? null;
-            $userData['email'] = $userData['email'] ?? null;
             
             // Add token and type to user data
             $userData['token'] = $token;
