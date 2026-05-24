@@ -3,16 +3,18 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class Designer extends Model
+class Designer extends Authenticatable implements JWTSubject
 {
     use HasFactory;
 
     protected $fillable = [
         'admin_id',
         'username',
+        'name',
         'email',
         'phone',
         'password',
@@ -30,6 +32,25 @@ class Designer extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+
+    /**
+     * Get the identifier that will be stored in the subject claim of the JWT.
+     */
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    /**
+     * Return a key value array, containing any custom claims to be added to the JWT.
+     */
+    public function getJWTCustomClaims()
+    {
+        return [
+            'role' => 'designer',
+            'type' => 'designer'
+        ];
+    }
 
     /**
      * Get the admin that created this designer.
