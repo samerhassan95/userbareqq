@@ -108,9 +108,9 @@ Accept-Language: en|ar
     "data": [
         {
             "id": 1,
-            "name_en": "Website Design",
+            "name": "Website Design",
             "name_ar": "تصميم موقع إلكتروني",
-            "description_en": "Professional website design service...",
+            "description": "Professional website design service...",
             "description_ar": "خدمة تصميم مواقع إلكترونية احترافية...",
             "type": "service",
             "role": null,
@@ -121,9 +121,9 @@ Accept-Language: en|ar
         },
         {
             "id": 2,
-            "name_en": "Social Media Management",
+            "name": "Social Media Management",
             "name_ar": "إدارة وسائل التواصل الاجتماعي",
-            "description_en": "Complete social media management...",
+            "description": "Complete social media management...",
             "description_ar": "إدارة كاملة لوسائل التواصل الاجتماعي...",
             "type": "subscription",
             "role": "marketer",
@@ -154,9 +154,9 @@ Accept-Language: en|ar
     "message": "Product content retrieved successfully",
     "data": {
         "id": 1,
-        "name_en": "Website Design",
+        "name": "Website Design",
         "name_ar": "تصميم موقع إلكتروني",
-        "description_en": "Professional website design service with modern UI/UX...",
+        "description": "Professional website design service with modern UI/UX...",
         "description_ar": "خدمة تصميم مواقع إلكترونية احترافية مع واجهة مستخدم حديثة...",
         "type": "service",
         "role": null,
@@ -193,16 +193,15 @@ Accept-Language: en|ar
         {
             "id": 1,
             "product_id": 2,
-            "title_en": "Define Your Target Audience",
-            "title_ar": "حدد جمهورك المستهدف",
-            "description_en": "Understanding your target audience is crucial...",
-            "description_ar": "فهم جمهورك المستهدف أمر بالغ الأهمية...",
-            "order": 1,
+            "text": "Understanding your target audience is crucial...",
+            "text_ar": "فهم جمهورك المستهدف أمر بالغ الأهمية...",
+            "platforms": ["facebook", "instagram", "twitter"],
+            "sort_order": 1,
             "created_at": "2026-05-20T10:00:00.000000Z",
             "updated_at": "2026-05-20T10:00:00.000000Z",
             "product": {
                 "id": 2,
-                "name_en": "Social Media Management",
+                "name": "Social Media Management",
                 "name_ar": "إدارة وسائل التواصل الاجتماعي"
             }
         }
@@ -229,16 +228,15 @@ Accept-Language: en|ar
     "data": {
         "id": 1,
         "product_id": 2,
-        "title_en": "Define Your Target Audience",
-        "title_ar": "حدد جمهورك المستهدف",
-        "description_en": "Understanding your target audience is crucial for effective social media marketing...",
-        "description_ar": "فهم جمهورك المستهدف أمر بالغ الأهمية للتسويق الفعال عبر وسائل التواصل الاجتماعي...",
-        "order": 1,
+        "text": "Understanding your target audience is crucial for effective social media marketing...",
+        "text_ar": "فهم جمهورك المستهدف أمر بالغ الأهمية للتسويق الفعال عبر وسائل التواصل الاجتماعي...",
+        "platforms": ["facebook", "instagram", "twitter"],
+        "sort_order": 1,
         "created_at": "2026-05-20T10:00:00.000000Z",
         "updated_at": "2026-05-20T10:00:00.000000Z",
         "product": {
             "id": 2,
-            "name_en": "Social Media Management",
+            "name": "Social Media Management",
             "name_ar": "إدارة وسائل التواصل الاجتماعي"
         }
     }

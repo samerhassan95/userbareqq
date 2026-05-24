@@ -24,9 +24,9 @@ class AdminContentController extends Controller
 
             $products = $query->select([
                 'id',
-                'name_en',
+                'name',
                 'name_ar',
-                'description_en',
+                'description',
                 'description_ar',
                 'type',
                 'role',
@@ -58,9 +58,9 @@ class AdminContentController extends Controller
         try {
             $product = Product::select([
                 'id',
-                'name_en',
+                'name',
                 'name_ar',
-                'description_en',
+                'description',
                 'description_ar',
                 'type',
                 'role',
@@ -90,7 +90,7 @@ class AdminContentController extends Controller
     public function getStrategyTipsContent(Request $request)
     {
         try {
-            $query = ProductStrategyTip::with('product:id,name_en,name_ar');
+            $query = ProductStrategyTip::with('product:id,name,name_ar');
 
             // Filter by product if provided
             if ($request->filled('product_id')) {
@@ -100,14 +100,13 @@ class AdminContentController extends Controller
             $tips = $query->select([
                 'id',
                 'product_id',
-                'title_en',
-                'title_ar',
-                'description_en',
-                'description_ar',
-                'order',
+                'text',
+                'text_ar',
+                'platforms',
+                'sort_order',
                 'created_at',
                 'updated_at'
-            ])->orderBy('product_id')->orderBy('order')->get();
+            ])->orderBy('product_id')->orderBy('sort_order')->get();
 
             return response()->json([
                 'success' => true,
@@ -129,15 +128,14 @@ class AdminContentController extends Controller
     public function getStrategyTipContent($id)
     {
         try {
-            $tip = ProductStrategyTip::with('product:id,name_en,name_ar')
+            $tip = ProductStrategyTip::with('product:id,name,name_ar')
                 ->select([
                     'id',
                     'product_id',
-                    'title_en',
-                    'title_ar',
-                    'description_en',
-                    'description_ar',
-                    'order',
+                    'text',
+                    'text_ar',
+                    'platforms',
+                    'sort_order',
                     'created_at',
                     'updated_at'
                 ])
