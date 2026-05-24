@@ -62,7 +62,7 @@ class StrategyDataSeeder extends Seeder
             ]);
         }
 
-        $this->command->info("Added team members for order #{$order->id}");
+        $this->command->info("Added team members for order #" . $order->id);
     }
 
     private function addSampleWorks($order)
@@ -74,11 +74,12 @@ class StrategyDataSeeder extends Seeder
         // Create 10 sample works
         for ($i = 0; $i < 10; $i++) {
             $date = Carbon::now()->addDays($i);
+            $postNumber = $i + 1;
             
             StrategyWork::create([
                 'product_order_id' => $order->id,
-                'title' => "Post #{$i + 1} - " . $date->format('M d'),
-                'title_ar' => "منشور #{$i + 1} - " . $date->format('M d'),
+                'title' => "Post #$postNumber - " . $date->format('M d'),
+                'title_ar' => "منشور #$postNumber - " . $date->format('M d'),
                 'description' => "Engaging content for " . $date->format('l'),
                 'description_ar' => "محتوى جذاب ليوم " . $date->format('l'),
                 'scheduled_date' => $date->format('Y-m-d'),
@@ -91,6 +92,6 @@ class StrategyDataSeeder extends Seeder
             ]);
         }
 
-        $this->command->info("Added sample works for order #{$order->id}");
+        $this->command->info("Added sample works for order #" . $order->id);
     }
 }
