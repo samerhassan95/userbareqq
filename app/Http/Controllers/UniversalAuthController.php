@@ -31,7 +31,7 @@ class UniversalAuthController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'status' => false,
-                'message' => 'Validation error',
+                'message' => __('messages.validation_error'),
                 'errors' => $validator->errors(),
             ], 422);
         }
@@ -101,7 +101,7 @@ class UniversalAuthController extends Controller
         if (!$user) {
             return response()->json([
                 'status' => false,
-                'message' => 'Invalid credentials',
+                'message' => __('messages.invalid_credentials'),
             ], 401);
         }
 
@@ -129,7 +129,7 @@ class UniversalAuthController extends Controller
             if (!$token = auth($guard)->attempt($credentials)) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Invalid credentials',
+                    'message' => __('messages.invalid_credentials'),
                 ], 401);
             }
 
@@ -167,14 +167,14 @@ class UniversalAuthController extends Controller
             return response()->json([
                 'status' => true,
                 'code' => 200,
-                'message' => 'Login successful',
+                'message' => __('messages.login_successful'),
                 'data' => $userData,
             ], 200);
 
         } catch (\Exception $e) {
             return response()->json([
                 'status' => false,
-                'message' => 'Server error, please try again later',
+                'message' => __('messages.server_error'),
                 'error' => $e->getMessage(),
             ], 500);
         }
@@ -196,12 +196,12 @@ class UniversalAuthController extends Controller
 
             return response()->json([
                 'status' => true,
-                'message' => 'Logout successful',
+                'message' => __('messages.logout_successful'),
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => false,
-                'message' => 'Logout failed',
+                'message' => __('messages.logout_failed'),
             ], 500);
         }
     }

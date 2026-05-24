@@ -35,7 +35,7 @@ class TicketController extends BaseController
     });        
         return response()->json([
             'status' => true,
-            'message' => 'Departments retrieved successfully.',
+            'message' => __('messages.departments_retrieved'),
             'data' => $departments
         ]);
     }
@@ -80,7 +80,7 @@ public function store(Request $request)
 
     return response()->json([
         'status' => true,
-        'message' => 'Ticket created successfully.',
+        'message' => __('messages.ticket_created'),
         'data' => new TicketResource($ticket)
     ], 201);
 }
@@ -106,7 +106,7 @@ public function store(Request $request)
         if ($ticket->created_by !== auth()->id()) {
             return response()->json([
                 'status' => false,
-                'message' => 'Unauthorized to update this ticket.'
+                'message' => __('messages.unauthorized_ticket')
             ], 403);
         }
 
@@ -138,7 +138,7 @@ public function store(Request $request)
 
         return response()->json([
             'status' => true,
-            'message' => 'Ticket updated successfully.',
+            'message' => __('messages.ticket_updated'),
             'data' => new TicketResource($ticket)
         ], 200);
     }
@@ -197,7 +197,7 @@ public function store(Request $request)
 
         return response()->json([
             'status' => true,
-            'message' => 'Tickets retrieved successfully.',
+            'message' => __('messages.tickets_retrieved'),
             'data' => TicketResource::collection($tickets),
             'pagination' => [
                 'current_page' => $tickets->currentPage(),
@@ -228,7 +228,7 @@ public function store(Request $request)
 
         return response()->json([
             'status' => true,
-            'message' => 'Tickets and summary retrieved successfully.',
+            'message' => __('messages.tickets_retrieved'),
             'data' => [
                 'summary' => [
                     'total' => $totalCount,
@@ -265,13 +265,13 @@ public function store(Request $request)
         if (!$ticket) {
             return response()->json([
                 'status' => false,
-                'message' => 'Ticket not found or unauthorized.',
+                'message' => __('messages.ticket_not_found'),
             ], 404);
         }
 
         return response()->json([
             'status' => true,
-            'message' => 'Ticket retrieved successfully.',
+            'message' => __('messages.tickets_retrieved'),
             'data' => new TicketResource($ticket),
         ]);
     }
@@ -290,7 +290,7 @@ public function store(Request $request)
         if (!$ticket) {
             return response()->json([
                 'status' => false,
-                'message' => 'Ticket not found or unauthorized.',
+                'message' => __('messages.ticket_not_found'),
             ], 404);
         }
 
@@ -301,7 +301,7 @@ public function store(Request $request)
 
         return response()->json([
             'status' => true,
-            'message' => 'Replies retrieved successfully.',
+            'message' => __('messages.replies_retrieved'),
             'data' => TicketReplyResource::collection($replies),
         ]);
     }
@@ -320,7 +320,7 @@ public function store(Request $request)
         if (!$ticket) {
             return response()->json([
                 'status' => false,
-                'message' => 'Ticket not found or unauthorized.',
+                'message' => __('messages.ticket_not_found'),
             ], 404);
         }
 
@@ -328,7 +328,7 @@ public function store(Request $request)
 
         return response()->json([
             'status' => true,
-            'message' => 'Ticket closed successfully.',
+            'message' => __('messages.ticket_closed'),
             'data' => new TicketResource($ticket),
         ]);
     }
@@ -347,7 +347,7 @@ public function store(Request $request)
         if (!$ticket) {
             return response()->json([
                 'status' => false,
-                'message' => 'Ticket not found or unauthorized.',
+                'message' => __('messages.ticket_not_found'),
             ], 404);
         }
 
@@ -366,7 +366,7 @@ public function store(Request $request)
 
         return response()->json([
             'status' => true,
-            'message' => 'Ticket deleted successfully.',
+            'message' => __('messages.ticket_deleted'),
         ]);
     }
     

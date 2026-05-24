@@ -52,7 +52,7 @@ class TicketReplyController extends BaseController
         if (!$creator instanceof Admin && $ticket->created_by !== $creator->id) {
             return response()->json([
                 'status' => false,
-                'message' => 'Unauthorized to reply to this ticket.'
+                'message' => __('messages.unauthorized_reply')
             ], 403);
         }
 
@@ -88,7 +88,7 @@ $ticketReply->save();
 
         return response()->json([
             'status' => true,
-            'message' => 'Reply added successfully.',
+            'message' => __('messages.reply_added'),
             'data' => new TicketReplyResource($ticketReply)
         ], 201);
     }

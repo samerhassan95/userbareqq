@@ -41,7 +41,7 @@ public function getSections()
     public function getSectionById($id)
     {
         if (!SectionEnum::isValid($id)) {
-            return response()->json(['success' => false, 'message' => 'Section not found'], 404);
+            return response()->json(['success' => false, 'message' => __('messages.section_not_found')], 404);
         }
 
         $topics = Topic::where('section_id', $id)->orderBy('id', 'desc')->get();
@@ -79,7 +79,7 @@ public function getSections()
 
     return response()->json([
         'success' => true,
-        'message' => 'Thank you for your review!' // Design text from Screen 3
+        'message' => __('messages.thank_you_review')
     ]);
 }
 }

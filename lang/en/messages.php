@@ -60,4 +60,91 @@ return [
     'credential_saved' => 'Credential saved successfully',
     'credential_updated' => 'Credential updated successfully',
     'credential_deleted' => 'Credential deleted successfully',
+    
+    // Universal Auth
+    'validation_error' => 'Validation error',
+    'invalid_credentials' => 'Invalid credentials',
+    'login_successful' => 'Login successful',
+    'logout_successful' => 'Logout successful',
+    'logout_failed' => 'Logout failed',
+    'server_error' => 'Server error, please try again later',
+    
+    // Tickets
+    'departments_retrieved' => 'Departments retrieved successfully',
+    'ticket_created' => 'Ticket created successfully',
+    'ticket_updated' => 'Ticket updated successfully',
+    'ticket_deleted' => 'Ticket deleted successfully',
+    'ticket_closed' => 'Ticket closed successfully',
+    'ticket_not_found' => 'Ticket not found or unauthorized',
+    'tickets_retrieved' => 'Tickets retrieved successfully',
+    'unauthorized_ticket' => 'Unauthorized to update this ticket',
+    'unauthorized_reply' => 'Unauthorized to reply to this ticket',
+    'reply_added' => 'Reply added successfully',
+    'replies_retrieved' => 'Replies retrieved successfully',
+    
+    // Topics
+    'section_not_found' => 'Section not found',
+    'thank_you_review' => 'Thank you for your review!',
+    
+    // General Status
+    'unauthenticated' => 'Unauthenticated',
+    'not_authorized' => 'Not authorized',
+    'failed_operation' => 'Operation failed',
+    'retrieved_successfully' => 'Retrieved successfully',
+    'created_successfully' => 'Created successfully',
+    'updated_successfully' => 'Updated successfully',
+    'deleted_successfully' => 'Deleted successfully',
+    
+    // Strategy Works
+    'strategy_works_retrieved' => 'Strategy works retrieved successfully',
+    'order_retrieved' => 'Order retrieved successfully',
+    'payment_approved' => 'Payment approved successfully',
+    'order_status_updated' => 'Order status updated successfully',
+    'deliverable_uploaded' => 'Deliverable uploaded successfully',
+    'statistics_retrieved' => 'Statistics retrieved successfully',
+    
+    // Payment Methods
+    'invalid_expiry_month' => 'Invalid expiry month',
+    'payment_method_added' => 'Payment method added successfully',
+    'payment_method_updated' => 'Payment method updated successfully',
+    'default_payment_updated' => 'Default payment method updated',
+    'payment_method_removed' => 'Payment method removed successfully',
+    
+    // Two Factor
+    'failed_send_verification' => 'Failed to send verification email',
+    'scan_qr_to_verify' => 'Scan QR in app to verify',
+    
+    // Account Sharing
+    'email_already_has_access' => 'This email already has access to your account',
+    'invitation_sent' => 'Invitation sent successfully',
+    'account_sharing_updated' => 'Account sharing updated successfully',
+    'account_sharing_removed' => 'Account sharing removed successfully',
+    'invitation_accepted' => 'Invitation accepted successfully',
+    
+    // Client Auth
+    'invalid_credentials' => 'Invalid credentials',
+    'login_successful' => 'Login successful',
+    'invalid_or_expired_otp' => 'Invalid or expired OTP. Please try again',
+    'unauthorized' => 'Unauthorized',
+    'profile_retrieved' => 'Profile retrieved successfully',
+    'profile_updated' => 'Profile updated successfully',
+    'current_password_incorrect' => 'Current password is incorrect',
+    'password_changed' => 'Password changed successfully',
+    'otp_sent_email' => 'OTP sent to your email',
+    'invalid_otp' => 'Invalid or expired OTP',
+    'phone_updated' => 'Phone number updated successfully',
+    'email_updated' => 'Email updated successfully',
+    'invalid_password' => 'Invalid password',
+    'phone_not_exist' => 'Phone number does not exist',
+    'otp_sent_check_email' => 'OTP sent successfully. Please check your email',
+    'otp_verified' => 'OTP verified successfully. You can now reset your password',
+    'client_not_found' => 'Client not found',
+    'password_reset' => 'Password reset successfully',
+    'clients_retrieved' => 'Clients retrieved successfully',
+    'account_deleted' => 'Account deleted successfully',
+    'successfully_logged_out' => 'Successfully logged out',
+    'token_already_blacklisted' => 'Token already blacklisted',
+    'token_invalid' => 'Token invalid',
+    'token_error' => 'Token error',
+    'password_reset_instructions_sent' => 'Password reset instructions sent',
 ];
