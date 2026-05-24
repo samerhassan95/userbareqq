@@ -80,7 +80,7 @@ class UniversalAuthController extends Controller
             if ($designer) {
                 $user = $designer;
                 $role = 'designer';
-                $guard = 'client'; // Designers use client guard
+                $guard = 'designer'; // Use designer guard
             }
         }
 
@@ -93,7 +93,7 @@ class UniversalAuthController extends Controller
             if ($marketer) {
                 $user = $marketer;
                 $role = 'marketer';
-                $guard = 'client'; // Marketers use client guard
+                $guard = 'marketer'; // Use marketer guard
             }
         }
 
@@ -192,6 +192,10 @@ class UniversalAuthController extends Controller
                 auth('admin')->logout();
             } elseif (auth('client')->check()) {
                 auth('client')->logout();
+            } elseif (auth('designer')->check()) {
+                auth('designer')->logout();
+            } elseif (auth('marketer')->check()) {
+                auth('marketer')->logout();
             }
 
             return response()->json([

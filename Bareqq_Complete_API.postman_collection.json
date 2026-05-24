@@ -225,7 +225,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"identifier\": \"designer@example.com\",\n    \"password\": \"password123\"\n}"
+							"raw": "{\n    \"identifier\": \"designer1@bareqq.com\",\n    \"password\": \"123456\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/login",
@@ -265,7 +265,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"identifier\": \"marketer@example.com\",\n    \"password\": \"password123\"\n}"
+							"raw": "{\n    \"identifier\": \"marketer1@bareqq.com\",\n    \"password\": \"123456\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/login",

@@ -45,9 +45,20 @@ return [
             'driver' => 'jwt',
             'provider' => 'clients',
         ],
-       'employee' => [
+        
+        'employee' => [
             'driver' => 'jwt',
             'provider' => 'employees',
+        ],
+        
+        'designer' => [
+            'driver' => 'jwt',
+            'provider' => 'designers',
+        ],
+        
+        'marketer' => [
+            'driver' => 'jwt',
+            'provider' => 'marketers',
         ],
     ],
 
@@ -78,9 +89,20 @@ return [
             'driver' => 'eloquent',
             'model' => App\Models\Client::class,
         ],
+        
         'employees' => [
             'driver' => 'eloquent',
             'model' => App\Models\Employee::class,
+        ],
+        
+        'designers' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Designer::class,
+        ],
+        
+        'marketers' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Marketer::class,
         ],
     ],
 
