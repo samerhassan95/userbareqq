@@ -18,6 +18,6 @@ class MultiGuard
             }
         }
 
-        return response()->json(['status' => false, 'message' => 'Unauthenticated'], 401);
+        return response()->json(['status' => false, 'message' => __('messages.unauthenticated')], 401);
     }
 }

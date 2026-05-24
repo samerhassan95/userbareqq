@@ -43,7 +43,7 @@ class Admin
             if ($payload['type'] !== 'admin') {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Not authorized',
+                    'message' => __('messages.not_authorized'),
                 ], 403); 
             }
 
@@ -58,17 +58,17 @@ class Admin
             if ($e instanceof TokenInvalidException) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Token is Invalid',
+                    'message' => __('messages.token_invalid'),
                 ], 401);
             } else if ($e instanceof TokenExpiredException) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Token is Expired',
+                    'message' => __('messages.token_expired'),
                 ], 401); 
             } else {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Authorization Token not found',
+                    'message' => __('messages.token_not_found'),
                 ], 401); 
             }
         }

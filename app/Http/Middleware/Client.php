@@ -40,7 +40,7 @@ class Client
             if ($payload['type'] != 'client') {
                 return response()->json([
                     'status'=>false,
-                    'message'=>'Not authorized',
+                    'message'=> __('messages.not_authorized'),
                 ],400);
             }
             if($user->status==SettingStatus::getDisabled()){
@@ -53,19 +53,19 @@ class Client
             if ($e instanceof TokenInvalidException ) {
                 return response()->json([
                     'status'=>false,
-                    'message'=>'Token is Invalid',
+                    'message'=> __('messages.token_invalid'),
                 ],400);
             } else if ($e instanceof TokenExpiredException) {
                 return response()->json([
                     'status'=>false,
-                    'message'=>'Token is Expired',
+                    'message'=> __('messages.token_expired'),
                 ],400);
             }
 
             else {
                 return response()->json([
                     'status'=>false,
-                    'message'=>'Authorization Token not found',
+                    'message'=> __('messages.token_not_found'),
                 ],400);
             }
         }
