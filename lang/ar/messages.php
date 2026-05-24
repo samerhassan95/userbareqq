@@ -152,4 +152,14 @@ return [
     'token_invalid' => 'الرمز غير صحيح',
     'token_error' => 'خطأ في الرمز',
     'password_reset_instructions_sent' => 'تم إرسال تعليمات إعادة تعيين كلمة المرور',
+
+    // Clients Management
+    'clients_retrieved_successfully' => 'تم استرجاع العملاء بنجاح',
+    'client_retrieved_successfully' => 'تم استرجاع العميل بنجاح',
+
+    // Content Management
+    'products_content_retrieved_successfully' => 'تم استرجاع محتوى المنتجات بنجاح',
+    'product_content_retrieved_successfully' => 'تم استرجاع محتوى المنتج بنجاح',
+    'strategy_tips_content_retrieved_successfully' => 'تم استرجاع محتوى النصائح الاستراتيجية بنجاح',
+    'strategy_tip_content_retrieved_successfully' => 'تم استرجاع محتوى النصيحة الاستراتيجية بنجاح',
 ];

@@ -1505,6 +1505,183 @@
 					}
 				}
 			]
+		},
+		{
+			"name": "Admin - Clients",
+			"item": [
+				{
+					"name": "Get All Clients",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}",
+								"description": "Language: en or ar"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/admin/clients?search=&role=&per_page=15",
+							"host": ["{{base_url}}"],
+							"path": ["admin", "clients"],
+							"query": [
+								{
+									"key": "search",
+									"value": "",
+									"description": "Search by name, email, or phone"
+								},
+								{
+									"key": "role",
+									"value": "",
+									"description": "Filter by role: client, designer, marketer"
+								},
+								{
+									"key": "per_page",
+									"value": "15",
+									"description": "Items per page"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Client Details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}",
+								"description": "Language: en or ar"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/admin/clients/1",
+							"host": ["{{base_url}}"],
+							"path": ["admin", "clients", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Admin - Content Management",
+			"item": [
+				{
+					"name": "Get All Products Content",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}",
+								"description": "Language: en or ar"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/admin/content/products?type=",
+							"host": ["{{base_url}}"],
+							"path": ["admin", "content", "products"],
+							"query": [
+								{
+									"key": "type",
+									"value": "",
+									"description": "Filter by type: service or subscription"
+								}
+							]
+						},
+						"description": "Get all products with English and Arabic descriptions for editing"
+					}
+				},
+				{
+					"name": "Get Single Product Content",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}",
+								"description": "Language: en or ar"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/admin/content/products/1",
+							"host": ["{{base_url}}"],
+							"path": ["admin", "content", "products", "1"]
+						},
+						"description": "Get single product content with English and Arabic descriptions"
+					}
+				},
+				{
+					"name": "Get All Strategy Tips Content",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}",
+								"description": "Language: en or ar"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/admin/content/strategy-tips?product_id=",
+							"host": ["{{base_url}}"],
+							"path": ["admin", "content", "strategy-tips"],
+							"query": [
+								{
+									"key": "product_id",
+									"value": "",
+									"description": "Filter by product ID"
+								}
+							]
+						},
+						"description": "Get all strategy tips with English and Arabic content for editing"
+					}
+				},
+				{
+					"name": "Get Single Strategy Tip Content",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}",
+								"description": "Language: en or ar"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/admin/content/strategy-tips/1",
+							"host": ["{{base_url}}"],
+							"path": ["admin", "content", "strategy-tips", "1"]
+						},
+						"description": "Get single strategy tip content with English and Arabic descriptions"
+					}
+				}
+			]
 		}
 	]
 }

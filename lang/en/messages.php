@@ -152,4 +152,14 @@ return [
     'token_invalid' => 'Token invalid',
     'token_error' => 'Token error',
     'password_reset_instructions_sent' => 'Password reset instructions sent',
+
+    // Clients Management
+    'clients_retrieved_successfully' => 'Clients retrieved successfully',
+    'client_retrieved_successfully' => 'Client retrieved successfully',
+
+    // Content Management
+    'products_content_retrieved_successfully' => 'Products content retrieved successfully',
+    'product_content_retrieved_successfully' => 'Product content retrieved successfully',
+    'strategy_tips_content_retrieved_successfully' => 'Strategy tips content retrieved successfully',
+    'strategy_tip_content_retrieved_successfully' => 'Strategy tip content retrieved successfully',
 ];

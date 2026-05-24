@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\AddonController;
+use App\Http\Controllers\Admin\AdminClientController;
+use App\Http\Controllers\Admin\AdminContentController;
 use App\Http\Controllers\Admin\AdminProductOrderController;
 use App\Http\Controllers\Admin\AdminStrategyTipController;
 use App\Http\Controllers\InvoiceController;
@@ -51,4 +53,14 @@ Route::middleware('admin')->group(function () {
     Route::put('strategy-tips/{id}', [AdminStrategyTipController::class, 'update']);
     Route::delete('strategy-tips/{id}', [AdminStrategyTipController::class, 'destroy']);
     Route::post('products/{productId}/strategy-tips/reorder', [AdminStrategyTipController::class, 'reorder']);
+
+    // Clients Management
+    Route::get('clients', [AdminClientController::class, 'index']);
+    Route::get('clients/{id}', [AdminClientController::class, 'show']);
+
+    // Content Management (for editing descriptions)
+    Route::get('content/products', [AdminContentController::class, 'getProductsContent']);
+    Route::get('content/products/{id}', [AdminContentController::class, 'getProductContent']);
+    Route::get('content/strategy-tips', [AdminContentController::class, 'getStrategyTipsContent']);
+    Route::get('content/strategy-tips/{id}', [AdminContentController::class, 'getStrategyTipContent']);
 });
