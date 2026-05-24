@@ -1,31 +1,29 @@
 # ✅ تم تصحيح أسماء الأعمدة - الملخص
 
 ## 🔧 المشكلة
-كانت الـ endpoints تستخدم أسماء أعمدة غير موجودة في قاعدة البيانات:
-- ❌ `name_en` → غير موجود
-- ❌ `description_en` → غير موجود
-- ❌ `title_en`, `title_ar` → غير موجودة
-- ❌ `description_en`, `description_ar` (في strategy tips) → غير موجودة
+كانت الـ endpoints تستخدم أسماء أعمدة غير موجودة في قاعدة البيانات.
 
 ---
 
 ## ✅ الحل
 
-### Products Table
+### Products Table - الأعمدة الصحيحة:
 ```php
-// الصحيح
 'name'            // English
 'name_ar'         // Arabic
 'description'     // English
 'description_ar'  // Arabic
+'type'            // general (default)
+'product_role'    // one_time أو strategy
+'monthly_price'   // السعر الشهري (للـ strategy فقط)
+'yearly_price'    // السعر السنوي (للـ strategy فقط)
 ```
 
-### Strategy Tips Table
+### Strategy Tips Table - الأعمدة الصحيحة:
 ```php
-// الصحيح
 'text'            // English
 'text_ar'         // Arabic
-'platforms'       // JSON
+'platforms'       // JSON array
 'sort_order'      // الترتيب
 ```
 
@@ -33,9 +31,27 @@
 
 ## 📝 الملفات المصححة
 
-1. ✅ `AdminContentController.php` - تصحيح أسماء الأعمدة
-2. ✅ `ADMIN_CLIENTS_CONTENT_ENDPOINTS.md` - تحديث الأمثلة
-3. ✅ `COLUMN_NAMES_FIX.md` - توثيق التصحيح
+1. ✅ `AdminContentController.php` - تصحيح جميع أسماء الأعمدة
+2. ✅ `Bareqq_Complete_API.postman_collection.json` - تحديث query parameter
+3. ✅ `ADMIN_CLIENTS_CONTENT_ENDPOINTS.md` - تحديث الأمثلة
+4. ✅ `COLUMN_NAMES_FIX.md` - توثيق التصحيح
+
+---
+
+## 🎯 نوع المنتج (Product Role)
+
+### one_time (خدمة لمرة واحدة):
+- تصميم موقع
+- تصميم تطبيق
+- تصميم شعار
+- الأسعار: ثابتة (price)
+- يمكن إضافة addons
+
+### strategy (خدمة استراتيجية مستمرة):
+- إدارة وسائل التواصل
+- استشارات تسويقية
+- الأسعار: شهري/سنوي (monthly_price, yearly_price)
+- يحتوي على strategy tips
 
 ---
 
@@ -43,55 +59,43 @@
 
 جرب الـ endpoints مرة أخرى في Postman:
 
-### 1. Products Content
+### 1. Get All Products
 ```
 GET /api/admin/content/products
 ```
-**يجب أن يعمل الآن! ✅**
 
-### 2. Strategy Tips Content
+### 2. Filter by Product Role
 ```
-GET /api/admin/content/strategy-tips
+GET /api/admin/content/products?product_role=one_time
+GET /api/admin/content/products?product_role=strategy
 ```
-**يجب أن يعمل الآن! ✅**
 
 ---
 
 ## 📊 Response الصحيح
 
-### Products:
+### One-Time Product:
 ```json
 {
     "id": 1,
     "name": "Website Design",
     "name_ar": "تصميم موقع",
-    "description": "...",
-    "description_ar": "..."
+    "product_role": "one_time",
+    "monthly_price": null,
+    "yearly_price": null
 }
 ```
 
-### Strategy Tips:
+### Strategy Product:
 ```json
 {
-    "id": 1,
-    "text": "Define your audience...",
-    "text_ar": "حدد جمهورك...",
-    "platforms": ["facebook"],
-    "sort_order": 1
+    "id": 2,
+    "name": "Social Media Management",
+    "name_ar": "إدارة وسائل التواصل",
+    "product_role": "strategy",
+    "monthly_price": 500.00,
+    "yearly_price": 5000.00
 }
-```
-
----
-
-## 🚀 للنشر
-
-```bash
-git add .
-git commit -m "Fix column names in AdminContentController"
-git push origin main
-
-# على السيرفر
-./deploy_admin_clients_content.sh
 ```
 
 ---

@@ -1525,7 +1525,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/admin/clients?search=&role=&per_page=15",
+							"raw": "{{base_url}}/admin/clients?search=&role=&per_page=15&pagination=true",
 							"host": ["{{base_url}}"],
 							"path": ["admin", "clients"],
 							"query": [
@@ -1543,6 +1543,11 @@
 									"key": "per_page",
 									"value": "15",
 									"description": "Items per page"
+								},
+								{
+									"key": "pagination",
+									"value": "true",
+									"description": "Enable/disable pagination: true or false"
 								}
 							]
 						}
@@ -1591,14 +1596,24 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/admin/content/products?type=",
+							"raw": "{{base_url}}/admin/content/products?product_role=&pagination=true&per_page=15",
 							"host": ["{{base_url}}"],
 							"path": ["admin", "content", "products"],
 							"query": [
 								{
-									"key": "type",
+									"key": "product_role",
 									"value": "",
-									"description": "Filter by type: service or subscription"
+									"description": "Filter by product_role: one_time or strategy"
+								},
+								{
+									"key": "pagination",
+									"value": "true",
+									"description": "Enable/disable pagination: true or false"
+								},
+								{
+									"key": "per_page",
+									"value": "15",
+									"description": "Items per page (when pagination is true)"
 								}
 							]
 						},
@@ -1644,7 +1659,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/admin/content/strategy-tips?product_id=",
+							"raw": "{{base_url}}/admin/content/strategy-tips?product_id=&pagination=true&per_page=15",
 							"host": ["{{base_url}}"],
 							"path": ["admin", "content", "strategy-tips"],
 							"query": [
@@ -1652,6 +1667,16 @@
 									"key": "product_id",
 									"value": "",
 									"description": "Filter by product ID"
+								},
+								{
+									"key": "pagination",
+									"value": "true",
+									"description": "Enable/disable pagination: true or false"
+								},
+								{
+									"key": "per_page",
+									"value": "15",
+									"description": "Items per page (when pagination is true)"
 								}
 							]
 						},
@@ -1679,6 +1704,596 @@
 							"path": ["admin", "content", "strategy-tips", "1"]
 						},
 						"description": "Get single strategy tip content with English and Arabic descriptions"
+					}
+				}
+			]
+		},
+		{
+			"name": "Admin - Posts",
+			"item": [
+				{
+					"name": "Get All Posts",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/admin/posts?status=&is_approved=&client_id=&search=&pagination=true&per_page=15",
+							"host": ["{{base_url}}"],
+							"path": ["admin", "posts"],
+							"query": [
+								{
+									"key": "status",
+									"value": "",
+									"description": "Filter by status: pending, approved, rejected"
+								},
+								{
+									"key": "is_approved",
+									"value": "",
+									"description": "Filter by approval: true or false"
+								},
+								{
+									"key": "client_id",
+									"value": "",
+									"description": "Filter by client ID"
+								},
+								{
+									"key": "search",
+									"value": "",
+									"description": "Search in title and description"
+								},
+								{
+									"key": "pagination",
+									"value": "true",
+									"description": "Enable/disable pagination"
+								},
+								{
+									"key": "per_page",
+									"value": "15",
+									"description": "Items per page"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Single Post",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/admin/posts/1",
+							"host": ["{{base_url}}"],
+							"path": ["admin", "posts", "1"]
+						}
+					}
+				},
+				{
+					"name": "Create Post",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "New Post Title",
+									"type": "text"
+								},
+								{
+									"key": "title_ar",
+									"value": "عنوان المنشور الجديد",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "Post description here...",
+									"type": "text"
+								},
+								{
+									"key": "description_ar",
+									"value": "وصف المنشور هنا...",
+									"type": "text"
+								},
+								{
+									"key": "client_id",
+									"value": "1",
+									"type": "text",
+									"description": "REQUIRED: Client who will approve this post"
+								},
+								{
+									"key": "status",
+									"value": "pending",
+									"type": "text",
+									"description": "pending, approved, or rejected"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/admin/posts",
+							"host": ["{{base_url}}"],
+							"path": ["admin", "posts"]
+						}
+					}
+				},
+				{
+					"name": "Update Post",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Updated Title",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "Updated description",
+									"type": "text"
+								},
+								{
+									"key": "client_id",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "status",
+									"value": "pending",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/admin/posts/1",
+							"host": ["{{base_url}}"],
+							"path": ["admin", "posts", "1"]
+						}
+					}
+				},
+				{
+					"name": "Delete Post",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/admin/posts/1",
+							"host": ["{{base_url}}"],
+							"path": ["admin", "posts", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Marketer - Posts",
+			"item": [
+				{
+					"name": "Get All Posts",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{marketer_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/marketer/posts?status=&is_approved=&client_id=&pagination=true&per_page=15",
+							"host": ["{{base_url}}"],
+							"path": ["marketer", "posts"],
+							"query": [
+								{
+									"key": "status",
+									"value": "",
+									"description": "pending, approved, rejected"
+								},
+								{
+									"key": "is_approved",
+									"value": "",
+									"description": "true or false"
+								},
+								{
+									"key": "client_id",
+									"value": "",
+									"description": "Filter by client"
+								},
+								{
+									"key": "pagination",
+									"value": "true"
+								},
+								{
+									"key": "per_page",
+									"value": "15"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Post",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{marketer_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Marketer Post",
+									"type": "text"
+								},
+								{
+									"key": "title_ar",
+									"value": "منشور المسوق",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "Description by marketer",
+									"type": "text"
+								},
+								{
+									"key": "description_ar",
+									"value": "وصف من المسوق",
+									"type": "text"
+								},
+								{
+									"key": "client_id",
+									"value": "1",
+									"type": "text",
+									"description": "REQUIRED: Client who will approve"
+								},
+								{
+									"key": "status",
+									"value": "pending",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/marketer/posts",
+							"host": ["{{base_url}}"],
+							"path": ["marketer", "posts"]
+						}
+					}
+				},
+				{
+					"name": "Update Post",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{marketer_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "description",
+									"value": "Updated by marketer",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/marketer/posts/1",
+							"host": ["{{base_url}}"],
+							"path": ["marketer", "posts", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Designer - Posts",
+			"item": [
+				{
+					"name": "Get All Posts",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{designer_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/designer/posts?status=&is_approved=&client_id=&pagination=true&per_page=15",
+							"host": ["{{base_url}}"],
+							"path": ["designer", "posts"],
+							"query": [
+								{
+									"key": "status",
+									"value": ""
+								},
+								{
+									"key": "is_approved",
+									"value": ""
+								},
+								{
+									"key": "client_id",
+									"value": ""
+								},
+								{
+									"key": "pagination",
+									"value": "true"
+								},
+								{
+									"key": "per_page",
+									"value": "15"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Update Post (Add Design)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{designer_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "image",
+									"type": "file",
+									"src": [],
+									"description": "Designer adds/updates image"
+								},
+								{
+									"key": "description",
+									"value": "",
+									"type": "text",
+									"description": "Optional: update description"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/designer/posts/1",
+							"host": ["{{base_url}}"],
+							"path": ["designer", "posts", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Client - Posts",
+			"item": [
+				{
+					"name": "Get My Posts",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{client_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/client/posts?is_approved=&status=&search=&pagination=true&per_page=15",
+							"host": ["{{base_url}}"],
+							"path": ["client", "posts"],
+							"query": [
+								{
+									"key": "is_approved",
+									"value": "",
+									"description": "Filter by approval status"
+								},
+								{
+									"key": "status",
+									"value": "",
+									"description": "pending, approved, rejected"
+								},
+								{
+									"key": "search",
+									"value": ""
+								},
+								{
+									"key": "pagination",
+									"value": "true"
+								},
+								{
+									"key": "per_page",
+									"value": "15"
+								}
+							]
+						},
+						"description": "Client sees only posts assigned to them"
+					}
+				},
+				{
+					"name": "Get Single Post",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{client_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/client/posts/1",
+							"host": ["{{base_url}}"],
+							"path": ["client", "posts", "1"]
+						}
+					}
+				},
+				{
+					"name": "Add Feedback to Post",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{client_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"comment\": \"This looks great! Can you change the color to blue?\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/client/posts/1/feedback",
+							"host": ["{{base_url}}"],
+							"path": ["client", "posts", "1", "feedback"]
+						},
+						"description": "Client adds feedback (comment) to post. Only works if post is not approved yet."
+					}
+				},
+				{
+					"name": "Approve Post",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{client_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/client/posts/1/approve",
+							"host": ["{{base_url}}"],
+							"path": ["client", "posts", "1", "approve"]
+						},
+						"description": "Client approves the post. This locks the post from further edits and feedbacks."
+					}
+				},
+				{
+					"name": "Get Post Feedbacks",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{client_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/client/posts/1/feedbacks",
+							"host": ["{{base_url}}"],
+							"path": ["client", "posts", "1", "feedbacks"]
+						},
+						"description": "Get all feedbacks for a specific post"
 					}
 				}
 			]

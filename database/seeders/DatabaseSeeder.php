@@ -40,6 +40,9 @@ class DatabaseSeeder extends Seeder
             ServiceAppSeeder::class,    // Apps must exist before Bundles/Pivot
             BundlePackageSeeder::class, // Packages must exist before Custom Bundles
             CustomBundleSeeder::class,  // This now runs after user 123, apps, and packages exist
+            ProductDataSeeder::class,   // Products with strategy tips
+            StrategyDataSeeder::class,  // Strategy team members and works
+            PostsDataSeeder::class,     // Posts with feedbacks
         ]);
     }
 }

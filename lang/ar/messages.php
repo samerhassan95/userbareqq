@@ -165,4 +165,17 @@ return [
     
     // Errors
     'error_occurred' => 'حدث خطأ',
+    
+    // Posts
+    'posts_retrieved_successfully' => 'تم استرجاع المنشورات بنجاح',
+    'post_retrieved_successfully' => 'تم استرجاع المنشور بنجاح',
+    'post_created_successfully' => 'تم إنشاء المنشور بنجاح',
+    'post_updated_successfully' => 'تم تحديث المنشور بنجاح',
+    'post_deleted_successfully' => 'تم حذف المنشور بنجاح',
+    'post_already_approved' => 'المنشور معتمد بالفعل ولا يمكن تعديله',
+    'post_already_approved_no_feedback' => 'المنشور معتمد بالفعل ولا يمكن إضافة ملاحظات',
+    'feedback_added_successfully' => 'تم إضافة الملاحظة بنجاح',
+    'feedbacks_retrieved_successfully' => 'تم استرجاع الملاحظات بنجاح',
+    'post_approved_successfully' => 'تم اعتماد المنشور بنجاح',
+    'validation_error' => 'خطأ في التحقق من البيانات',
 ];

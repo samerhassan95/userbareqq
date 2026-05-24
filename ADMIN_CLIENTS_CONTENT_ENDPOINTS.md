@@ -20,6 +20,7 @@ Accept-Language: en|ar
 - `search` (optional): البحث بالاسم أو البريد الإلكتروني أو رقم الهاتف
 - `role` (optional): تصفية حسب الدور (client, designer, marketer)
 - `per_page` (optional): عدد العناصر في الصفحة (default: 15)
+- `pagination` (optional): تفعيل/تعطيل الـ pagination (true/false، default: true)
 
 **Response Example:**
 ```json
@@ -98,7 +99,9 @@ Accept-Language: en|ar
 ```
 
 **Query Parameters:**
-- `type` (optional): تصفية حسب النوع (service, subscription)
+- `product_role` (optional): تصفية حسب نوع المنتج (one_time, strategy)
+- `pagination` (optional): تفعيل/تعطيل الـ pagination (true/false، default: true)
+- `per_page` (optional): عدد العناصر في الصفحة (default: 15)
 
 **Response Example:**
 ```json
@@ -112,10 +115,10 @@ Accept-Language: en|ar
             "name_ar": "تصميم موقع إلكتروني",
             "description": "Professional website design service...",
             "description_ar": "خدمة تصميم مواقع إلكترونية احترافية...",
-            "type": "service",
-            "role": null,
-            "price_monthly": null,
-            "price_yearly": null,
+            "type": "general",
+            "product_role": "one_time",
+            "monthly_price": null,
+            "yearly_price": null,
             "created_at": "2026-05-20T10:00:00.000000Z",
             "updated_at": "2026-05-20T10:00:00.000000Z"
         },
@@ -125,10 +128,12 @@ Accept-Language: en|ar
             "name_ar": "إدارة وسائل التواصل الاجتماعي",
             "description": "Complete social media management...",
             "description_ar": "إدارة كاملة لوسائل التواصل الاجتماعي...",
-            "type": "subscription",
-            "role": "marketer",
-            "price_monthly": 500,
-            "price_yearly": 5000,
+            "type": "general",
+            "product_role": "strategy",
+            "monthly_price": null,
+            "three_month_price": 1200.00,
+            "six_month_price": 2200.00,
+            "yearly_price": 4000.00,
             "created_at": "2026-05-20T10:00:00.000000Z",
             "updated_at": "2026-05-20T10:00:00.000000Z"
         }
@@ -158,10 +163,12 @@ Accept-Language: en|ar
         "name_ar": "تصميم موقع إلكتروني",
         "description": "Professional website design service with modern UI/UX...",
         "description_ar": "خدمة تصميم مواقع إلكترونية احترافية مع واجهة مستخدم حديثة...",
-        "type": "service",
-        "role": null,
-        "price_monthly": null,
-        "price_yearly": null,
+        "type": "general",
+        "product_role": "one_time",
+        "monthly_price": null,
+        "three_month_price": null,
+        "six_month_price": null,
+        "yearly_price": null,
         "created_at": "2026-05-20T10:00:00.000000Z",
         "updated_at": "2026-05-20T10:00:00.000000Z"
     }
@@ -183,6 +190,8 @@ Accept-Language: en|ar
 
 **Query Parameters:**
 - `product_id` (optional): تصفية حسب معرف المنتج
+- `pagination` (optional): تفعيل/تعطيل الـ pagination (true/false، default: true)
+- `per_page` (optional): عدد العناصر في الصفحة (default: 15)
 
 **Response Example:**
 ```json

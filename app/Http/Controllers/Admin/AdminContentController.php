@@ -17,9 +17,9 @@ class AdminContentController extends Controller
         try {
             $query = Product::query();
 
-            // Filter by type if provided
-            if ($request->filled('type')) {
-                $query->where('type', $request->type);
+            // Filter by product_role if provided
+            if ($request->filled('product_role')) {
+                $query->where('product_role', $request->product_role);
             }
 
             $products = $query->select([
@@ -29,12 +29,22 @@ class AdminContentController extends Controller
                 'description',
                 'description_ar',
                 'type',
-                'role',
-                'price_monthly',
-                'price_yearly',
+                'product_role',
+                'monthly_price',
+                'three_month_price',
+                'six_month_price',
+                'yearly_price',
                 'created_at',
                 'updated_at'
-            ])->get();
+            ]);
+
+            // Check if pagination is disabled
+            if ($request->get('pagination') === 'false' || $request->get('pagination') === false) {
+                $products = $products->get();
+            } else {
+                $perPage = $request->get('per_page', 15);
+                $products = $products->paginate($perPage);
+            }
 
             return response()->json([
                 'success' => true,
@@ -63,9 +73,11 @@ class AdminContentController extends Controller
                 'description',
                 'description_ar',
                 'type',
-                'role',
-                'price_monthly',
-                'price_yearly',
+                'product_role',
+                'monthly_price',
+                'three_month_price',
+                'six_month_price',
+                'yearly_price',
                 'created_at',
                 'updated_at'
             ])->findOrFail($id);
@@ -97,7 +109,7 @@ class AdminContentController extends Controller
                 $query->where('product_id', $request->product_id);
             }
 
-            $tips = $query->select([
+            $query->select([
                 'id',
                 'product_id',
                 'text',
@@ -106,7 +118,15 @@ class AdminContentController extends Controller
                 'sort_order',
                 'created_at',
                 'updated_at'
-            ])->orderBy('product_id')->orderBy('sort_order')->get();
+            ])->orderBy('product_id')->orderBy('sort_order');
+
+            // Check if pagination is disabled
+            if ($request->get('pagination') === 'false' || $request->get('pagination') === false) {
+                $tips = $query->get();
+            } else {
+                $perPage = $request->get('per_page', 15);
+                $tips = $query->paginate($perPage);
+            }
 
             return response()->json([
                 'success' => true,

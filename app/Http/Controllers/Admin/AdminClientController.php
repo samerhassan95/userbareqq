@@ -31,6 +31,17 @@ class AdminClientController extends Controller
                 $query->where('role', $request->role);
             }
 
+            // Check if pagination is disabled
+            if ($request->get('pagination') === 'false' || $request->get('pagination') === false) {
+                $clients = $query->latest()->get();
+                
+                return response()->json([
+                    'success' => true,
+                    'message' => __('messages.clients_retrieved_successfully'),
+                    'data' => $clients
+                ]);
+            }
+
             // Pagination
             $perPage = $request->get('per_page', 15);
             $clients = $query->latest()->paginate($perPage);

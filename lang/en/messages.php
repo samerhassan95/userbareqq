@@ -165,4 +165,17 @@ return [
     
     // Errors
     'error_occurred' => 'An error occurred',
+    
+    // Posts
+    'posts_retrieved_successfully' => 'Posts retrieved successfully',
+    'post_retrieved_successfully' => 'Post retrieved successfully',
+    'post_created_successfully' => 'Post created successfully',
+    'post_updated_successfully' => 'Post updated successfully',
+    'post_deleted_successfully' => 'Post deleted successfully',
+    'post_already_approved' => 'Post is already approved and cannot be edited',
+    'post_already_approved_no_feedback' => 'Post is already approved and cannot receive feedback',
+    'feedback_added_successfully' => 'Feedback added successfully',
+    'feedbacks_retrieved_successfully' => 'Feedbacks retrieved successfully',
+    'post_approved_successfully' => 'Post approved successfully',
+    'validation_error' => 'Validation error',
 ];
