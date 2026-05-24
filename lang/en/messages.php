@@ -162,4 +162,7 @@ return [
     'product_content_retrieved_successfully' => 'Product content retrieved successfully',
     'strategy_tips_content_retrieved_successfully' => 'Strategy tips content retrieved successfully',
     'strategy_tip_content_retrieved_successfully' => 'Strategy tip content retrieved successfully',
+    
+    // Errors
+    'error_occurred' => 'An error occurred',
 ];

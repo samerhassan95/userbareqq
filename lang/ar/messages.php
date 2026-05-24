@@ -162,4 +162,7 @@ return [
     'product_content_retrieved_successfully' => 'تم استرجاع محتوى المنتج بنجاح',
     'strategy_tips_content_retrieved_successfully' => 'تم استرجاع محتوى النصائح الاستراتيجية بنجاح',
     'strategy_tip_content_retrieved_successfully' => 'تم استرجاع محتوى النصيحة الاستراتيجية بنجاح',
+    
+    // Errors
+    'error_occurred' => 'حدث خطأ',
 ];

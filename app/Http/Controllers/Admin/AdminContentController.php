@@ -14,32 +14,40 @@ class AdminContentController extends Controller
      */
     public function getProductsContent(Request $request)
     {
-        $query = Product::query();
+        try {
+            $query = Product::query();
 
-        // Filter by type if provided
-        if ($request->has('type')) {
-            $query->where('type', $request->type);
+            // Filter by type if provided
+            if ($request->filled('type')) {
+                $query->where('type', $request->type);
+            }
+
+            $products = $query->select([
+                'id',
+                'name_en',
+                'name_ar',
+                'description_en',
+                'description_ar',
+                'type',
+                'role',
+                'price_monthly',
+                'price_yearly',
+                'created_at',
+                'updated_at'
+            ])->get();
+
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.products_content_retrieved_successfully'),
+                'data' => $products
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => __('messages.error_occurred'),
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        $products = $query->select([
-            'id',
-            'name_en',
-            'name_ar',
-            'description_en',
-            'description_ar',
-            'type',
-            'role',
-            'price_monthly',
-            'price_yearly',
-            'created_at',
-            'updated_at'
-        ])->get();
-
-        return response()->json([
-            'success' => true,
-            'message' => __('messages.products_content_retrieved_successfully'),
-            'data' => $products
-        ]);
     }
 
     /**
@@ -47,25 +55,33 @@ class AdminContentController extends Controller
      */
     public function getProductContent($id)
     {
-        $product = Product::select([
-            'id',
-            'name_en',
-            'name_ar',
-            'description_en',
-            'description_ar',
-            'type',
-            'role',
-            'price_monthly',
-            'price_yearly',
-            'created_at',
-            'updated_at'
-        ])->findOrFail($id);
+        try {
+            $product = Product::select([
+                'id',
+                'name_en',
+                'name_ar',
+                'description_en',
+                'description_ar',
+                'type',
+                'role',
+                'price_monthly',
+                'price_yearly',
+                'created_at',
+                'updated_at'
+            ])->findOrFail($id);
 
-        return response()->json([
-            'success' => true,
-            'message' => __('messages.product_content_retrieved_successfully'),
-            'data' => $product
-        ]);
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.product_content_retrieved_successfully'),
+                'data' => $product
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => __('messages.error_occurred'),
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -73,39 +89,15 @@ class AdminContentController extends Controller
      */
     public function getStrategyTipsContent(Request $request)
     {
-        $query = ProductStrategyTip::with('product:id,name_en,name_ar');
+        try {
+            $query = ProductStrategyTip::with('product:id,name_en,name_ar');
 
-        // Filter by product if provided
-        if ($request->has('product_id')) {
-            $query->where('product_id', $request->product_id);
-        }
+            // Filter by product if provided
+            if ($request->filled('product_id')) {
+                $query->where('product_id', $request->product_id);
+            }
 
-        $tips = $query->select([
-            'id',
-            'product_id',
-            'title_en',
-            'title_ar',
-            'description_en',
-            'description_ar',
-            'order',
-            'created_at',
-            'updated_at'
-        ])->orderBy('product_id')->orderBy('order')->get();
-
-        return response()->json([
-            'success' => true,
-            'message' => __('messages.strategy_tips_content_retrieved_successfully'),
-            'data' => $tips
-        ]);
-    }
-
-    /**
-     * Get single strategy tip content for editing
-     */
-    public function getStrategyTipContent($id)
-    {
-        $tip = ProductStrategyTip::with('product:id,name_en,name_ar')
-            ->select([
+            $tips = $query->select([
                 'id',
                 'product_id',
                 'title_en',
@@ -115,13 +107,53 @@ class AdminContentController extends Controller
                 'order',
                 'created_at',
                 'updated_at'
-            ])
-            ->findOrFail($id);
+            ])->orderBy('product_id')->orderBy('order')->get();
 
-        return response()->json([
-            'success' => true,
-            'message' => __('messages.strategy_tip_content_retrieved_successfully'),
-            'data' => $tip
-        ]);
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.strategy_tips_content_retrieved_successfully'),
+                'data' => $tips
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => __('messages.error_occurred'),
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Get single strategy tip content for editing
+     */
+    public function getStrategyTipContent($id)
+    {
+        try {
+            $tip = ProductStrategyTip::with('product:id,name_en,name_ar')
+                ->select([
+                    'id',
+                    'product_id',
+                    'title_en',
+                    'title_ar',
+                    'description_en',
+                    'description_ar',
+                    'order',
+                    'created_at',
+                    'updated_at'
+                ])
+                ->findOrFail($id);
+
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.strategy_tip_content_retrieved_successfully'),
+                'data' => $tip
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => __('messages.error_occurred'),
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }
