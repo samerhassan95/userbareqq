@@ -103,6 +103,9 @@ class ProductOrderResource extends JsonResource
                     ->get();
 
                 $data['works_preview'] = $upcomingWorks->map(function ($work) {
+                    // Get posts for this work
+                    $posts = $work->posts()->get();
+                    
                     return [
                         'id' => $work->id,
                         'title' => \App\Helpers\TranslationHelper::getTranslatedField($work, 'title'),
@@ -112,8 +115,34 @@ class ProductOrderResource extends JsonResource
                         'platforms' => $work->platforms ?? [],
                         'status' => $work->status,
                         'post_type' => $work->post_type,
+                        'posts' => $posts->map(function ($post) {
+                            return [
+                                'id' => $post->id,
+                                'title' => \App\Helpers\TranslationHelper::getTranslatedField($post, 'title'),
+                                'image' => $post->image ? asset($post->image) : null,
+                                'status' => $post->status,
+                                'is_approved' => $post->is_approved,
+                            ];
+                        })->toArray(),
+                        'posts_count' => $posts->count(),
                     ];
                 })->toArray();
+
+                // Add all posts for this order
+                $allPosts = $this->posts()->orderBy('created_at', 'desc')->get();
+                $data['posts'] = $allPosts->map(function ($post) {
+                    return [
+                        'id' => $post->id,
+                        'title' => \App\Helpers\TranslationHelper::getTranslatedField($post, 'title'),
+                        'description' => \App\Helpers\TranslationHelper::getTranslatedField($post, 'description'),
+                        'image' => $post->image ? asset($post->image) : null,
+                        'status' => $post->status,
+                        'is_approved' => $post->is_approved,
+                        'approved_at' => $post->approved_at ? $post->approved_at->format('Y-m-d H:i:s') : null,
+                        'created_at' => $post->created_at ? $post->created_at->format('Y-m-d H:i:s') : null,
+                    ];
+                })->toArray();
+                $data['posts_count'] = $allPosts->count();
             }
 
             return $data;

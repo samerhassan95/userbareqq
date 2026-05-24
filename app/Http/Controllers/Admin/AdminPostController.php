@@ -101,6 +101,8 @@ class AdminPostController extends Controller
                 'description_ar' => 'nullable|string',
                 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'client_id' => 'required|exists:clients,id',
+                'product_order_id' => 'nullable|exists:product_orders,id',
+                'strategy_work_id' => 'nullable|exists:strategy_works,id',
                 'status' => 'nullable|in:pending,approved,rejected',
             ]);
 
@@ -168,6 +170,8 @@ class AdminPostController extends Controller
                 'description_ar' => 'nullable|string',
                 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'client_id' => 'sometimes|required|exists:clients,id',
+                'product_order_id' => 'nullable|exists:product_orders,id',
+                'strategy_work_id' => 'nullable|exists:strategy_works,id',
                 'status' => 'nullable|in:pending,approved,rejected',
             ]);
 

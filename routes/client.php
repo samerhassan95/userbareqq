@@ -37,6 +37,7 @@ Route::middleware(['client'])->group(function () {
     Route::post('product-orders', [ProductOrderController::class, 'store']);
     Route::get('my-orders', [ProductOrderController::class, 'index']);
     Route::get('product-orders/{id}', [ProductOrderController::class, 'show']);
+    Route::get('product-orders/{orderId}/posts', [ProductOrderController::class, 'getPosts']);
     
     // Strategy Works Routes
     Route::get('product-orders/{orderId}/works', [StrategyWorkController::class, 'index']);

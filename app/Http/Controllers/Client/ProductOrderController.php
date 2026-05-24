@@ -282,4 +282,39 @@ class ProductOrderController extends Controller
 
         return $labels[$status] ?? ucfirst(str_replace('_', ' ', $status));
     }
+
+    /**
+     * Get all posts for a specific order
+     * GET /api/client/product-orders/{orderId}/posts
+     */
+    public function getPosts($orderId)
+    {
+        try {
+            $client = auth()->user();
+            
+            $order = $this->orderRepository->findById($orderId);
+
+            if (!$order || $order->client_id !== $client->id) {
+                return ResponseHelper::error('Order not found', [], 404);
+            }
+
+            $posts = $order->posts()
+                ->with(['createdBy', 'feedbacks.createdBy', 'strategyWork'])
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            return ResponseHelper::success(
+                \App\Http\Resources\PostResource::collection($posts),
+                __('messages.posts_retrieved')
+            );
+        } catch (\Exception $e) {
+            \Log::error('Failed to fetch order posts: ' . $e->getMessage());
+            
+            return ResponseHelper::error(
+                'Failed to retrieve posts: ' . $e->getMessage(),
+                [],
+                500
+            );
+        }
+    }
 }

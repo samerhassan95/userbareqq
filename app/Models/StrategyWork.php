@@ -37,4 +37,12 @@ class StrategyWork extends Model
     {
         return $this->belongsTo(ProductOrder::class);
     }
+
+    /**
+     * Get all posts for this strategy work
+     */
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
 }

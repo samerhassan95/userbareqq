@@ -20,6 +20,8 @@ class Post extends Model
         'is_approved',
         'approved_at',
         'client_id',
+        'product_order_id',
+        'strategy_work_id',
         'created_by_id',
         'created_by_type',
         'updated_by_id',
@@ -77,5 +79,21 @@ class Post extends Model
     public function canReceiveFeedback()
     {
         return !$this->is_approved;
+    }
+
+    /**
+     * Get the product order this post belongs to
+     */
+    public function productOrder()
+    {
+        return $this->belongsTo(ProductOrder::class);
+    }
+
+    /**
+     * Get the strategy work this post belongs to
+     */
+    public function strategyWork()
+    {
+        return $this->belongsTo(StrategyWork::class);
     }
 }

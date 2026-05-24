@@ -70,4 +70,12 @@ class ProductOrder extends Model
     {
         return $this->hasMany(StrategyWork::class);
     }
+
+    /**
+     * Get all posts for this order
+     */
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
 }

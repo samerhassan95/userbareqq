@@ -43,6 +43,7 @@ Route::middleware('admin')->group(function () {
     Route::get('product-orders', [AdminProductOrderController::class, 'index']);
     Route::get('product-orders/statistics', [AdminProductOrderController::class, 'statistics']);
     Route::get('product-orders/{id}', [AdminProductOrderController::class, 'show']);
+    Route::get('product-orders/{orderId}/posts', [AdminProductOrderController::class, 'getPosts']);
     Route::post('product-orders/{id}/approve-payment', [AdminProductOrderController::class, 'approvePayment']);
     Route::put('product-orders/{id}/status', [AdminProductOrderController::class, 'updateStatus']);
     Route::post('product-orders/{id}/upload-deliverable', [AdminProductOrderController::class, 'uploadDeliverable']);

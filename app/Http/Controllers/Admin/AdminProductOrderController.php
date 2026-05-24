@@ -209,4 +209,37 @@ class AdminProductOrderController extends Controller
 
         return ResponseHelper::success($stats, __('Statistics retrieved successfully'));
     }
+
+    /**
+     * Get all posts for a specific order
+     * GET /api/admin/product-orders/{orderId}/posts
+     */
+    public function getPosts($orderId)
+    {
+        try {
+            $order = $this->orderRepository->findById($orderId);
+
+            if (!$order) {
+                return ResponseHelper::error('Order not found', [], 404);
+            }
+
+            $posts = $order->posts()
+                ->with(['createdBy', 'feedbacks.createdBy', 'strategyWork', 'client'])
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            return ResponseHelper::success(
+                \App\Http\Resources\PostResource::collection($posts),
+                __('messages.posts_retrieved')
+            );
+        } catch (\Exception $e) {
+            \Log::error('Failed to fetch order posts: ' . $e->getMessage());
+            
+            return ResponseHelper::error(
+                'Failed to retrieve posts: ' . $e->getMessage(),
+                [],
+                500
+            );
+        }
+    }
 }
