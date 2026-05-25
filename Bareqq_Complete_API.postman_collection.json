@@ -1872,8 +1872,18 @@
 									"type": "text"
 								},
 								{
+									"key": "title_ar",
+									"value": "العنوان المحدث",
+									"type": "text"
+								},
+								{
 									"key": "description",
 									"value": "Updated description",
+									"type": "text"
+								},
+								{
+									"key": "description_ar",
+									"value": "الوصف المحدث",
 									"type": "text"
 								},
 								{
@@ -1884,7 +1894,8 @@
 								{
 									"key": "status",
 									"value": "pending",
-									"type": "text"
+									"type": "text",
+									"description": "pending, approved, or rejected"
 								},
 								{
 									"key": "image",
@@ -2162,9 +2173,40 @@
 							"mode": "formdata",
 							"formdata": [
 								{
+									"key": "title",
+									"value": "Updated Title",
+									"type": "text"
+								},
+								{
+									"key": "title_ar",
+									"value": "العنوان المحدث",
+									"type": "text"
+								},
+								{
 									"key": "description",
 									"value": "Updated by marketer",
 									"type": "text"
+								},
+								{
+									"key": "description_ar",
+									"value": "محدث بواسطة المسوق",
+									"type": "text"
+								},
+								{
+									"key": "client_id",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "status",
+									"value": "pending",
+									"type": "text",
+									"description": "pending, approved, or rejected"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": []
 								}
 							]
 						},
@@ -2263,16 +2305,34 @@
 							"mode": "formdata",
 							"formdata": [
 								{
-									"key": "image",
-									"type": "file",
-									"src": [],
-									"description": "Designer adds/updates image"
+									"key": "title",
+									"value": "",
+									"type": "text",
+									"description": "Optional: update title"
+								},
+								{
+									"key": "title_ar",
+									"value": "",
+									"type": "text",
+									"description": "Optional: update Arabic title"
 								},
 								{
 									"key": "description",
 									"value": "",
 									"type": "text",
 									"description": "Optional: update description"
+								},
+								{
+									"key": "description_ar",
+									"value": "",
+									"type": "text",
+									"description": "Optional: update Arabic description"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": [],
+									"description": "Designer adds/updates image"
 								}
 							]
 						},
@@ -2427,6 +2487,128 @@
 							"path": ["client", "posts", "1", "feedbacks"]
 						},
 						"description": "Get all feedbacks for a specific post"
+					}
+				}
+			]
+		},
+		{
+			"name": "Admin - Team Members",
+			"item": [
+				{
+					"name": "Get All Designers",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/admin/designers?search=&pagination=true&per_page=15",
+							"host": ["{{base_url}}"],
+							"path": ["admin", "designers"],
+							"query": [
+								{
+									"key": "search",
+									"value": "",
+									"description": "Search by username, email, or phone"
+								},
+								{
+									"key": "pagination",
+									"value": "true",
+									"description": "Enable/disable pagination"
+								},
+								{
+									"key": "per_page",
+									"value": "15",
+									"description": "Items per page"
+								}
+							]
+						},
+						"description": "Get all designers with optional search and pagination"
+					}
+				},
+				{
+					"name": "Get All Marketers",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/admin/marketers?search=&pagination=true&per_page=15",
+							"host": ["{{base_url}}"],
+							"path": ["admin", "marketers"],
+							"query": [
+								{
+									"key": "search",
+									"value": "",
+									"description": "Search by username, email, or phone"
+								},
+								{
+									"key": "pagination",
+									"value": "true",
+									"description": "Enable/disable pagination"
+								},
+								{
+									"key": "per_page",
+									"value": "15",
+									"description": "Items per page"
+								}
+							]
+						},
+						"description": "Get all marketers with optional search and pagination"
+					}
+				},
+				{
+					"name": "Get All Team Members (Combined)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/admin/team-members?search=&pagination=true&per_page=15",
+							"host": ["{{base_url}}"],
+							"path": ["admin", "team-members"],
+							"query": [
+								{
+									"key": "search",
+									"value": "",
+									"description": "Search by username, email, or phone"
+								},
+								{
+									"key": "pagination",
+									"value": "true",
+									"description": "Enable/disable pagination"
+								},
+								{
+									"key": "per_page",
+									"value": "15",
+									"description": "Items per page"
+								}
+							]
+						},
+						"description": "Get all team members (designers and marketers combined) with optional search and pagination. Returns grouped data with designers and marketers arrays, plus a combined array."
 					}
 				}
 			]

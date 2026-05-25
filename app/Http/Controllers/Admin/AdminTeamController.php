@@ -22,19 +22,19 @@ class AdminTeamController extends Controller
             if ($request->filled('search')) {
                 $search = $request->search;
                 $query->where(function($q) use ($search) {
-                    $q->where('name', 'like', "%{$search}%")
-                      ->orWhere('username', 'like', "%{$search}%")
-                      ->orWhere('email', 'like', "%{$search}%");
+                    $q->where('username', 'like', "%{$search}%")
+                      ->orWhere('email', 'like', "%{$search}%")
+                      ->orWhere('phone', 'like', "%{$search}%");
                 });
             }
 
             // Pagination
             if ($request->get('pagination') === 'false' || $request->get('pagination') === false) {
-                $designers = $query->select('id', 'name', 'username', 'email', 'phone', 'created_at')
+                $designers = $query->select('id', 'username', 'email', 'phone', 'created_at')
                     ->get();
             } else {
                 $perPage = $request->get('per_page', 15);
-                $designers = $query->select('id', 'name', 'username', 'email', 'phone', 'created_at')
+                $designers = $query->select('id', 'username', 'email', 'phone', 'created_at')
                     ->paginate($perPage);
             }
 
@@ -65,19 +65,19 @@ class AdminTeamController extends Controller
             if ($request->filled('search')) {
                 $search = $request->search;
                 $query->where(function($q) use ($search) {
-                    $q->where('name', 'like', "%{$search}%")
-                      ->orWhere('username', 'like', "%{$search}%")
-                      ->orWhere('email', 'like', "%{$search}%");
+                    $q->where('username', 'like', "%{$search}%")
+                      ->orWhere('email', 'like', "%{$search}%")
+                      ->orWhere('phone', 'like', "%{$search}%");
                 });
             }
 
             // Pagination
             if ($request->get('pagination') === 'false' || $request->get('pagination') === false) {
-                $marketers = $query->select('id', 'name', 'username', 'email', 'phone', 'created_at')
+                $marketers = $query->select('id', 'username', 'email', 'phone', 'created_at')
                     ->get();
             } else {
                 $perPage = $request->get('per_page', 15);
-                $marketers = $query->select('id', 'name', 'username', 'email', 'phone', 'created_at')
+                $marketers = $query->select('id', 'username', 'email', 'phone', 'created_at')
                     ->paginate($perPage);
             }
 
@@ -102,12 +102,11 @@ class AdminTeamController extends Controller
     public function getAllTeamMembers(Request $request)
     {
         try {
-            $designers = Designer::select('id', 'name', 'username', 'email', 'phone', 'created_at')
+            $designers = Designer::select('id', 'username', 'email', 'phone', 'created_at')
                 ->get()
                 ->map(function ($designer) {
                     return [
                         'id' => $designer->id,
-                        'name' => $designer->name,
                         'username' => $designer->username,
                         'email' => $designer->email,
                         'phone' => $designer->phone,
@@ -116,12 +115,11 @@ class AdminTeamController extends Controller
                     ];
                 });
 
-            $marketers = Marketer::select('id', 'name', 'username', 'email', 'phone', 'created_at')
+            $marketers = Marketer::select('id', 'username', 'email', 'phone', 'created_at')
                 ->get()
                 ->map(function ($marketer) {
                     return [
                         'id' => $marketer->id,
-                        'name' => $marketer->name,
                         'username' => $marketer->username,
                         'email' => $marketer->email,
                         'phone' => $marketer->phone,
@@ -130,7 +128,7 @@ class AdminTeamController extends Controller
                     ];
                 });
 
-            $teamMembers = $designers->merge($marketers)->sortBy('name')->values();
+            $teamMembers = $designers->merge($marketers)->sortBy('username')->values();
 
             return response()->json([
                 'success' => true,
