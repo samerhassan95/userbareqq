@@ -111,12 +111,14 @@ class AdminProductOrderController extends Controller
                     $billingCycle = 'monthly';
                     break;
                 case '3_months':
+                case 'three_months':
                     $expiresAt = $startsAt->copy()->addMonths(3);
-                    $billingCycle = '3_months';
+                    $billingCycle = 'three_months';
                     break;
                 case '6_months':
+                case 'six_months':
                     $expiresAt = $startsAt->copy()->addMonths(6);
-                    $billingCycle = '6_months';
+                    $billingCycle = 'six_months';
                     break;
                 case 'year':
                     $expiresAt = $startsAt->copy()->addYear();

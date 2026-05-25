@@ -81,20 +81,28 @@ class ProductOrderController extends Controller
             $durationDetails = null;
 
             if ($validated['product_role'] === 'strategy') {
-                $orderData['duration'] = $validated['duration'];
+                // Normalize duration format (map 3_months/6_months to three_months/six_months)
+                $duration = $validated['duration'];
+                if ($duration === '3_months') {
+                    $duration = 'three_months';
+                } elseif ($duration === '6_months') {
+                    $duration = 'six_months';
+                }
+                
+                $orderData['duration'] = $duration;
                 
                 // Calculate expiry date based on duration
                 $startsAt = Carbon::now();
-                switch ($validated['duration']) {
+                switch ($duration) {
                     case 'month':
                         $endsAt = $startsAt->copy()->addMonth();
                         $durationLabel = 'Monthly';
                         break;
-                    case '3_months':
+                    case 'three_months':
                         $endsAt = $startsAt->copy()->addMonths(3);
                         $durationLabel = '3 Months';
                         break;
-                    case '6_months':
+                    case 'six_months':
                         $endsAt = $startsAt->copy()->addMonths(6);
                         $durationLabel = '6 Months';
                         break;
@@ -109,7 +117,7 @@ class ProductOrderController extends Controller
                 
                 // Get duration details
                 $durationDetails = [
-                    'duration' => $validated['duration'],
+                    'duration' => $duration,
                     'duration_label' => $durationLabel,
                     'price' => (float) $calculatedPrice,
                     'starts_at' => $startsAt->format('Y-m-d'),
@@ -281,8 +289,10 @@ class ProductOrderController extends Controller
                 case 'month':
                     return $product->monthly_price ?? $product->price;
                 case '3_months':
+                case 'three_months':
                     return $product->three_months_price ?? ($product->monthly_price * 3) ?? $product->price;
                 case '6_months':
+                case 'six_months':
                     return $product->six_months_price ?? ($product->monthly_price * 6) ?? $product->price;
                 case 'year':
                     return $product->yearly_price ?? ($product->monthly_price * 12) ?? $product->price;

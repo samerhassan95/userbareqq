@@ -17,7 +17,7 @@ class CreateProductOrderRequest extends FormRequest
             'product_id' => 'required|exists:products,id',
             'product_role' => 'required|in:one_time,strategy',
             'total_price' => 'required|numeric|min:0',
-            'duration' => 'required_if:product_role,strategy|in:month,3_months,6_months,year',
+            'duration' => 'required_if:product_role,strategy|in:month,three_months,six_months,year,3_months,6_months',
         ];
     }
 
@@ -29,7 +29,7 @@ class CreateProductOrderRequest extends FormRequest
             'product_role.required' => 'Product role is required.',
             'product_role.in' => 'Product role must be one_time or strategy.',
             'duration.required_if' => 'Duration is required for strategy products.',
-            'duration.in' => 'Duration must be month, 3_months, 6_months, or year.',
+            'duration.in' => 'Duration must be month, three_months, six_months, or year.',
         ];
     }
 }

@@ -729,8 +729,83 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/client/product-orders",
-							"host": ["{{base_url}}"],
-							"path": ["client", "product-orders"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"client",
+								"product-orders"
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Strategy Order (3 Months)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{client_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}",
+								"description": "Language: en or ar"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"product_id\": 2,\n    \"product_role\": \"strategy\",\n    \"total_price\": \"5000\",\n    \"duration\": \"three_months\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/client/product-orders",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"client",
+								"product-orders"
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Strategy Order (6 Months)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{client_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}",
+								"description": "Language: en or ar"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"product_id\": 2,\n    \"product_role\": \"strategy\",\n    \"total_price\": \"9000\",\n    \"duration\": \"six_months\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/client/product-orders",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"client",
+								"product-orders"
+							]
 						}
 					}
 				},
@@ -759,8 +834,13 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/client/product-orders",
-							"host": ["{{base_url}}"],
-							"path": ["client", "product-orders"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"client",
+								"product-orders"
+							]
 						}
 					}
 				},
