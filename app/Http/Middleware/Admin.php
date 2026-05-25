@@ -14,7 +14,11 @@ class Admin
 {
     public function handle(Request $request, Closure $next)
     {
-
+        // Set locale based on Accept-Language header
+        $locale = $request->header('Accept-Language', 'en');
+        if (in_array($locale, ['en', 'ar'])) {
+            app()->setLocale($locale);
+        }
 
        
         $apiPassword = $request->header('API-Password');
