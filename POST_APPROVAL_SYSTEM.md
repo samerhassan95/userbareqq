@@ -8,6 +8,23 @@
 
 البوست يصبح **fully approved** فقط عندما يوافق عليه الثلاثة أطراف.
 
+## ⚠️ Important: Post Locking Behavior
+
+**عند أول موافقة من أي طرف:**
+- ❌ البوست يتقفل من التعديل (Edit)
+- ❌ لا يمكن إضافة feedbacks جديدة
+- ✅ يمكن للأطراف الأخرى الموافقة فقط
+- 🔒 Status يتغير إلى `in_review`
+
+**مثال:**
+```
+1. Client يوافق → البوست يتقفل ✅
+2. Admin يحاول التعديل → ❌ Error: Post is locked
+3. Marketer يحاول إضافة feedback → ❌ Error: Post is locked
+4. Admin يوافق → ✅ Allowed
+5. Marketer يوافق → ✅ Allowed → Fully Approved
+```
+
 ## Database Fields
 
 ### posts table - New Fields
@@ -156,28 +173,45 @@ Accept-Language: ar
 
 ## Approval Flow
 
-### Step 1: Client Approves
+### Step 1: Client Approves (Post Gets Locked 🔒)
 ```
 Client → POST /client/posts/1/approve
-Result: client_approved = true
-Status: is_approved = false (waiting for admin & marketer)
+Result: 
+  - client_approved = true
+  - status = 'in_review'
+  - 🔒 Post is LOCKED (no edits, no feedbacks)
+  - ⏳ Waiting for admin & marketer approval
 ```
 
 ### Step 2: Admin Approves
 ```
 Admin → POST /admin/posts/1/approve
-Result: admin_approved = true
-Status: is_approved = false (waiting for marketer)
+Result: 
+  - admin_approved = true
+  - status = 'in_review'
+  - 🔒 Still LOCKED
+  - ⏳ Waiting for marketer approval
 ```
 
 ### Step 3: Marketer Approves (Final)
 ```
 Marketer → POST /marketer/posts/1/approve
-Result: marketer_approved = true
-Status: is_approved = true ✅ FULLY APPROVED
-       approved_at = now()
-       status = 'approved'
+Result: 
+  - marketer_approved = true
+  - is_approved = true ✅ FULLY APPROVED
+  - approved_at = now()
+  - status = 'approved'
+  - 🔒 Permanently LOCKED
 ```
+
+## Post Status Values
+
+| Status | Description |
+|--------|-------------|
+| `pending` | Initial state, no approvals yet |
+| `in_review` | At least one party approved, locked for editing |
+| `approved` | All three parties approved, fully locked |
+| `rejected` | Post was rejected (future feature) |
 
 ## Approval Order
 الموافقات يمكن أن تحدث بأي ترتيب:
@@ -198,6 +232,22 @@ Status: is_approved = true ✅ FULLY APPROVED
 }
 ```
 
+### Post is Locked (Cannot Edit)
+```json
+{
+    "success": false,
+    "message": "Post is locked. Cannot edit after approval."
+}
+```
+
+### Post is Locked (Cannot Add Feedback)
+```json
+{
+    "success": false,
+    "message": "Post is locked. Cannot add feedback after approval."
+}
+```
+
 ### Post Not Found
 ```json
 {
@@ -211,7 +261,7 @@ Status: is_approved = true ✅ FULLY APPROVED
 ### Post Model - New Methods
 
 ```php
-// Approve by specific party
+// Approve by specific party (locks post automatically)
 $post->approveByClient($clientId);
 $post->approveByAdmin($adminId);
 $post->approveByMarketer($marketerId);
@@ -222,9 +272,34 @@ $post->isFullyApproved(); // Returns boolean
 // Get approval status
 $post->getApprovalStatus(); // Returns array with all approval info
 
-// Check if can be edited (old method still works)
-$post->canBeEdited(); // Returns false if is_approved = true
+// Check if can be edited (returns false if ANY approval exists)
+$post->canBeEdited(); // Returns false if client_approved OR admin_approved OR marketer_approved
+
+// Check if can receive feedback (returns false if ANY approval exists)
+$post->canReceiveFeedback(); // Returns false if client_approved OR admin_approved OR marketer_approved
 ```
+
+## Locking Logic
+
+### canBeEdited()
+```php
+public function canBeEdited()
+{
+    // Post cannot be edited if ANY party has approved it
+    return !$this->client_approved && !$this->admin_approved && !$this->marketer_approved;
+}
+```
+
+### canReceiveFeedback()
+```php
+public function canReceiveFeedback()
+{
+    // Post cannot receive feedback if ANY party has approved it
+    return !$this->client_approved && !$this->admin_approved && !$this->marketer_approved;
+}
+```
+
+**Important:** البوست يتقفل من أول موافقة من أي طرف!
 
 ## Frontend Implementation Example
 
@@ -295,44 +370,62 @@ php artisan migrate
 ### 1. Create Post (Admin)
 ```bash
 POST /admin/posts
+# Status: pending, can be edited ✅
 ```
 
-### 2. Client Approves
+### 2. Try to Edit (Before Any Approval)
+```bash
+PUT /admin/posts/1
+# Result: Success ✅ (no approvals yet)
+```
+
+### 3. Client Approves (Post Gets Locked)
 ```bash
 POST /client/posts/1/approve
-# Result: client_approved = true, is_approved = false
+# Result: client_approved = true, status = 'in_review'
+# Post is now LOCKED 🔒
 ```
 
-### 3. Check Status
+### 4. Try to Edit (After Client Approval)
 ```bash
-GET /client/posts/1
-# Shows: client_approved = true, admin_approved = false, marketer_approved = false
+PUT /admin/posts/1
+# Result: Error ❌ "Post is locked. Cannot edit after approval."
 ```
 
-### 4. Admin Approves
+### 5. Try to Add Feedback (After Client Approval)
+```bash
+POST /client/posts/1/feedback
+# Result: Error ❌ "Post is locked. Cannot add feedback after approval."
+```
+
+### 6. Admin Approves
 ```bash
 POST /admin/posts/1/approve
-# Result: admin_approved = true, is_approved = false
+# Result: admin_approved = true, status = 'in_review'
+# Still LOCKED 🔒
 ```
 
-### 5. Marketer Approves (Final)
+### 7. Marketer Approves (Final)
 ```bash
 POST /marketer/posts/1/approve
-# Result: marketer_approved = true, is_approved = true ✅
+# Result: marketer_approved = true, is_approved = true, status = 'approved'
+# Permanently LOCKED 🔒
 ```
 
-### 6. Verify Full Approval
+### 8. Verify Full Approval
 ```bash
 GET /admin/posts/1
-# Shows: is_approved = true, status = 'approved', approved_at = timestamp
+# Shows: is_approved = true, status = 'approved', all three approvals = true
 ```
 
 ## Notes
+- ⚠️ **البوست يتقفل من أول موافقة من أي طرف**
 - كل طرف يمكنه الموافقة مرة واحدة فقط
 - الموافقة لا يمكن إلغاؤها (no undo)
-- البوست يصبح locked من التعديل عندما `is_approved = true`
+- بعد أول موافقة: ❌ لا تعديل، ❌ لا feedbacks، ✅ موافقات فقط
 - يتم حفظ ID الشخص الذي وافق من كل طرف
 - يتم حفظ تاريخ ووقت كل موافقة
+- Status يتغير من `pending` → `in_review` → `approved`
 
 ## Future Enhancements
 - إضافة notifications عند كل موافقة
