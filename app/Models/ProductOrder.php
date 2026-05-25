@@ -64,6 +64,14 @@ class ProductOrder extends Model
     }
 
     /**
+     * Get the product order team members (new system)
+     */
+    public function orderTeamMembers()
+    {
+        return $this->hasMany(ProductOrderTeamMember::class);
+    }
+
+    /**
      * Get the strategy works/posts
      */
     public function strategyWorks()

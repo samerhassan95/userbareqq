@@ -46,6 +46,11 @@ Route::middleware('admin')->group(function () {
     Route::get('product-orders/{orderId}/posts', [AdminProductOrderController::class, 'getPosts']);
     Route::post('product-orders/{id}/approve-payment', [AdminProductOrderController::class, 'approvePayment']);
     Route::put('product-orders/{id}/status', [AdminProductOrderController::class, 'updateStatus']);
+
+    // Product Order Team Members (NEW)
+    Route::post('product-orders/{orderId}/team', [\App\Http\Controllers\Admin\AdminProductOrderTeamController::class, 'addTeamMembers']);
+    Route::get('product-orders/{orderId}/team', [\App\Http\Controllers\Admin\AdminProductOrderTeamController::class, 'getTeamMembers']);
+    Route::delete('product-orders/{orderId}/team/{teamMemberId}', [\App\Http\Controllers\Admin\AdminProductOrderTeamController::class, 'removeTeamMember']);
     Route::post('product-orders/{id}/upload-deliverable', [AdminProductOrderController::class, 'uploadDeliverable']);
 
     // Strategy Tips Management

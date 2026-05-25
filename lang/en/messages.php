@@ -56,6 +56,12 @@ return [
     'Strategy tip deleted successfully' => 'Strategy tip deleted successfully',
     'Tips reordered successfully' => 'Tips reordered successfully',
     
+    // Team Members
+    'only_strategy_orders_can_have_team' => 'Only strategy orders can have team members',
+    'team_members_added_successfully' => 'Team members added successfully',
+    'team_members_retrieved_successfully' => 'Team members retrieved successfully',
+    'team_member_removed_successfully' => 'Team member removed successfully',
+    
     // Credentials
     'credential_saved' => 'Credential saved successfully',
     'credential_updated' => 'Credential updated successfully',

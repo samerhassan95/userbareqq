@@ -56,6 +56,12 @@ return [
     'Strategy tip deleted successfully' => 'تم حذف النصيحة الاستراتيجية بنجاح',
     'Tips reordered successfully' => 'تم إعادة ترتيب النصائح بنجاح',
     
+    // Team Members
+    'only_strategy_orders_can_have_team' => 'فقط طلبات الاستراتيجية يمكن أن يكون لها أعضاء فريق',
+    'team_members_added_successfully' => 'تم إضافة أعضاء الفريق بنجاح',
+    'team_members_retrieved_successfully' => 'تم استرجاع أعضاء الفريق بنجاح',
+    'team_member_removed_successfully' => 'تم إزالة عضو الفريق بنجاح',
+    
     // Credentials
     'credential_saved' => 'تم حفظ بيانات الاعتماد بنجاح',
     'credential_updated' => 'تم تحديث بيانات الاعتماد بنجاح',

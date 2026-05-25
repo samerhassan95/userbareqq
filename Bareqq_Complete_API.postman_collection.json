@@ -1269,6 +1269,85 @@
 							"path": ["admin", "product-orders", "1", "upload-deliverable"]
 						}
 					}
+				},
+				{
+					"name": "Add Team Members to Order",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"team_members\": [\n    {\n      \"member_id\": 1,\n      \"member_type\": \"designer\"\n    },\n    {\n      \"member_id\": 2,\n      \"member_type\": \"marketer\"\n    }\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/admin/product-orders/7/team",
+							"host": ["{{base_url}}"],
+							"path": ["admin", "product-orders", "7", "team"]
+						},
+						"description": "Add team members (designers/marketers) to a strategy order. All team members will be available for all posts in this order."
+					}
+				},
+				{
+					"name": "Get Team Members for Order",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/admin/product-orders/7/team",
+							"host": ["{{base_url}}"],
+							"path": ["admin", "product-orders", "7", "team"]
+						},
+						"description": "Get all team members assigned to this strategy order"
+					}
+				},
+				{
+					"name": "Remove Team Member from Order",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/admin/product-orders/7/team/1",
+							"host": ["{{base_url}}"],
+							"path": ["admin", "product-orders", "7", "team", "1"]
+						},
+						"description": "Remove a team member from the strategy order"
+					}
 				}
 			]
 		},
