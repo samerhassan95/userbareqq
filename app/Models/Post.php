@@ -134,9 +134,12 @@ class Post extends Model
             'client_approved' => true,
             'client_approved_at' => now(),
             'approved_by_client_id' => $clientId,
+            'admin_approved' => true,
+            'admin_approved_at' => now(),
+            'marketer_approved' => true,
+            'marketer_approved_at' => now(),
             'is_approved' => true,
             'approved_at' => $this->approved_at ?? now(),
-            'status' => 'in_review',
         ]);
         
         $this->refresh();
@@ -152,9 +155,12 @@ class Post extends Model
             'admin_approved' => true,
             'admin_approved_at' => now(),
             'approved_by_admin_id' => $adminId,
+            'client_approved' => true,
+            'client_approved_at' => now(),
+            'marketer_approved' => true,
+            'marketer_approved_at' => now(),
             'is_approved' => true,
             'approved_at' => $this->approved_at ?? now(),
-            'status' => 'in_review',
         ]);
         
         $this->refresh();
@@ -170,9 +176,12 @@ class Post extends Model
             'marketer_approved' => true,
             'marketer_approved_at' => now(),
             'approved_by_marketer_id' => $marketerId,
+            'client_approved' => true,
+            'client_approved_at' => now(),
+            'admin_approved' => true,
+            'admin_approved_at' => now(),
             'is_approved' => true,
             'approved_at' => $this->approved_at ?? now(),
-            'status' => 'in_review',
         ]);
         
         $this->refresh();
