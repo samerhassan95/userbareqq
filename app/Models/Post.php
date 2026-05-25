@@ -17,6 +17,8 @@ class Post extends Model
         'description_ar',
         'image',
         'status',
+        'scheduled_date',
+        'scheduled_time',
         'is_approved',
         'approved_at',
         'client_approved',
@@ -46,6 +48,7 @@ class Post extends Model
         'admin_approved_at' => 'datetime',
         'marketer_approved' => 'boolean',
         'marketer_approved_at' => 'datetime',
+        'scheduled_date' => 'date:Y-m-d',
     ];
 
     /**
@@ -131,10 +134,12 @@ class Post extends Model
             'client_approved' => true,
             'client_approved_at' => now(),
             'approved_by_client_id' => $clientId,
-            'status' => 'in_review', // Change status to indicate approval started
+            'is_approved' => true,
+            'approved_at' => $this->approved_at ?? now(),
+            'status' => 'in_review',
         ]);
         
-        $this->refresh(); // Refresh to get updated values
+        $this->refresh();
         $this->checkFullApproval();
     }
 
@@ -147,10 +152,12 @@ class Post extends Model
             'admin_approved' => true,
             'admin_approved_at' => now(),
             'approved_by_admin_id' => $adminId,
-            'status' => 'in_review', // Change status to indicate approval started
+            'is_approved' => true,
+            'approved_at' => $this->approved_at ?? now(),
+            'status' => 'in_review',
         ]);
         
-        $this->refresh(); // Refresh to get updated values
+        $this->refresh();
         $this->checkFullApproval();
     }
 
@@ -163,10 +170,12 @@ class Post extends Model
             'marketer_approved' => true,
             'marketer_approved_at' => now(),
             'approved_by_marketer_id' => $marketerId,
-            'status' => 'in_review', // Change status to indicate approval started
+            'is_approved' => true,
+            'approved_at' => $this->approved_at ?? now(),
+            'status' => 'in_review',
         ]);
         
-        $this->refresh(); // Refresh to get updated values
+        $this->refresh();
         $this->checkFullApproval();
     }
 
@@ -177,8 +186,6 @@ class Post extends Model
     {
         if ($this->client_approved && $this->admin_approved && $this->marketer_approved) {
             $this->update([
-                'is_approved' => true,
-                'approved_at' => now(),
                 'status' => 'approved',
             ]);
         }

@@ -92,6 +92,11 @@ class AdminPostController extends Controller
                 'message' => __('messages.post_retrieved_successfully'),
                 'data' => $post
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => __('messages.post_not_found')
+            ], 404);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -117,6 +122,8 @@ class AdminPostController extends Controller
                 'product_order_id' => 'nullable|exists:product_orders,id',
                 'strategy_work_id' => 'nullable|exists:strategy_works,id',
                 'status' => 'nullable|in:pending,approved,rejected',
+                'scheduled_date' => 'nullable|date_format:Y-m-d',
+                'scheduled_time' => 'nullable|date_format:H:i',
             ]);
 
             if ($validator->fails()) {
@@ -191,6 +198,8 @@ class AdminPostController extends Controller
                 'product_order_id' => 'nullable|exists:product_orders,id',
                 'strategy_work_id' => 'nullable|exists:strategy_works,id',
                 'status' => 'nullable|in:pending,approved,rejected',
+                'scheduled_date' => 'nullable|date_format:Y-m-d',
+                'scheduled_time' => 'nullable|date_format:H:i',
             ]);
 
             if ($validator->fails()) {
@@ -232,6 +241,11 @@ class AdminPostController extends Controller
                 'message' => __('messages.post_updated_successfully'),
                 'data' => $post->load(['createdBy', 'updatedBy', 'client', 'feedbacks'])
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => __('messages.post_not_found')
+            ], 404);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -260,6 +274,11 @@ class AdminPostController extends Controller
                 'success' => true,
                 'message' => __('messages.post_deleted_successfully')
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => __('messages.post_not_found')
+            ], 404);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -337,6 +356,11 @@ class AdminPostController extends Controller
                     'total_team_members' => $post->teamMembers()->count(),
                 ]
             ], 201);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => __('messages.post_not_found')
+            ], 404);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -380,6 +404,11 @@ class AdminPostController extends Controller
                     'total_count' => $data->count(),
                 ]
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => __('messages.post_not_found')
+            ], 404);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -407,6 +436,11 @@ class AdminPostController extends Controller
                 'success' => true,
                 'message' => __('Team member removed successfully')
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => __('messages.post_not_found')
+            ], 404);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -451,6 +485,11 @@ class AdminPostController extends Controller
                     'approval_status' => $post->getApprovalStatus()
                 ]
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => __('messages.post_not_found')
+            ], 404);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,

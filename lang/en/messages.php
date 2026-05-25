@@ -183,5 +183,6 @@ return [
     'feedback_added_successfully' => 'Feedback added successfully',
     'feedbacks_retrieved_successfully' => 'Feedbacks retrieved successfully',
     'post_approved_successfully' => 'Post approved successfully',
+    'post_not_found' => 'Post not found',
     'validation_error' => 'Validation error',
 ];

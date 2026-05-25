@@ -127,6 +127,11 @@ class DesignerPostController extends Controller
                 'message' => __('messages.post_updated_successfully'),
                 'data' => $post->load(['createdBy', 'updatedBy', 'client', 'feedbacks'])
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => __('messages.post_not_found')
+            ], 404);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,

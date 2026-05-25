@@ -92,6 +92,11 @@ class ClientPostController extends Controller
                 'message' => __('messages.post_retrieved_successfully'),
                 'data' => $post
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => __('messages.post_not_found')
+            ], 404);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -142,6 +147,11 @@ class ClientPostController extends Controller
                 'message' => __('messages.feedback_added_successfully'),
                 'data' => $feedback->load('client')
             ], 201);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => __('messages.post_not_found')
+            ], 404);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -185,6 +195,11 @@ class ClientPostController extends Controller
                     'approval_status' => $post->getApprovalStatus()
                 ]
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => __('messages.post_not_found')
+            ], 404);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -211,6 +226,11 @@ class ClientPostController extends Controller
                 'message' => __('messages.feedbacks_retrieved_successfully'),
                 'data' => $feedbacks
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => __('messages.post_not_found')
+            ], 404);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,

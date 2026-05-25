@@ -2007,6 +2007,18 @@
 									"description": "pending, approved, or rejected"
 								},
 								{
+									"key": "scheduled_date",
+									"value": "2026-06-01",
+									"type": "text",
+									"description": "OPTIONAL: Scheduled publish date (format: Y-m-d, e.g. 2026-06-01)"
+								},
+								{
+									"key": "scheduled_time",
+									"value": "09:00",
+									"type": "text",
+									"description": "OPTIONAL: Scheduled publish time (format: H:i, e.g. 09:00)"
+								},
+								{
 									"key": "image",
 									"type": "file",
 									"src": []
@@ -2067,6 +2079,18 @@
 									"value": "pending",
 									"type": "text",
 									"description": "pending, approved, or rejected"
+								},
+								{
+									"key": "scheduled_date",
+									"value": "2026-06-01",
+									"type": "text",
+									"description": "OPTIONAL: Scheduled publish date (format: Y-m-d, e.g. 2026-06-01)"
+								},
+								{
+									"key": "scheduled_time",
+									"value": "09:00",
+									"type": "text",
+									"description": "OPTIONAL: Scheduled publish time (format: H:i, e.g. 09:00)"
 								},
 								{
 									"key": "image",
@@ -2325,6 +2349,18 @@
 									"type": "text"
 								},
 								{
+									"key": "scheduled_date",
+									"value": "2026-06-01",
+									"type": "text",
+									"description": "OPTIONAL: Scheduled publish date (format: Y-m-d, e.g. 2026-06-01)"
+								},
+								{
+									"key": "scheduled_time",
+									"value": "09:00",
+									"type": "text",
+									"description": "OPTIONAL: Scheduled publish time (format: H:i, e.g. 09:00)"
+								},
+								{
 									"key": "image",
 									"type": "file",
 									"src": []
@@ -2385,6 +2421,18 @@
 									"value": "pending",
 									"type": "text",
 									"description": "pending, approved, or rejected"
+								},
+								{
+									"key": "scheduled_date",
+									"value": "2026-06-01",
+									"type": "text",
+									"description": "OPTIONAL: Scheduled publish date (format: Y-m-d, e.g. 2026-06-01)"
+								},
+								{
+									"key": "scheduled_time",
+									"value": "09:00",
+									"type": "text",
+									"description": "OPTIONAL: Scheduled publish time (format: H:i, e.g. 09:00)"
 								},
 								{
 									"key": "image",

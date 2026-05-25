@@ -76,6 +76,8 @@ class MarketerPostController extends Controller
                 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'client_id' => 'required|exists:clients,id',
                 'status' => 'nullable|in:pending,approved,rejected',
+                'scheduled_date' => 'nullable|date_format:Y-m-d',
+                'scheduled_time' => 'nullable|date_format:H:i',
             ]);
 
             if ($validator->fails()) {
@@ -148,6 +150,8 @@ class MarketerPostController extends Controller
                 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'client_id' => 'sometimes|required|exists:clients,id',
                 'status' => 'nullable|in:pending,approved,rejected',
+                'scheduled_date' => 'nullable|date_format:Y-m-d',
+                'scheduled_time' => 'nullable|date_format:H:i',
             ]);
 
             if ($validator->fails()) {
@@ -189,6 +193,11 @@ class MarketerPostController extends Controller
                 'message' => __('messages.post_updated_successfully'),
                 'data' => $post->load(['createdBy', 'updatedBy', 'client', 'feedbacks'])
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => __('messages.post_not_found')
+            ], 404);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -233,6 +242,11 @@ class MarketerPostController extends Controller
                     'approval_status' => $post->getApprovalStatus()
                 ]
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => __('messages.post_not_found')
+            ], 404);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,

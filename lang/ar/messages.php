@@ -183,5 +183,6 @@ return [
     'feedback_added_successfully' => 'تم إضافة الملاحظة بنجاح',
     'feedbacks_retrieved_successfully' => 'تم استرجاع الملاحظات بنجاح',
     'post_approved_successfully' => 'تم اعتماد المنشور بنجاح',
+    'post_not_found' => 'المنشور غير موجود',
     'validation_error' => 'خطأ في التحقق من البيانات',
 ];
