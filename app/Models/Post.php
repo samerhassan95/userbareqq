@@ -134,6 +134,7 @@ class Post extends Model
             'status' => 'in_review', // Change status to indicate approval started
         ]);
         
+        $this->refresh(); // Refresh to get updated values
         $this->checkFullApproval();
     }
 
@@ -149,6 +150,7 @@ class Post extends Model
             'status' => 'in_review', // Change status to indicate approval started
         ]);
         
+        $this->refresh(); // Refresh to get updated values
         $this->checkFullApproval();
     }
 
@@ -164,6 +166,7 @@ class Post extends Model
             'status' => 'in_review', // Change status to indicate approval started
         ]);
         
+        $this->refresh(); // Refresh to get updated values
         $this->checkFullApproval();
     }
 
