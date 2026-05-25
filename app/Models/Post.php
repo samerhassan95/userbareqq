@@ -96,4 +96,12 @@ class Post extends Model
     {
         return $this->belongsTo(StrategyWork::class);
     }
+
+    /**
+     * Get the team members for this post
+     */
+    public function teamMembers()
+    {
+        return $this->hasMany(PostTeamMember::class);
+    }
 }

@@ -14,6 +14,11 @@ Route::middleware('admin')->prefix('admin')->group(function () {
     Route::put('posts/{id}', [AdminPostController::class, 'update']);
     Route::post('posts/{id}', [AdminPostController::class, 'update']); // For form-data with image
     Route::delete('posts/{id}', [AdminPostController::class, 'destroy']);
+    
+    // Team management
+    Route::post('posts/{id}/team', [AdminPostController::class, 'addTeamMembers']);
+    Route::get('posts/{id}/team', [AdminPostController::class, 'getTeamMembers']);
+    Route::delete('posts/{postId}/team/{teamMemberId}', [AdminPostController::class, 'removeTeamMember']);
 });
 
 // Marketer Routes (Create & Edit) - Marketer users

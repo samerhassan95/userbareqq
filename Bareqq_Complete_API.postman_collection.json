@@ -1919,6 +1919,94 @@
 							"path": ["admin", "posts", "1"]
 						}
 					}
+				},
+				{
+					"name": "Add Team Members to Post",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"team_members\": [\n    {\n      \"member_id\": 1,\n      \"member_type\": \"designer\"\n    },\n    {\n      \"member_id\": 2,\n      \"member_type\": \"marketer\"\n    }\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/admin/posts/1/team",
+							"host": ["{{base_url}}"],
+							"path": ["admin", "posts", "1", "team"]
+						}
+					}
+				},
+				{
+					"name": "Get Team Members for Post",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/admin/posts/1/team",
+							"host": ["{{base_url}}"],
+							"path": ["admin", "posts", "1", "team"]
+						}
+					}
+				},
+				{
+					"name": "Remove Team Member from Post",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/admin/posts/1/team/1",
+							"host": ["{{base_url}}"],
+							"path": ["admin", "posts", "1", "team", "1"],
+							"variable": [
+								{
+									"key": "postId",
+									"value": "1",
+									"description": "Post ID"
+								},
+								{
+									"key": "teamMemberId",
+									"value": "1",
+									"description": "Team Member ID to remove"
+								}
+							]
+						}
+					}
 				}
 			]
 		},

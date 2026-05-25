@@ -258,4 +258,151 @@ class AdminPostController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Add team members to post
+     * POST /api/admin/posts/{id}/team
+     */
+    public function addTeamMembers(Request $request, $id)
+    {
+        try {
+            $post = Post::findOrFail($id);
+
+            $validator = Validator::make($request->all(), [
+                'team_members' => 'required|array',
+                'team_members.*.member_id' => 'required|integer',
+                'team_members.*.member_type' => 'required|in:designer,marketer',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => __('messages.validation_error'),
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $addedMembers = [];
+
+            foreach ($request->team_members as $memberData) {
+                // Convert member_type to full class name
+                $memberType = $memberData['member_type'] === 'designer' 
+                    ? \App\Models\Designer::class 
+                    : \App\Models\Marketer::class;
+
+                // Check if member exists
+                $memberExists = $memberType::find($memberData['member_id']);
+                
+                if (!$memberExists) {
+                    continue;
+                }
+
+                // Add team member (will skip if already exists due to unique constraint)
+                try {
+                    $teamMember = \App\Models\PostTeamMember::create([
+                        'post_id' => $post->id,
+                        'member_id' => $memberData['member_id'],
+                        'member_type' => $memberType,
+                        'role' => $memberData['member_type'],
+                    ]);
+
+                    $addedMembers[] = [
+                        'id' => $teamMember->id,
+                        'member_id' => $teamMember->member_id,
+                        'member_type' => $memberData['member_type'],
+                        'member_name' => $memberExists->name ?? $memberExists->username ?? 'N/A',
+                    ];
+                } catch (\Exception $e) {
+                    // Skip if duplicate
+                    continue;
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => __('Team members added successfully'),
+                'data' => [
+                    'post_id' => $post->id,
+                    'added_members' => $addedMembers,
+                    'total_team_members' => $post->teamMembers()->count(),
+                ]
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => __('messages.error_occurred'),
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Get team members for a post
+     * GET /api/admin/posts/{id}/team
+     */
+    public function getTeamMembers($id)
+    {
+        try {
+            $post = Post::findOrFail($id);
+
+            $teamMembers = $post->teamMembers()->with('member')->get();
+
+            $data = $teamMembers->map(function ($teamMember) {
+                $member = $teamMember->member;
+                
+                return [
+                    'id' => $teamMember->id,
+                    'member_id' => $teamMember->member_id,
+                    'member_type' => $teamMember->role,
+                    'member_name' => $member->name ?? $member->username ?? 'N/A',
+                    'member_email' => $member->email ?? null,
+                    'member_photo' => isset($member->photo) && $member->photo ? asset($member->photo) : null,
+                    'added_at' => $teamMember->created_at->format('Y-m-d H:i:s'),
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => __('Team members retrieved successfully'),
+                'data' => [
+                    'post_id' => $post->id,
+                    'team_members' => $data,
+                    'total_count' => $data->count(),
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => __('messages.error_occurred'),
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Remove team member from post
+     * DELETE /api/admin/posts/{postId}/team/{teamMemberId}
+     */
+    public function removeTeamMember($postId, $teamMemberId)
+    {
+        try {
+            $post = Post::findOrFail($postId);
+            $teamMember = \App\Models\PostTeamMember::where('post_id', $postId)
+                ->where('id', $teamMemberId)
+                ->firstOrFail();
+
+            $teamMember->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => __('Team member removed successfully')
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => __('messages.error_occurred'),
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }
