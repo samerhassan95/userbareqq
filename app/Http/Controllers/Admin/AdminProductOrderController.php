@@ -104,15 +104,34 @@ class AdminProductOrderController extends Controller
         // If strategy product, create subscription
         if ($order->product_role === 'strategy') {
             $startsAt = Carbon::now();
-            $expiresAt = $order->duration === 'year' 
-                ? $startsAt->copy()->addYear() 
-                : $startsAt->copy()->addMonth();
+            
+            switch ($order->duration) {
+                case 'month':
+                    $expiresAt = $startsAt->copy()->addMonth();
+                    $billingCycle = 'monthly';
+                    break;
+                case '3_months':
+                    $expiresAt = $startsAt->copy()->addMonths(3);
+                    $billingCycle = '3_months';
+                    break;
+                case '6_months':
+                    $expiresAt = $startsAt->copy()->addMonths(6);
+                    $billingCycle = '6_months';
+                    break;
+                case 'year':
+                    $expiresAt = $startsAt->copy()->addYear();
+                    $billingCycle = 'yearly';
+                    break;
+                default:
+                    $expiresAt = $startsAt->copy()->addMonth();
+                    $billingCycle = 'monthly';
+            }
 
             $subscription = Subscription::create([
                 'client_id' => $order->client_id,
                 'product_id' => $order->product_id,
                 'status' => 'active',
-                'billing_cycle' => $order->duration === 'year' ? 'yearly' : 'monthly',
+                'billing_cycle' => $billingCycle,
                 'starts_at' => $startsAt,
                 'expires_at' => $expiresAt,
             ]);

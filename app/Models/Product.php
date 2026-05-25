@@ -25,12 +25,16 @@ class Product extends Model
         'type',
         'product_role',
         'monthly_price',
+        'three_months_price',
+        'six_months_price',
         'yearly_price',
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
         'monthly_price' => 'decimal:2',
+        'three_months_price' => 'decimal:2',
+        'six_months_price' => 'decimal:2',
         'yearly_price' => 'decimal:2',
     ];
 

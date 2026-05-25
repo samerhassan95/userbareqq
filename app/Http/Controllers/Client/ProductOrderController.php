@@ -83,15 +83,37 @@ class ProductOrderController extends Controller
             if ($validated['product_role'] === 'strategy') {
                 $orderData['duration'] = $validated['duration'];
                 
+                // Calculate expiry date based on duration
+                $startsAt = Carbon::now();
+                switch ($validated['duration']) {
+                    case 'month':
+                        $endsAt = $startsAt->copy()->addMonth();
+                        $durationLabel = 'Monthly';
+                        break;
+                    case '3_months':
+                        $endsAt = $startsAt->copy()->addMonths(3);
+                        $durationLabel = '3 Months';
+                        break;
+                    case '6_months':
+                        $endsAt = $startsAt->copy()->addMonths(6);
+                        $durationLabel = '6 Months';
+                        break;
+                    case 'year':
+                        $endsAt = $startsAt->copy()->addYear();
+                        $durationLabel = 'Yearly';
+                        break;
+                    default:
+                        $endsAt = $startsAt->copy()->addMonth();
+                        $durationLabel = 'Monthly';
+                }
+                
                 // Get duration details
                 $durationDetails = [
                     'duration' => $validated['duration'],
-                    'duration_label' => $validated['duration'] === 'month' ? 'Monthly' : 'Yearly',
+                    'duration_label' => $durationLabel,
                     'price' => (float) $calculatedPrice,
-                    'starts_at' => Carbon::now()->format('Y-m-d'),
-                    'ends_at' => $validated['duration'] === 'month' 
-                        ? Carbon::now()->addMonth()->format('Y-m-d')
-                        : Carbon::now()->addYear()->format('Y-m-d'),
+                    'starts_at' => $startsAt->format('Y-m-d'),
+                    'ends_at' => $endsAt->format('Y-m-d'),
                 ];
             }
 
@@ -255,10 +277,17 @@ class ProductOrderController extends Controller
     {
         if ($data['product_role'] === 'strategy') {
             // Strategy product
-            if ($data['duration'] === 'month') {
-                return $product->monthly_price ?? $product->price;
-            } else {
-                return $product->yearly_price ?? $product->price;
+            switch ($data['duration']) {
+                case 'month':
+                    return $product->monthly_price ?? $product->price;
+                case '3_months':
+                    return $product->three_months_price ?? ($product->monthly_price * 3) ?? $product->price;
+                case '6_months':
+                    return $product->six_months_price ?? ($product->monthly_price * 6) ?? $product->price;
+                case 'year':
+                    return $product->yearly_price ?? ($product->monthly_price * 12) ?? $product->price;
+                default:
+                    return $product->price;
             }
         } else {
             // One-time product - just the base price
