@@ -47,8 +47,8 @@ class AdminStrategyWorkController extends Controller
                 ->get();
 
             $data = $works->map(function ($work) {
-                // Get posts for this work
-                $posts = $work->posts()->with(['createdBy', 'client'])->get();
+                // Get posts for this work with feedbacks
+                $posts = $work->posts()->with(['createdBy', 'client', 'feedbacks.client'])->get();
                 
                 return [
                     'id' => $work->id,
@@ -60,7 +60,6 @@ class AdminStrategyWorkController extends Controller
                     'status' => $work->status,
                     'status_label' => ucfirst($work->status),
                     'post_type' => $work->post_type,
-                    'attachments' => $work->attachments ?? [],
                     'notes' => $work->notes,
                     'posts' => $posts->map(function ($post) {
                         return [
@@ -70,6 +69,9 @@ class AdminStrategyWorkController extends Controller
                             'image' => $post->image ? asset('posts/' . $post->image) : null,
                             'status' => $post->status,
                             'is_approved' => $post->is_approved,
+                            'client_approved' => $post->client_approved,
+                            'admin_approved' => $post->admin_approved,
+                            'marketer_approved' => $post->marketer_approved,
                             'approved_at' => $post->approved_at ? $post->approved_at->format('Y-m-d H:i:s') : null,
                             'created_by' => $post->createdBy ? [
                                 'id' => $post->createdBy->id,
@@ -81,6 +83,18 @@ class AdminStrategyWorkController extends Controller
                                 'name' => $post->client->name,
                                 'email' => $post->client->email,
                             ] : null,
+                            'feedbacks' => $post->feedbacks->map(function ($feedback) {
+                                return [
+                                    'id' => $feedback->id,
+                                    'comment' => $feedback->comment,
+                                    'created_at' => $feedback->created_at->format('Y-m-d H:i:s'),
+                                    'client' => $feedback->client ? [
+                                        'id' => $feedback->client->id,
+                                        'name' => $feedback->client->name,
+                                        'email' => $feedback->client->email,
+                                    ] : null,
+                                ];
+                            })->toArray(),
                         ];
                     })->toArray(),
                     'posts_count' => $posts->count(),
