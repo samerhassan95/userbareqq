@@ -36,7 +36,9 @@ class StrategyWorkController extends Controller
             // Get date filter (optional)
             $date = $request->query('date');
             
-            $query = StrategyWork::where('product_order_id', $orderId);
+            $query = \App\Models\Post::with(['createdBy', 'client', 'feedbacks.client', 'strategyWork'])
+                ->where('product_order_id', $orderId)
+                ->whereNotNull('strategy_work_id');
 
             if ($date) {
                 // Validate date format
@@ -46,69 +48,59 @@ class StrategyWorkController extends Controller
                 $query->whereDate('scheduled_date', $date);
             }
 
-            $works = $query->orderBy('scheduled_date')
+            $posts = $query->orderBy('scheduled_date')
                 ->orderBy('scheduled_time')
                 ->get();
 
-            $data = $works->map(function ($work) {
-                // Get posts for this work with feedbacks
-                $posts = $work->posts()->with(['createdBy', 'client', 'feedbacks.client'])->get();
-                
+            $data = $posts->map(function ($post) {
                 return [
-                    'id' => $work->id,
-                    'title' => \App\Helpers\TranslationHelper::getTranslatedField($work, 'title'),
-                    'description' => \App\Helpers\TranslationHelper::getTranslatedField($work, 'description'),
-                    'scheduled_date' => $work->scheduled_date->format('Y-m-d'),
-                    'scheduled_time' => $work->scheduled_time,
-                    'platforms' => $work->platforms ?? [],
-                    'status' => $work->status,
-                    'status_label' => ucfirst($work->status),
-                    'post_type' => $work->post_type,
-                    'notes' => $work->notes,
-                    'posts' => $posts->map(function ($post) {
+                    'id' => $post->id,
+                    'title' => \App\Helpers\TranslationHelper::getTranslatedField($post, 'title'),
+                    'description' => \App\Helpers\TranslationHelper::getTranslatedField($post, 'description'),
+                    'image' => $post->image ? asset('posts/' . $post->image) : null,
+                    'status' => $post->status,
+                    'scheduled_date' => $post->scheduled_date ? $post->scheduled_date->format('Y-m-d') : null,
+                    'scheduled_time' => $post->scheduled_time,
+                    'is_approved' => $post->is_approved,
+                    'client_approved' => $post->client_approved,
+                    'admin_approved' => $post->admin_approved,
+                    'marketer_approved' => $post->marketer_approved,
+                    'approved_at' => $post->approved_at ? $post->approved_at->format('Y-m-d H:i:s') : null,
+                    'work' => $post->strategyWork ? [
+                        'id' => $post->strategyWork->id,
+                        'title' => \App\Helpers\TranslationHelper::getTranslatedField($post->strategyWork, 'title'),
+                        'platforms' => $post->strategyWork->platforms ?? [],
+                        'post_type' => $post->strategyWork->post_type,
+                        'notes' => $post->strategyWork->notes,
+                    ] : null,
+                    'created_by' => $post->createdBy ? [
+                        'id' => $post->createdBy->id,
+                        'name' => $post->createdBy->name ?? $post->createdBy->username ?? 'N/A',
+                        'type' => class_basename($post->created_by_type),
+                    ] : null,
+                    'client' => $post->client ? [
+                        'id' => $post->client->id,
+                        'name' => $post->client->name,
+                        'email' => $post->client->email,
+                    ] : null,
+                    'feedbacks' => $post->feedbacks->map(function ($feedback) {
                         return [
-                            'id' => $post->id,
-                            'title' => \App\Helpers\TranslationHelper::getTranslatedField($post, 'title'),
-                            'description' => \App\Helpers\TranslationHelper::getTranslatedField($post, 'description'),
-                            'image' => $post->image ? asset('posts/' . $post->image) : null,
-                            'status' => $post->status,
-                            'is_approved' => $post->is_approved,
-                            'client_approved' => $post->client_approved,
-                            'admin_approved' => $post->admin_approved,
-                            'marketer_approved' => $post->marketer_approved,
-                            'approved_at' => $post->approved_at ? $post->approved_at->format('Y-m-d H:i:s') : null,
-                            'created_by' => $post->createdBy ? [
-                                'id' => $post->createdBy->id,
-                                'name' => $post->createdBy->name ?? $post->createdBy->username ?? 'N/A',
-                                'type' => class_basename($post->created_by_type),
+                            'id' => $feedback->id,
+                            'comment' => $feedback->comment,
+                            'created_at' => $feedback->created_at->format('Y-m-d H:i:s'),
+                            'client' => $feedback->client ? [
+                                'id' => $feedback->client->id,
+                                'name' => $feedback->client->name,
+                                'email' => $feedback->client->email,
                             ] : null,
-                            'client' => $post->client ? [
-                                'id' => $post->client->id,
-                                'name' => $post->client->name,
-                                'email' => $post->client->email,
-                            ] : null,
-                            'feedbacks' => $post->feedbacks->map(function ($feedback) {
-                                return [
-                                    'id' => $feedback->id,
-                                    'comment' => $feedback->comment,
-                                    'created_at' => $feedback->created_at->format('Y-m-d H:i:s'),
-                                    'client' => $feedback->client ? [
-                                        'id' => $feedback->client->id,
-                                        'name' => $feedback->client->name,
-                                        'email' => $feedback->client->email,
-                                    ] : null,
-                                ];
-                            })->toArray(),
                         ];
                     })->toArray(),
-                    'posts_count' => $posts->count(),
-                    'created_at' => $work->created_at->format('Y-m-d H:i:s'),
                 ];
             });
 
             return ResponseHelper::success(
                 $data,
-                __('Strategy works retrieved successfully')
+                __('messages.posts_retrieved_successfully') ?? 'Posts retrieved successfully'
             );
         } catch (\Exception $e) {
             \Log::error('Failed to fetch strategy works: ' . $e->getMessage());
