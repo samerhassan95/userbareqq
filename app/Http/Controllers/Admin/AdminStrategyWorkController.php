@@ -105,7 +105,9 @@ class AdminStrategyWorkController extends Controller
             return ResponseHelper::success(
                 $data,
                 __('Strategy works retrieved successfully')
-            );
+            )->header('Cache-Control', 'no-cache, no-store, must-revalidate')
+             ->header('Pragma', 'no-cache')
+             ->header('Expires', '0');
         } catch (\Exception $e) {
             \Log::error('Failed to fetch strategy works: ' . $e->getMessage());
             
