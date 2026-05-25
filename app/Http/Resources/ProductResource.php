@@ -11,7 +11,7 @@ class ProductResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'description' => $this->description,
-            'price' => (float) $this->price,
+            'price' => (float) ($this->price ?? 0),
             'note' => $this->note,
             'image' => $this->image ? asset($this->image) : null,
             'background_image' => $this->background_image ? asset('uploads/products/' . $this->background_image) : null,
@@ -23,6 +23,8 @@ class ProductResource extends JsonResource
         // Add role-specific fields
         if ($this->product_role === 'strategy') {
             $data['monthly_price'] = (float) ($this->monthly_price ?? 0);
+            $data['three_months_price'] = (float) ($this->three_months_price ?? 0);
+            $data['six_months_price'] = (float) ($this->six_months_price ?? 0);
             $data['yearly_price'] = (float) ($this->yearly_price ?? 0);
             
             if ($this->relationLoaded('strategyTips')) {
