@@ -46,10 +46,27 @@ class AdminContentController extends Controller
 
             // Check if pagination is disabled
             if ($request->get('pagination') === 'false' || $request->get('pagination') === false) {
-                $products = $products->get();
+                $products = $products->get()->map(function ($product) {
+                    // Ensure prices are never null
+                    $product->price = $product->price ?? 0;
+                    $product->monthly_price = $product->monthly_price ?? 0;
+                    $product->three_months_price = $product->three_months_price ?? 0;
+                    $product->six_months_price = $product->six_months_price ?? 0;
+                    $product->yearly_price = $product->yearly_price ?? 0;
+                    return $product;
+                });
             } else {
                 $perPage = $request->get('per_page', 15);
                 $products = $products->paginate($perPage);
+                // Map through paginated items
+                $products->getCollection()->transform(function ($product) {
+                    $product->price = $product->price ?? 0;
+                    $product->monthly_price = $product->monthly_price ?? 0;
+                    $product->three_months_price = $product->three_months_price ?? 0;
+                    $product->six_months_price = $product->six_months_price ?? 0;
+                    $product->yearly_price = $product->yearly_price ?? 0;
+                    return $product;
+                });
             }
 
             return response()->json([
@@ -101,6 +118,13 @@ class AdminContentController extends Controller
             if ($product->background_image) {
                 $product->background_image = asset($product->background_image);
             }
+
+            // Ensure prices are never null (convert to 0)
+            $product->price = $product->price ?? 0;
+            $product->monthly_price = $product->monthly_price ?? 0;
+            $product->three_months_price = $product->three_months_price ?? 0;
+            $product->six_months_price = $product->six_months_price ?? 0;
+            $product->yearly_price = $product->yearly_price ?? 0;
 
             return response()->json([
                 'success' => true,

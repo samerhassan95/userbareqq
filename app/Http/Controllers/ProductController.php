@@ -225,10 +225,10 @@ public function show($id)
 
         // Add role-specific fields
         if ($product->product_role === 'strategy') {
-            $data['monthly_price'] = (float) $product->monthly_price;
-            $data['three_months_price'] = (float) $product->three_months_price;
-            $data['six_months_price'] = (float) $product->six_months_price;
-            $data['yearly_price'] = (float) $product->yearly_price;
+            $data['monthly_price'] = $product->monthly_price ?? 0;
+            $data['three_months_price'] = $product->three_months_price ?? 0;
+            $data['six_months_price'] = $product->six_months_price ?? 0;
+            $data['yearly_price'] = $product->yearly_price ?? 0;
             $data['strategy_tips'] = $product->strategyTips->map(function ($tip) {
                 return [
                     'id'        => $tip->id,
@@ -238,7 +238,7 @@ public function show($id)
             });
         } else {
             // One-time product - just the base price
-            $data['price'] = (float) $product->price;
+            $data['price'] = $product->price ?? 0;
         }
 
         return response()->json([
@@ -289,13 +289,13 @@ public function ourProducts(Request $request)
         ->when($productRole, function ($q) use ($productRole) {
             $q->where('product_role', $productRole);
         })
-        ->select('id', 'name', 'name_ar', 'category_id', 'price', 'description', 'description_ar', 'background_image', 'type', 'image', 'product_role', 'monthly_price', 'yearly_price')
+        ->select('id', 'name', 'name_ar', 'category_id', 'price', 'description', 'description_ar', 'background_image', 'type', 'image', 'product_role', 'monthly_price', 'three_months_price', 'six_months_price', 'yearly_price')
         ->get()
         ->map(function ($item) use ($device) {
             $data = [
                 'id'               => $item->id,
                 'name'             => \App\Helpers\TranslationHelper::getTranslatedField($item, 'name'),
-                'price'            => $item->price,
+                'price'            => $item->price ?? 0,
                 'description'      => \App\Helpers\TranslationHelper::getTranslatedField($item, 'description'),
                 'image'            => $this->resolveImage($item->image, $device),
                 'category_name'    => $item->category ? \App\Helpers\TranslationHelper::getTranslatedField($item->category, 'name') : null,
@@ -306,10 +306,10 @@ public function ourProducts(Request $request)
 
             // Add role-specific fields
             if ($item->product_role === 'strategy') {
-                $data['monthly_price'] = $item->monthly_price;
-                $data['three_months_price'] = $item->three_months_price;
-                $data['six_months_price'] = $item->six_months_price;
-                $data['yearly_price'] = $item->yearly_price;
+                $data['monthly_price'] = $item->monthly_price ?? 0;
+                $data['three_months_price'] = $item->three_months_price ?? 0;
+                $data['six_months_price'] = $item->six_months_price ?? 0;
+                $data['yearly_price'] = $item->yearly_price ?? 0;
             }
 
             return $data;
