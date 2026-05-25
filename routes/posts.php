@@ -15,6 +15,9 @@ Route::middleware('admin')->prefix('admin')->group(function () {
     Route::post('posts/{id}', [AdminPostController::class, 'update']); // For form-data with image
     Route::delete('posts/{id}', [AdminPostController::class, 'destroy']);
     
+    // Approve post
+    Route::post('posts/{id}/approve', [AdminPostController::class, 'approve']);
+    
     // Team management
     Route::post('posts/{id}/team', [AdminPostController::class, 'addTeamMembers']);
     Route::get('posts/{id}/team', [AdminPostController::class, 'getTeamMembers']);
@@ -27,6 +30,9 @@ Route::middleware(['auth:marketer'])->prefix('marketer')->group(function () {
     Route::post('posts', [MarketerPostController::class, 'store']);
     Route::put('posts/{id}', [MarketerPostController::class, 'update']);
     Route::post('posts/{id}', [MarketerPostController::class, 'update']); // For form-data
+    
+    // Approve post
+    Route::post('posts/{id}/approve', [MarketerPostController::class, 'approve']);
 });
 
 // Designer Routes (Edit only) - Designer users

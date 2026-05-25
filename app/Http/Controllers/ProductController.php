@@ -43,6 +43,8 @@ class ProductController extends BaseController
                 'type' => 'required|in:subscription,one_time',
                 'product_role' => 'required|in:one_time,strategy',
                 'monthly_price' => 'required_if:product_role,strategy|nullable|numeric',
+                'three_months_price' => 'nullable|numeric',
+                'six_months_price' => 'nullable|numeric',
                 'yearly_price' => 'required_if:product_role,strategy|nullable|numeric',
                 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
                 'attachments.*' => 'file|max:10240',
@@ -137,6 +139,8 @@ class ProductController extends BaseController
             'type' => 'nullable|in:subscription,one_time',
             'product_role' => 'nullable|in:one_time,strategy',
             'monthly_price' => 'nullable|numeric',
+            'three_months_price' => 'nullable|numeric',
+            'six_months_price' => 'nullable|numeric',
             'yearly_price' => 'nullable|numeric',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'attachments.*' => 'file|max:10240',
@@ -222,6 +226,8 @@ public function show($id)
         // Add role-specific fields
         if ($product->product_role === 'strategy') {
             $data['monthly_price'] = (float) $product->monthly_price;
+            $data['three_months_price'] = (float) $product->three_months_price;
+            $data['six_months_price'] = (float) $product->six_months_price;
             $data['yearly_price'] = (float) $product->yearly_price;
             $data['strategy_tips'] = $product->strategyTips->map(function ($tip) {
                 return [
@@ -301,6 +307,8 @@ public function ourProducts(Request $request)
             // Add role-specific fields
             if ($item->product_role === 'strategy') {
                 $data['monthly_price'] = $item->monthly_price;
+                $data['three_months_price'] = $item->three_months_price;
+                $data['six_months_price'] = $item->six_months_price;
                 $data['yearly_price'] = $item->yearly_price;
             }
 

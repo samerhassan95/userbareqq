@@ -152,7 +152,7 @@ class ClientPostController extends Controller
     }
 
     /**
-     * Approve a post (locks it from further edits and feedbacks)
+     * Approve a post by client
      */
     public function approve($id)
     {
@@ -161,24 +161,29 @@ class ClientPostController extends Controller
             
             $post = Post::where('client_id', $clientId)->findOrFail($id);
 
-            // Check if already approved
-            if ($post->is_approved) {
+            // Check if already approved by client
+            if ($post->client_approved) {
                 return response()->json([
                     'success' => false,
-                    'message' => __('messages.post_already_approved')
+                    'message' => __('messages.post_already_approved_by_you')
                 ], 400);
             }
 
-            $post->update([
-                'is_approved' => true,
-                'approved_at' => now(),
-                'status' => 'approved',
-            ]);
+            $post->approveByClient($clientId);
+
+            // Add full image URL
+            $postData = $post->load(['createdBy', 'updatedBy', 'client']);
+            if ($postData->image) {
+                $postData->image = asset('posts/' . $postData->image);
+            }
 
             return response()->json([
                 'success' => true,
-                'message' => __('messages.post_approved_successfully'),
-                'data' => $post->load(['createdBy', 'updatedBy', 'client', 'feedbacks.client'])
+                'message' => __('messages.post_approved_by_client_successfully'),
+                'data' => [
+                    'post' => $postData,
+                    'approval_status' => $post->getApprovalStatus()
+                ]
             ]);
         } catch (\Exception $e) {
             return response()->json([

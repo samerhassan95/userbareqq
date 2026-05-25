@@ -117,6 +117,11 @@ class DesignerPostController extends Controller
 
             $post->update($data);
 
+            // Add full image URL
+            if ($post->image) {
+                $post->image = asset('posts/' . $post->image);
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => __('messages.post_updated_successfully'),

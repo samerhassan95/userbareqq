@@ -105,6 +105,11 @@ class MarketerPostController extends Controller
 
             $post = Post::create($data);
 
+            // Add full image URL
+            if ($post->image) {
+                $post->image = asset('posts/' . $post->image);
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => __('messages.post_created_successfully'),
@@ -174,10 +179,59 @@ class MarketerPostController extends Controller
 
             $post->update($data);
 
+            // Add full image URL
+            if ($post->image) {
+                $post->image = asset('posts/' . $post->image);
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => __('messages.post_updated_successfully'),
                 'data' => $post->load(['createdBy', 'updatedBy', 'client', 'feedbacks'])
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => __('messages.error_occurred'),
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Approve post by marketer
+     * POST /api/marketer/posts/{id}/approve
+     */
+    public function approve($id)
+    {
+        try {
+            $marketerId = auth()->id();
+            
+            $post = Post::findOrFail($id);
+
+            // Check if already approved by marketer
+            if ($post->marketer_approved) {
+                return response()->json([
+                    'success' => false,
+                    'message' => __('messages.post_already_approved_by_marketer')
+                ], 400);
+            }
+
+            $post->approveByMarketer($marketerId);
+
+            // Add full image URL
+            $postData = $post->load(['createdBy', 'updatedBy', 'client']);
+            if ($postData->image) {
+                $postData->image = asset('posts/' . $postData->image);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.post_approved_by_marketer_successfully'),
+                'data' => [
+                    'post' => $postData,
+                    'approval_status' => $post->getApprovalStatus()
+                ]
             ]);
         } catch (\Exception $e) {
             return response()->json([

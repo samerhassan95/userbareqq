@@ -984,13 +984,14 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"New Product\",\n    \"name_ar\": \"منتج جديد\",\n    \"description\": \"Product description\",\n    \"description_ar\": \"وصف المنتج\",\n    \"note\": \"Important note\",\n    \"note_ar\": \"ملاحظة مهمة\",\n    \"price\": 1000,\n    \"product_role\": \"one_time\",\n    \"category_id\": 1\n}"
+							"raw": "{\n    \"name\": \"Digital Marketing Strategy\",\n    \"name_ar\": \"استراتيجية التسويق الرقمي\",\n    \"description\": \"Complete digital marketing strategy with social media management\",\n    \"description_ar\": \"استراتيجية تسويق رقمي كاملة مع إدارة وسائل التواصل الاجتماعي\",\n    \"note\": \"Includes monthly reports and analytics\",\n    \"note_ar\": \"يتضمن تقارير شهرية وتحليلات\",\n    \"type\": \"subscription\",\n    \"product_role\": \"strategy\",\n    \"monthly_price\": 500,\n    \"three_months_price\": 1350,\n    \"six_months_price\": 2550,\n    \"yearly_price\": 4800,\n    \"category_id\": 1\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/admin/products",
 							"host": ["{{base_url}}"],
 							"path": ["admin", "products"]
-						}
+						},
+						"description": "Create a new product. For strategy products, include all duration prices:\n- monthly_price: Price for 1 month\n- three_months_price: Price for 3 months\n- six_months_price: Price for 6 months\n- yearly_price: Price for 1 year\n\nFor one_time products, use 'price' field instead."
 					}
 				},
 				{
@@ -1640,7 +1641,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["admin", "content", "products", "1"]
 						},
-						"description": "Get single product content with English and Arabic descriptions"
+						"description": "Get single product content with separate English and Arabic fields for editing.\n\nResponse includes:\n- name & name_ar (separate fields)\n- description & description_ar (separate fields)\n- note & note_ar (separate fields)\n- All price fields (price, monthly_price, three_months_price, six_months_price, yearly_price)\n- Full image URLs\n- Category information\n\nExample Response:\n{\n  \"success\": true,\n  \"message\": \"Product content retrieved successfully\",\n  \"data\": {\n    \"id\": 1,\n    \"name\": \"Digital Marketing Strategy\",\n    \"name_ar\": \"استراتيجية التسويق الرقمي\",\n    \"description\": \"Complete digital marketing strategy\",\n    \"description_ar\": \"استراتيجية تسويق رقمي كاملة\",\n    \"note\": \"Includes monthly reports\",\n    \"note_ar\": \"يتضمن تقارير شهرية\",\n    \"price\": null,\n    \"type\": \"subscription\",\n    \"product_role\": \"strategy\",\n    \"category_id\": 1,\n    \"image\": \"https://user.bareqq.com/product_images/xyz.jpg\",\n    \"background_image\": \"https://user.bareqq.com/product_images/bg.jpg\",\n    \"monthly_price\": 500.00,\n    \"three_months_price\": 1350.00,\n    \"six_months_price\": 2550.00,\n    \"yearly_price\": 4800.00,\n    \"category\": {\n      \"id\": 1,\n      \"name\": \"Marketing\",\n      \"name_ar\": \"التسويق\"\n    }\n  }\n}"
 					}
 				},
 				{
@@ -2007,6 +2008,28 @@
 							]
 						}
 					}
+				},
+				{
+					"name": "Approve Post (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/admin/posts/1/approve",
+							"host": ["{{base_url}}"],
+							"path": ["admin", "posts", "1", "approve"]
+						},
+						"description": "Admin approves the post. Post needs approval from Client, Admin, and Marketer to be fully approved."
+					}
 				}
 			]
 		},
@@ -2150,6 +2173,28 @@
 							"host": ["{{base_url}}"],
 							"path": ["marketer", "posts", "1"]
 						}
+					}
+				},
+				{
+					"name": "Approve Post (Marketer)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{marketer_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/marketer/posts/1/approve",
+							"host": ["{{base_url}}"],
+							"path": ["marketer", "posts", "1", "approve"]
+						},
+						"description": "Marketer approves the post. Post needs approval from Client, Admin, and Marketer to be fully approved."
 					}
 				}
 			]
@@ -2359,7 +2404,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["client", "posts", "1", "approve"]
 						},
-						"description": "Client approves the post. This locks the post from further edits and feedbacks."
+						"description": "Client approves the post. Post needs approval from Client, Admin, and Marketer to be fully approved."
 					}
 				},
 				{

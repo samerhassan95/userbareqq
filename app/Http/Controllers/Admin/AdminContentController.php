@@ -28,11 +28,17 @@ class AdminContentController extends Controller
                 'name_ar',
                 'description',
                 'description_ar',
+                'note',
+                'note_ar',
+                'price',
                 'type',
                 'product_role',
+                'category_id',
+                'image',
+                'background_image',
                 'monthly_price',
-                'three_month_price',
-                'six_month_price',
+                'three_months_price',
+                'six_months_price',
                 'yearly_price',
                 'created_at',
                 'updated_at'
@@ -72,15 +78,29 @@ class AdminContentController extends Controller
                 'name_ar',
                 'description',
                 'description_ar',
+                'note',
+                'note_ar',
+                'price',
                 'type',
                 'product_role',
+                'category_id',
+                'image',
+                'background_image',
                 'monthly_price',
-                'three_month_price',
-                'six_month_price',
+                'three_months_price',
+                'six_months_price',
                 'yearly_price',
                 'created_at',
                 'updated_at'
-            ])->findOrFail($id);
+            ])->with('category:id,name,name_ar')->findOrFail($id);
+
+            // Convert image paths to full URLs
+            if ($product->image) {
+                $product->image = asset($product->image);
+            }
+            if ($product->background_image) {
+                $product->background_image = asset($product->background_image);
+            }
 
             return response()->json([
                 'success' => true,

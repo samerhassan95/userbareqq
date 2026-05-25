@@ -146,6 +146,11 @@ class AdminPostController extends Controller
 
             $post = Post::create($data);
 
+            // Add full image URL
+            if ($post->image) {
+                $post->image = asset('posts/' . $post->image);
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => __('messages.post_created_successfully'),
@@ -216,6 +221,11 @@ class AdminPostController extends Controller
             $data['updated_by_type'] = 'App\Models\Admin';
 
             $post->update($data);
+
+            // Add full image URL
+            if ($post->image) {
+                $post->image = asset('posts/' . $post->image);
+            }
 
             return response()->json([
                 'success' => true,
@@ -396,6 +406,50 @@ class AdminPostController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => __('Team member removed successfully')
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => __('messages.error_occurred'),
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Approve post by admin
+     * POST /api/admin/posts/{id}/approve
+     */
+    public function approve($id)
+    {
+        try {
+            $adminId = auth()->id();
+            
+            $post = Post::findOrFail($id);
+
+            // Check if already approved by admin
+            if ($post->admin_approved) {
+                return response()->json([
+                    'success' => false,
+                    'message' => __('messages.post_already_approved_by_admin')
+                ], 400);
+            }
+
+            $post->approveByAdmin($adminId);
+
+            // Add full image URL
+            $postData = $post->load(['createdBy', 'updatedBy', 'client']);
+            if ($postData->image) {
+                $postData->image = asset('posts/' . $postData->image);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.post_approved_by_admin_successfully'),
+                'data' => [
+                    'post' => $postData,
+                    'approval_status' => $post->getApprovalStatus()
+                ]
             ]);
         } catch (\Exception $e) {
             return response()->json([
