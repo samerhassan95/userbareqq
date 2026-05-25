@@ -52,6 +52,14 @@ class AdminPostController extends Controller
                 $posts = $query->latest()->paginate($perPage);
             }
 
+            // Add full image URL
+            $posts->transform(function ($post) {
+                if ($post->image) {
+                    $post->image = asset('posts/' . $post->image);
+                }
+                return $post;
+            });
+
             return response()->json([
                 'success' => true,
                 'message' => __('messages.posts_retrieved_successfully'),
@@ -73,6 +81,11 @@ class AdminPostController extends Controller
     {
         try {
             $post = Post::with(['createdBy', 'updatedBy', 'client', 'feedbacks.client'])->findOrFail($id);
+
+            // Add full image URL
+            if ($post->image) {
+                $post->image = asset('posts/' . $post->image);
+            }
 
             return response()->json([
                 'success' => true,

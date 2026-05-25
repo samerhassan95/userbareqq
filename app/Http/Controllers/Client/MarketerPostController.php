@@ -40,6 +40,14 @@ class MarketerPostController extends Controller
                 $posts = $query->latest()->paginate($perPage);
             }
 
+            // Add full image URL
+            $posts->transform(function ($post) {
+                if ($post->image) {
+                    $post->image = asset('posts/' . $post->image);
+                }
+                return $post;
+            });
+
             return response()->json([
                 'success' => true,
                 'message' => __('messages.posts_retrieved_successfully'),
