@@ -47,7 +47,6 @@ class ProductController extends BaseController
                 'six_months_price' => 'nullable|numeric',
                 'yearly_price' => 'required_if:product_role,strategy|nullable|numeric',
                 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-                'attachments.*' => 'file|max:10240',
                 'addons' => 'array',
                 'addons.*' => 'exists:addons,id',
                 'media.*' => 'file|max:10240', 
@@ -61,7 +60,7 @@ class ProductController extends BaseController
         }
     
         try {
-            $productData = collect($validatedData)->except(['attachments', 'image', 'addons', 'media'])->toArray();
+            $productData = collect($validatedData)->except(['image', 'addons', 'media'])->toArray();
         
             if ($request->hasFile('image')) {
                 $imagePath = ImageService::upload($request->file('image'), 'product_images');
@@ -143,13 +142,12 @@ class ProductController extends BaseController
             'six_months_price' => 'nullable|numeric',
             'yearly_price' => 'nullable|numeric',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'attachments.*' => 'file|max:10240',
             'addons' => 'array',
             'addons.*' => 'exists:addons,id',
             'media.*' => 'file|max:10240', 
         ]);
     
-        $productData = collect($validatedData)->except(['attachments', 'image', 'addons', 'media'])->toArray();
+        $productData = collect($validatedData)->except(['image', 'addons', 'media'])->toArray();
     
         if ($request->hasFile('image')) {
             if ($product->image) {
@@ -160,13 +158,6 @@ class ProductController extends BaseController
         }
     
         $product->update($productData);
-    
-        if ($request->hasFile('attachments')) {
-            foreach ($request->file('attachments') as $file) {
-                $path = ImageService::upload($file, 'attachments');
-                $product->attachments()->create(['file_path' => $path]);
-            }
-        }
     
         if ($request->hasFile('media')) {
             foreach ($request->file('media') as $file) {
@@ -179,7 +170,7 @@ class ProductController extends BaseController
             $product->addons()->sync($validatedData['addons']);
         }
     
-        return response()->json(new ProductResource($product->load(['attachments', 'addons', 'media', 'strategyTips'])), 200);
+        return response()->json(new ProductResource($product->load(['addons', 'media', 'strategyTips'])), 200);
     }
 
 

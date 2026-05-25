@@ -1830,6 +1830,18 @@
 									"description": "REQUIRED: Client who will approve this post"
 								},
 								{
+									"key": "product_order_id",
+									"value": "",
+									"type": "text",
+									"description": "OPTIONAL: Link post to specific product order"
+								},
+								{
+									"key": "strategy_work_id",
+									"value": "",
+									"type": "text",
+									"description": "OPTIONAL: Link post to specific strategy work"
+								},
+								{
 									"key": "status",
 									"value": "pending",
 									"type": "text",
@@ -2135,6 +2147,18 @@
 									"value": "1",
 									"type": "text",
 									"description": "REQUIRED: Client who will approve"
+								},
+								{
+									"key": "product_order_id",
+									"value": "",
+									"type": "text",
+									"description": "OPTIONAL: Link post to specific product order"
+								},
+								{
+									"key": "strategy_work_id",
+									"value": "",
+									"type": "text",
+									"description": "OPTIONAL: Link post to specific strategy work"
 								},
 								{
 									"key": "status",
