@@ -70,4 +70,9 @@ Route::middleware('admin')->group(function () {
     Route::get('content/products/{id}', [AdminContentController::class, 'getProductContent']);
     Route::get('content/strategy-tips', [AdminContentController::class, 'getStrategyTipsContent']);
     Route::get('content/strategy-tips/{id}', [AdminContentController::class, 'getStrategyTipContent']);
+
+    // Team Members (Designers & Marketers)
+    Route::get('designers', [\App\Http\Controllers\Admin\AdminTeamController::class, 'getDesigners']);
+    Route::get('marketers', [\App\Http\Controllers\Admin\AdminTeamController::class, 'getMarketers']);
+    Route::get('team-members', [\App\Http\Controllers\Admin\AdminTeamController::class, 'getAllTeamMembers']);
 });
