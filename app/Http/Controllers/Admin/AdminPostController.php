@@ -432,7 +432,7 @@ class AdminPostController extends Controller
                             $member,
                             'Post Assignment',
                             "You have been assigned to work on post: {$post->title}",
-                            'post_assigned',
+                            'post_team_assigned',
                             [
                                 'post_id' => $post->id,
                                 'title' => $post->title

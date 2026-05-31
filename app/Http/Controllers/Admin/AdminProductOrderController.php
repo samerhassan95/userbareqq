@@ -326,12 +326,25 @@ class AdminProductOrderController extends Controller
         $designerIds = $request->designer_ids ?? [];
         $marketerIds = $request->marketer_ids ?? [];
 
-        // Sync team members (assuming pivot table exists)
-        if (method_exists($order, 'designers')) {
-            $order->designers()->sync($designerIds);
+        // Delete existing team members for this order
+        \App\Models\ProductOrderTeamMember::where('product_order_id', $order->id)->delete();
+
+        // Add designers
+        foreach ($designerIds as $designerId) {
+            \App\Models\ProductOrderTeamMember::create([
+                'product_order_id' => $order->id,
+                'member_id' => $designerId,
+                'member_type' => 'designer',
+            ]);
         }
-        if (method_exists($order, 'marketers')) {
-            $order->marketers()->sync($marketerIds);
+
+        // Add marketers
+        foreach ($marketerIds as $marketerId) {
+            \App\Models\ProductOrderTeamMember::create([
+                'product_order_id' => $order->id,
+                'member_id' => $marketerId,
+                'member_type' => 'marketer',
+            ]);
         }
 
         // Send notifications
