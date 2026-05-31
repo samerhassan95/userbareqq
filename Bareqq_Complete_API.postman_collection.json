@@ -2234,7 +2234,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["admin", "posts", "1", "approve"]
 						},
-						"description": "Admin approves the post. Post needs approval from Client, Admin, and Marketer to be fully approved."
+						"description": "Admin approves the post. Sets id_approved=true when any role (Admin, Client, Marketer) approves. Post needs approval from Client, Admin, and Marketer to be fully approved."
 					}
 				}
 			]
@@ -2467,7 +2467,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["marketer", "posts", "1", "approve"]
 						},
-						"description": "Marketer approves the post. Post needs approval from Client, Admin, and Marketer to be fully approved."
+						"description": "Marketer approves the post. Sets id_approved=true when any role (Admin, Client, Marketer) approves. Post needs approval from Client, Admin, and Marketer to be fully approved."
 					}
 				}
 			]
@@ -2695,7 +2695,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["client", "posts", "1", "approve"]
 						},
-						"description": "Client approves the post. Post needs approval from Client, Admin, and Marketer to be fully approved."
+						"description": "Client approves the post. Sets id_approved=true when any role (Admin, Client, Marketer) approves. Post needs approval from Client, Admin, and Marketer to be fully approved."
 					}
 				},
 				{
@@ -2840,6 +2840,64 @@
 							]
 						},
 						"description": "Get all team members (designers and marketers combined) with optional search and pagination. Returns grouped data with designers and marketers arrays, plus a combined array."
+					}
+				}
+			]
+		},
+		{
+			"name": "Shared Posts Feedback (All Roles)",
+			"description": "Feedback endpoints accessible to Admin, Client, Marketer, and Designer",
+			"item": [
+				{
+					"name": "Add Feedback to Post (Any Role)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{client_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"comment\": \"This design looks amazing! Ready to publish.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/posts/1/feedback",
+							"host": ["{{base_url}}"],
+							"path": ["posts", "1", "feedback"]
+						},
+						"description": "Add feedback/comment to a post. Accessible by Admin, Client, Marketer, or Designer. Can use any token (admin_token, client_token, marketer_token, designer_token). Only works if post is not approved yet."
+					}
+				},
+				{
+					"name": "Get Post Feedbacks (Any Role)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{client_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/posts/1/feedbacks",
+							"host": ["{{base_url}}"],
+							"path": ["posts", "1", "feedbacks"]
+						},
+						"description": "Get all feedbacks/comments for a specific post. Accessible by Admin, Client, Marketer, or Designer. Returns feedback with user details including role."
 					}
 				}
 			]
