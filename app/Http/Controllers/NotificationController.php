@@ -113,26 +113,50 @@ class NotificationController extends Controller
 
     public function getNotifications(Request $request)
     {
+        \Log::info('getNotifications called', [
+            'headers' => $request->headers->all(),
+            'auth_header' => $request->header('Authorization')
+        ]);
+
         $user = null;
+        $authenticatedGuard = null;
+        
         foreach (['admin', 'client', 'designer', 'marketer'] as $guard) {
+            \Log::info("Checking guard: {$guard}");
+            
             if (auth()->guard($guard)->check()) {
                 $user = auth()->guard($guard)->user();
+                $authenticatedGuard = $guard;
+                \Log::info("User authenticated via {$guard}", [
+                    'user_id' => $user->id,
+                    'user_class' => get_class($user)
+                ]);
                 break;
             }
         }
 
         if (!$user) {
+            \Log::warning('No user authenticated in any guard');
             return response()->json([
                 'status' => false,
                 'message' => 'Unauthorized'
             ], 401);
         }
 
+        \Log::info('Querying notifications', [
+            'notifiable_id' => $user->id,
+            'notifiable_type' => get_class($user)
+        ]);
+
         $notifications = Notification::where('notifiable_id', $user->id)
             ->where('notifiable_type', get_class($user))
             ->latest()
             ->with('template')
             ->get();
+
+        \Log::info('Notifications retrieved', [
+            'count' => $notifications->count()
+        ]);
 
         return response()->json([
             'status' => true,
