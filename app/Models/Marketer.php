@@ -20,6 +20,7 @@ class Marketer extends Authenticatable implements JWTSubject
         'photo',
         'bio',
         'role',
+        'device_token',
     ];
 
     protected $hidden = [

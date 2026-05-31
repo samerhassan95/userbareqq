@@ -3050,70 +3050,333 @@
 			"description": "Shared notification endpoints accessible to Admin, Client, Employee, Designer, and Marketer dynamically based on the token.",
 			"item": [
 				{
-					"name": "Get My Notifications",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{client_token}}"
-							},
-							{
-								"key": "Accept-Language",
-								"value": "{{lang}}"
+					"name": "Admin Notifications",
+					"item": [
+						{
+							"name": "Get My Notifications - Admin",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "{{lang}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/notifications",
+									"host": ["{{base_url}}"],
+									"path": ["notifications"]
+								},
+								"description": "Get all notifications for the authenticated admin user."
 							}
-						],
-						"url": {
-							"raw": "{{base_url}}/notifications",
-							"host": ["{{base_url}}"],
-							"path": ["notifications"]
 						},
-						"description": "Get all notifications for the authenticated user (supports admin_token, client_token, marketer_token, designer_token, etc.)."
-					}
+						{
+							"name": "Mark Notification as Read - Admin",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "{{lang}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/notifications/1/read",
+									"host": ["{{base_url}}"],
+									"path": ["notifications", "1", "read"]
+								},
+								"description": "Mark a single notification as read for admin."
+							}
+						},
+						{
+							"name": "Mark All Notifications as Read - Admin",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "{{lang}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/notifications/read-all",
+									"host": ["{{base_url}}"],
+									"path": ["notifications", "read-all"]
+								},
+								"description": "Mark all notifications as read for admin."
+							}
+						}
+					]
 				},
 				{
-					"name": "Mark Notification as Read",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{client_token}}"
-							},
-							{
-								"key": "Accept-Language",
-								"value": "{{lang}}"
+					"name": "Client Notifications",
+					"item": [
+						{
+							"name": "Get My Notifications - Client",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{client_token}}"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "{{lang}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/notifications",
+									"host": ["{{base_url}}"],
+									"path": ["notifications"]
+								},
+								"description": "Get all notifications for the authenticated client user."
 							}
-						],
-						"url": {
-							"raw": "{{base_url}}/notifications/1/read",
-							"host": ["{{base_url}}"],
-							"path": ["notifications", "1", "read"]
 						},
-						"description": "Mark a single notification as read."
-					}
+						{
+							"name": "Mark Notification as Read - Client",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{client_token}}"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "{{lang}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/notifications/1/read",
+									"host": ["{{base_url}}"],
+									"path": ["notifications", "1", "read"]
+								},
+								"description": "Mark a single notification as read for client."
+							}
+						},
+						{
+							"name": "Mark All Notifications as Read - Client",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{client_token}}"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "{{lang}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/notifications/read-all",
+									"host": ["{{base_url}}"],
+									"path": ["notifications", "read-all"]
+								},
+								"description": "Mark all notifications as read for client."
+							}
+						}
+					]
 				},
 				{
-					"name": "Mark All Notifications as Read",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{client_token}}"
-							},
-							{
-								"key": "Accept-Language",
-								"value": "{{lang}}"
+					"name": "Designer Notifications",
+					"item": [
+						{
+							"name": "Get My Notifications - Designer",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{designer_token}}"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "{{lang}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/notifications",
+									"host": ["{{base_url}}"],
+									"path": ["notifications"]
+								},
+								"description": "Get all notifications for the authenticated designer user."
 							}
-						],
-						"url": {
-							"raw": "{{base_url}}/notifications/read-all",
-							"host": ["{{base_url}}"],
-							"path": ["notifications", "read-all"]
 						},
-						"description": "Mark all notifications for the authenticated user as read."
-					}
+						{
+							"name": "Mark Notification as Read - Designer",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{designer_token}}"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "{{lang}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/notifications/1/read",
+									"host": ["{{base_url}}"],
+									"path": ["notifications", "1", "read"]
+								},
+								"description": "Mark a single notification as read for designer."
+							}
+						},
+						{
+							"name": "Mark All Notifications as Read - Designer",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{designer_token}}"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "{{lang}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/notifications/read-all",
+									"host": ["{{base_url}}"],
+									"path": ["notifications", "read-all"]
+								},
+								"description": "Mark all notifications as read for designer."
+							}
+						}
+					]
+				},
+				{
+					"name": "Marketer Notifications",
+					"item": [
+						{
+							"name": "Get My Notifications - Marketer",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{marketer_token}}"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "{{lang}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/notifications",
+									"host": ["{{base_url}}"],
+									"path": ["notifications"]
+								},
+								"description": "Get all notifications for the authenticated marketer user."
+							}
+						},
+						{
+							"name": "Mark Notification as Read - Marketer",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{marketer_token}}"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "{{lang}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/notifications/1/read",
+									"host": ["{{base_url}}"],
+									"path": ["notifications", "1", "read"]
+								},
+								"description": "Mark a single notification as read for marketer."
+							}
+						},
+						{
+							"name": "Mark All Notifications as Read - Marketer",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{marketer_token}}"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "{{lang}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/notifications/read-all",
+									"host": ["{{base_url}}"],
+									"path": ["notifications", "read-all"]
+								},
+								"description": "Mark all notifications as read for marketer."
+							}
+						}
+					]
+				},
+				{
+					"name": "Error Cases",
+					"item": [
+						{
+							"name": "Unauthorized - No Token",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept-Language",
+										"value": "{{lang}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/notifications",
+									"host": ["{{base_url}}"],
+									"path": ["notifications"]
+								},
+								"description": "Test unauthorized access without token. Should return 401."
+							}
+						},
+						{
+							"name": "Not Found - Invalid Notification ID",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{client_token}}"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "{{lang}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/notifications/99999/read",
+									"host": ["{{base_url}}"],
+									"path": ["notifications", "99999", "read"]
+								},
+								"description": "Test marking non-existent notification as read. Should return 404."
+							}
+						}
+					]
 				}
 			]
 		}
