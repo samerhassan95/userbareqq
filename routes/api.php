@@ -5,6 +5,7 @@ use App\Http\Controllers\Client\ClientAuthController;
 use App\Http\Controllers\Employee\EmployeeAuthController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\StrategyDayController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\UniversalAuthController;
 use Illuminate\Support\Facades\Route;
 
@@ -44,4 +45,11 @@ Route::post('opay/callback', [PaymentController::class, 'opayCallback'])->name('
 // Shared Routes - Strategies by Day (All Authenticated Roles: Admin, Client, Marketer, Designer)
 Route::middleware(['auth:admin,client,marketer,designer'])->group(function () {
     Route::get('strategies/day', [StrategyDayController::class, 'getStrategiesByDay']);
+});
+
+// Shared Routes - Notifications (All Authenticated Roles)
+Route::middleware(['auth:admin,client,employee,designer,marketer'])->group(function () {
+    Route::get('notifications', [NotificationController::class, 'getNotifications']);
+    Route::post('notifications/{id}/read', [NotificationController::class, 'markNotificationAsRead']);
+    Route::post('notifications/read-all', [NotificationController::class, 'markAllNotificationsAsRead']);
 });
