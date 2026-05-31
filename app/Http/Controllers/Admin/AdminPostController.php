@@ -80,7 +80,7 @@ class AdminPostController extends Controller
     public function show($id)
     {
         try {
-            $post = Post::with(['createdBy', 'updatedBy', 'client', 'feedbacks.client'])->findOrFail($id);
+            $post = Post::with(['createdBy', 'updatedBy', 'client', 'feedbacks.user'])->findOrFail($id);
 
             // Add full image URL
             if ($post->image) {

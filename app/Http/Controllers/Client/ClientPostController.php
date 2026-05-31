@@ -18,7 +18,7 @@ class ClientPostController extends Controller
         try {
             $clientId = auth()->id();
             
-            $query = Post::with(['createdBy', 'updatedBy', 'client', 'feedbacks.client'])
+            $query = Post::with(['createdBy', 'updatedBy', 'client', 'feedbacks.user'])
                 ->where('client_id', $clientId);
 
             // Filter by approval status
@@ -78,7 +78,7 @@ class ClientPostController extends Controller
         try {
             $clientId = auth()->id();
             
-            $post = Post::with(['createdBy', 'updatedBy', 'client', 'feedbacks.client'])
+            $post = Post::with(['createdBy', 'updatedBy', 'client', 'feedbacks.user'])
                 ->where('client_id', $clientId)
                 ->findOrFail($id);
 

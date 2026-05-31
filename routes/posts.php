@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Route;
 // Admin Routes (Create & Edit)
 Route::middleware('admin')->prefix('admin')->group(function () {
     Route::get('posts', [AdminPostController::class, 'index']);
-    Route::get('posts/{id}', [AdminPostController::class, 'show']);
     Route::post('posts', [AdminPostController::class, 'store']);
     Route::put('posts/{id}', [AdminPostController::class, 'update']);
     Route::post('posts/{id}', [AdminPostController::class, 'update']); // For form-data with image
@@ -54,7 +53,10 @@ Route::middleware(['client'])->prefix('client')->group(function () {
 
 // Shared Routes - Feedback for any authenticated role (Admin, Client, Marketer, Designer)
 // These routes are accessible to any user who is authenticated through any guard
+use App\Http\Controllers\PostController;
+
 Route::middleware(['auth:admin,client,marketer,designer'])->group(function () {
+    Route::get('posts/{id}', [PostController::class, 'show']);
     Route::post('posts/{id}/feedback', [PostFeedbackController::class, 'addFeedback']);
     Route::get('posts/{id}/feedbacks', [PostFeedbackController::class, 'getFeedbacks']);
 });

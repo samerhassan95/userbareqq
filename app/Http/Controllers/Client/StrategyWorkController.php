@@ -36,7 +36,7 @@ class StrategyWorkController extends Controller
             // Get date filter (optional)
             $date = $request->query('date');
             
-            $query = \App\Models\Post::with(['createdBy', 'client', 'feedbacks.client', 'strategyWork'])
+            $query = \App\Models\Post::with(['createdBy', 'client', 'feedbacks.user', 'strategyWork'])
                 ->where('product_order_id', $orderId)
                 ->whereNotNull('strategy_work_id');
 

@@ -1939,9 +1939,9 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/admin/posts/1",
+							"raw": "{{base_url}}/posts/1",
 							"host": ["{{base_url}}"],
-							"path": ["admin", "posts", "1"]
+							"path": ["posts", "1"]
 						}
 					}
 				},
