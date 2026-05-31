@@ -1,3 +1,7 @@
+#!/bin/bash
+
+# Update SendsNotifications.php on server with correct code
+cat > /www/wwwroot/user.bareqq.com/app/Traits/SendsNotifications.php << 'EOF'
 <?php
 
 namespace App\Traits;
@@ -93,3 +97,25 @@ trait SendsNotifications
         return null;
     }
 }
+EOF
+
+echo "✅ SendsNotifications.php updated"
+
+# Clear all caches
+php /www/wwwroot/user.bareqq.com/artisan config:clear
+php /www/wwwroot/user.bareqq.com/artisan cache:clear
+php /www/wwwroot/user.bareqq.com/artisan route:clear
+php /www/wwwroot/user.bareqq.com/artisan view:clear
+
+echo "✅ Cache cleared"
+
+# Restart PHP-FPM
+systemctl restart php8.2-fpm 2>/dev/null || service php8.2-fpm restart 2>/dev/null || echo "⚠️  Please manually restart PHP-FPM"
+
+echo "✅ PHP-FPM restart attempted"
+
+echo ""
+echo "🧪 Now test by creating an order and check:"
+echo "1. Logs should show: 'Notification saved to database (no device_token for push)'"
+echo "2. Database should have notifications:"
+echo "   mysql -u userbareqq -p userbareqq -e \"SELECT id, user_type, user_id, title, created_at FROM notifications ORDER BY created_at DESC LIMIT 5;\""
