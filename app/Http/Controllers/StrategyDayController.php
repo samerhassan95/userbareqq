@@ -67,7 +67,12 @@ class StrategyDayController extends Controller
 
             // Get posts for the client scheduled on this date under strategy orders
             $query = Post::where('client_id', $clientId)
-                ->whereDate('scheduled_date', $date)
+                ->where(function ($q) use ($date) {
+                    $q->whereHas('strategyWork', function ($sq) use ($date) {
+                        $sq->whereDate('scheduled_date', $date);
+                    })
+                    ->orWhereDate('scheduled_date', $date);
+                })
                 ->whereHas('productOrder', function ($q) {
                     $q->where('product_role', 'strategy');
                 });
