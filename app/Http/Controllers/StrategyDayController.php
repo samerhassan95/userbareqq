@@ -57,25 +57,22 @@ class StrategyDayController extends Controller
                 ], 401);
             }
 
-            // For non-client roles, client_id is required
-            if ($userType !== 'client' && !$clientId) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'client_id is required for ' . $userType . ' users'
-                ], 400);
+            // Get posts scheduled on this date under strategy orders
+            $query = Post::query();
+
+            if ($clientId) {
+                $query->where('client_id', $clientId);
             }
 
-            // Get posts for the client scheduled on this date under strategy orders
-            $query = Post::where('client_id', $clientId)
-                ->where(function ($q) use ($date) {
-                    $q->whereHas('strategyWork', function ($sq) use ($date) {
-                        $sq->whereDate('scheduled_date', $date);
-                    })
-                    ->orWhereDate('scheduled_date', $date);
+            $query->where(function ($q) use ($date) {
+                $q->whereHas('strategyWork', function ($sq) use ($date) {
+                    $sq->whereDate('scheduled_date', $date);
                 })
-                ->whereHas('productOrder', function ($q) {
-                    $q->where('product_role', 'strategy');
-                });
+                ->orWhereDate('scheduled_date', $date);
+            })
+            ->whereHas('productOrder', function ($q) {
+                $q->where('product_role', 'strategy');
+            });
 
             $posts = $query->with([
                 'feedbacks.user',
@@ -153,26 +150,21 @@ class StrategyDayController extends Controller
                         'attachments' => $post->strategyWork->attachments,
                         'notes' => $post->strategyWork->notes,
                     ] : null,
+                    'client' => $post->client ? [
+                        'id' => $post->client->id,
+                        'name' => $post->client->name,
+                        'email' => $post->client->email,
+                        'image' => $post->client->photo ? asset($post->client->photo) : null,
+                    ] : null,
                 ];
             }
 
-            $responseData = [];
-
-            if ($userType !== 'client') {
-                $clientInfo = $posts->first()?->client;
-                $responseData['client'] = [
-                    'id' => $clientId,
-                    'name' => $clientInfo->name ?? null,
-                    'email' => $clientInfo->email ?? null,
-                ];
-            }
-
-            $responseData = array_merge($responseData, [
+            $responseData = [
                 'date' => $date,
                 'user_type' => $userType,
                 'posts' => $postsData,
                 'total_posts' => count($postsData),
-            ]);
+            ];
 
             return response()->json([
                 'success' => true,
