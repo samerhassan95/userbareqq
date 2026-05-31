@@ -684,18 +684,37 @@
 								"value": "Bearer {{client_token}}"
 							},
 							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
 								"key": "Accept-Language",
 								"value": "{{lang}}",
 								"description": "Language: en or ar"
 							}
 						],
 						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"product_id\": 1,\n    \"product_role\": \"one_time\",\n    \"total_price\": \"1000\"\n}"
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "product_id",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "product_role",
+									"value": "one_time",
+									"type": "text"
+								},
+								{
+									"key": "total_price",
+									"value": "1000",
+									"type": "text"
+								},
+								{
+									"key": "payment_proof",
+									"type": "file",
+									"src": [],
+									"disabled": true,
+									"description": "Optional - attach payment proof (jpeg, png, jpg, pdf, max 5MB)"
+								}
+							]
 						},
 						"url": {
 							"raw": "{{base_url}}/client/product-orders",
@@ -714,28 +733,47 @@
 								"value": "Bearer {{client_token}}"
 							},
 							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
 								"key": "Accept-Language",
 								"value": "{{lang}}",
 								"description": "Language: en or ar"
 							}
 						],
 						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"product_id\": 2,\n    \"product_role\": \"strategy\",\n    \"total_price\": \"2000\",\n    \"duration\": \"month\"\n}"
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "product_id",
+									"value": "2",
+									"type": "text"
+								},
+								{
+									"key": "product_role",
+									"value": "strategy",
+									"type": "text"
+								},
+								{
+									"key": "total_price",
+									"value": "2000",
+									"type": "text"
+								},
+								{
+									"key": "duration",
+									"value": "month",
+									"type": "text"
+								},
+								{
+									"key": "payment_proof",
+									"type": "file",
+									"src": [],
+									"disabled": true,
+									"description": "Optional - attach payment proof (jpeg, png, jpg, pdf, max 5MB)"
+								}
+							]
 						},
 						"url": {
 							"raw": "{{base_url}}/client/product-orders",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"client",
-								"product-orders"
-							]
+							"host": ["{{base_url}}"],
+							"path": ["client", "product-orders"]
 						}
 					}
 				},
@@ -749,28 +787,47 @@
 								"value": "Bearer {{client_token}}"
 							},
 							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
 								"key": "Accept-Language",
 								"value": "{{lang}}",
 								"description": "Language: en or ar"
 							}
 						],
 						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"product_id\": 2,\n    \"product_role\": \"strategy\",\n    \"total_price\": \"5000\",\n    \"duration\": \"three_months\"\n}"
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "product_id",
+									"value": "2",
+									"type": "text"
+								},
+								{
+									"key": "product_role",
+									"value": "strategy",
+									"type": "text"
+								},
+								{
+									"key": "total_price",
+									"value": "5000",
+									"type": "text"
+								},
+								{
+									"key": "duration",
+									"value": "three_months",
+									"type": "text"
+								},
+								{
+									"key": "payment_proof",
+									"type": "file",
+									"src": [],
+									"disabled": true,
+									"description": "Optional - attach payment proof (jpeg, png, jpg, pdf, max 5MB)"
+								}
+							]
 						},
 						"url": {
 							"raw": "{{base_url}}/client/product-orders",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"client",
-								"product-orders"
-							]
+							"host": ["{{base_url}}"],
+							"path": ["client", "product-orders"]
 						}
 					}
 				},
@@ -784,28 +841,47 @@
 								"value": "Bearer {{client_token}}"
 							},
 							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
 								"key": "Accept-Language",
 								"value": "{{lang}}",
 								"description": "Language: en or ar"
 							}
 						],
 						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"product_id\": 2,\n    \"product_role\": \"strategy\",\n    \"total_price\": \"9000\",\n    \"duration\": \"six_months\"\n}"
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "product_id",
+									"value": "2",
+									"type": "text"
+								},
+								{
+									"key": "product_role",
+									"value": "strategy",
+									"type": "text"
+								},
+								{
+									"key": "total_price",
+									"value": "9000",
+									"type": "text"
+								},
+								{
+									"key": "duration",
+									"value": "six_months",
+									"type": "text"
+								},
+								{
+									"key": "payment_proof",
+									"type": "file",
+									"src": [],
+									"disabled": true,
+									"description": "Optional - attach payment proof (jpeg, png, jpg, pdf, max 5MB)"
+								}
+							]
 						},
 						"url": {
 							"raw": "{{base_url}}/client/product-orders",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"client",
-								"product-orders"
-							]
+							"host": ["{{base_url}}"],
+							"path": ["client", "product-orders"]
 						}
 					}
 				},
@@ -819,28 +895,47 @@
 								"value": "Bearer {{client_token}}"
 							},
 							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
 								"key": "Accept-Language",
 								"value": "{{lang}}",
 								"description": "Language: en or ar"
 							}
 						],
 						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"product_id\": 2,\n    \"product_role\": \"strategy\",\n    \"total_price\": \"20000\",\n    \"duration\": \"year\"\n}"
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "product_id",
+									"value": "2",
+									"type": "text"
+								},
+								{
+									"key": "product_role",
+									"value": "strategy",
+									"type": "text"
+								},
+								{
+									"key": "total_price",
+									"value": "20000",
+									"type": "text"
+								},
+								{
+									"key": "duration",
+									"value": "year",
+									"type": "text"
+								},
+								{
+									"key": "payment_proof",
+									"type": "file",
+									"src": [],
+									"disabled": true,
+									"description": "Optional - attach payment proof (jpeg, png, jpg, pdf, max 5MB)"
+								}
+							]
 						},
 						"url": {
 							"raw": "{{base_url}}/client/product-orders",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"client",
-								"product-orders"
-							]
+							"host": ["{{base_url}}"],
+							"path": ["client", "product-orders"]
 						}
 					}
 				},
@@ -990,7 +1085,7 @@
 					}
 				},
 				{
-					"name": "Upload Payment Proof",
+					"name": "Upload Payment Proof (Fallback - via Invoice)",
 					"request": {
 						"method": "POST",
 						"header": [

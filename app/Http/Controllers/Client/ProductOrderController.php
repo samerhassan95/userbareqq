@@ -146,6 +146,18 @@ class ProductOrderController extends Controller
             // Link invoice to order
             $this->orderRepository->attachInvoice($order->id, $invoice->id);
 
+            // Handle optional payment proof upload
+            $paymentProofUrl = null;
+            if ($request->hasFile('payment_proof')) {
+                $filePath = \App\Services\ImageService::upload($request->file('payment_proof'), 'payment_proofs');
+                $invoice->update([
+                    'payment_proof' => $filePath,
+                    'payment_method' => 'bank_transfer',
+                ]);
+                $paymentProofUrl = asset($filePath);
+                \Log::info('Payment proof uploaded', ['invoice_id' => $invoice->id, 'path' => $filePath]);
+            }
+
             // Build comprehensive response
             $responseData = [
                 'order' => [
@@ -171,9 +183,12 @@ class ProductOrderController extends Controller
                     'status_label' => ucfirst($invoice->status),
                     'due_date' => $invoice->due_date->format('Y-m-d'),
                     'payment_method' => $invoice->payment_method,
+                    'payment_proof' => $paymentProofUrl,
                 ],
                 'next_steps' => [
-                    'step_1' => 'Upload payment proof to the invoice',
+                    'step_1' => $paymentProofUrl
+                        ? 'Payment proof uploaded — waiting for admin approval'
+                        : 'Upload payment proof to the invoice',
                     'step_2' => 'Wait for admin approval',
                     'step_3' => $validated['product_role'] === 'one_time' 
                         ? 'Admin will deliver your selected feature'

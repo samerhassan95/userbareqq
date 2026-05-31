@@ -18,6 +18,7 @@ class CreateProductOrderRequest extends FormRequest
             'product_role' => 'required|in:one_time,strategy',
             'total_price' => 'required|numeric|min:0',
             'duration' => 'required_if:product_role,strategy|in:month,three_months,six_months,year,3_months,6_months',
+            'payment_proof' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:5120',
         ];
     }
 
@@ -30,6 +31,9 @@ class CreateProductOrderRequest extends FormRequest
             'product_role.in' => 'Product role must be one_time or strategy.',
             'duration.required_if' => 'Duration is required for strategy products.',
             'duration.in' => 'Duration must be month, three_months, six_months, or year.',
+            'payment_proof.file' => 'Payment proof must be a file.',
+            'payment_proof.mimes' => 'Payment proof must be an image (jpeg, png, jpg) or PDF.',
+            'payment_proof.max' => 'Payment proof must not exceed 5MB.',
         ];
     }
 }
