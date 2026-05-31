@@ -95,8 +95,12 @@ class StrategyDayController extends Controller
                     'description_ar' => $post->description_ar,
                     'image' => $post->image ? asset('posts/' . $post->image) : null,
                     'status' => $post->status,
-                    'scheduled_date' => $post->scheduled_date ? $post->scheduled_date->format('Y-m-d') : null,
-                    'scheduled_time' => $post->scheduled_time,
+                    'scheduled_date' => $post->strategyWork
+                        ? $post->strategyWork->scheduled_date->format('Y-m-d')
+                        : ($post->scheduled_date ? $post->scheduled_date->format('Y-m-d') : null),
+                    'scheduled_time' => $post->strategyWork
+                        ? $post->strategyWork->scheduled_time
+                        : $post->scheduled_time,
                     'approval_status' => [
                         'is_approved' => $post->is_approved,
                         'id_approved' => $post->id_approved,
@@ -144,6 +148,10 @@ class StrategyDayController extends Controller
                         'title_ar' => $post->strategyWork->title_ar,
                         'description' => $post->strategyWork->description,
                         'description_ar' => $post->strategyWork->description_ar,
+                        'scheduled_date' => $post->strategyWork->scheduled_date
+                            ? $post->strategyWork->scheduled_date->format('Y-m-d')
+                            : null,
+                        'scheduled_time' => $post->strategyWork->scheduled_time,
                         'platforms' => $post->strategyWork->platforms,
                         'status' => $post->strategyWork->status,
                         'post_type' => $post->strategyWork->post_type,

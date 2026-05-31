@@ -58,6 +58,14 @@
 			}
 		]
 	},
+	"header": [
+		{
+			"key": "Accept",
+			"value": "application/json",
+			"type": "text",
+			"description": "Ensures Laravel returns JSON responses instead of HTML"
+		}
+	],
 	"item": [
 		{
 			"name": "Universal Login (All Roles)",
