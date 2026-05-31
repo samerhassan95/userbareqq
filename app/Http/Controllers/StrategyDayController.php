@@ -107,7 +107,7 @@ class StrategyDayController extends Controller
                             'title_ar' => $post->title_ar,
                             'description' => $post->description,
                             'description_ar' => $post->description_ar,
-                            'image' => $post->image,
+                            'image' => $post->image ? asset('posts/' . $post->image) : null,
                             'status' => $post->status,
                             'scheduled_date' => $post->scheduled_date,
                             'scheduled_time' => $post->scheduled_time,
@@ -181,21 +181,26 @@ class StrategyDayController extends Controller
                 return $timeA - $timeB;
             });
 
+            $responseData = [
+                'date' => $date,
+                'user_type' => $userType,
+                'strategies' => $strategies,
+                'total_strategies' => count($strategies),
+                'total_posts' => $totalPosts,
+            ];
+
+            if ($userType !== 'client') {
+                $responseData['client'] = [
+                    'id' => $clientId,
+                    'name' => $productOrders->first()?->client->name ?? null,
+                    'email' => $productOrders->first()?->client->email ?? null,
+                ];
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => __('messages.strategies_retrieved_successfully'),
-                'data' => [
-                    'client' => [
-                        'id' => $clientId,
-                        'name' => $productOrders->first()?->client->name ?? null,
-                        'email' => $productOrders->first()?->client->email ?? null,
-                    ],
-                    'date' => $date,
-                    'user_type' => $userType,
-                    'strategies' => $strategies,
-                    'total_strategies' => count($strategies),
-                    'total_posts' => $totalPosts,
-                ]
+                'data' => $responseData
             ], 200);
 
         } catch (\Exception $e) {
