@@ -173,37 +173,29 @@ class AdminPostController extends Controller
                 
                 // Notify team members if post is linked to an order
                 if ($post->product_order_id) {
-                    $order = $post->productOrder;
-                    if ($order && method_exists($order, 'designers')) {
-                        $designers = $order->designers;
-                        if ($designers && $designers->count() > 0) {
-                            $this->sendNotification(
-                                $designers,
-                                'New Post',
-                                "New post \"{$post->title}\" needs your work",
-                                'post_created',
-                                [
-                                    'post_id' => $post->id,
-                                    'title' => $post->title,
-                                    'order_id' => $order->id
-                                ]
-                            );
-                        }
-                    }
-                    if ($order && method_exists($order, 'marketers')) {
-                        $marketers = $order->marketers;
-                        if ($marketers && $marketers->count() > 0) {
-                            $this->sendNotification(
-                                $marketers,
-                                'New Post',
-                                "New post \"{$post->title}\" needs your work",
-                                'post_created',
-                                [
-                                    'post_id' => $post->id,
-                                    'title' => $post->title,
-                                    'order_id' => $order->id
-                                ]
-                            );
+                    $order = \App\Models\ProductOrder::with('orderTeamMembers')->find($post->product_order_id);
+                    if ($order && $order->orderTeamMembers) {
+                        foreach ($order->orderTeamMembers as $teamMember) {
+                            $member = null;
+                            if ($teamMember->member_type === 'designer') {
+                                $member = \App\Models\Designer::find($teamMember->member_id);
+                            } elseif ($teamMember->member_type === 'marketer') {
+                                $member = \App\Models\Marketer::find($teamMember->member_id);
+                            }
+                            
+                            if ($member) {
+                                $this->sendNotification(
+                                    $member,
+                                    'New Post',
+                                    "New post \"{$post->title}\" needs your work",
+                                    'post_created',
+                                    [
+                                        'post_id' => $post->id,
+                                        'title' => $post->title,
+                                        'order_id' => $order->id
+                                    ]
+                                );
+                            }
                         }
                     }
                 }

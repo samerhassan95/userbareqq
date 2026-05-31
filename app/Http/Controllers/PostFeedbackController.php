@@ -84,7 +84,7 @@ class PostFeedbackController extends Controller
                             $member,
                             'New Feedback',
                             "{$currentUser->name} added feedback on post: {$post->title}",
-                            'feedback_added',
+                            'post_feedback_received',
                             [
                                 'post_id' => $post->id,
                                 'title' => $post->title,
@@ -100,7 +100,7 @@ class PostFeedbackController extends Controller
                         $post->client,
                         'New Feedback',
                         "New feedback on post: {$post->title}",
-                        'feedback_added',
+                        'post_feedback_received',
                         [
                             'post_id' => $post->id,
                             'title' => $post->title
@@ -113,7 +113,7 @@ class PostFeedbackController extends Controller
                     $this->notifyAdmins(
                         'New Feedback',
                         "Feedback on post: {$post->title}",
-                        'feedback_added',
+                        'post_feedback_received',
                         [
                             'post_id' => $post->id,
                             'title' => $post->title

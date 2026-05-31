@@ -76,7 +76,7 @@ trait SendsNotifications
      */
     protected function notifyAdmins(string $title, string $message, string $type, array $data = [])
     {
-        $admins = \App\Models\Admin::whereNotNull('device_token')->get();
+        $admins = \App\Models\Admin::all(); // Get ALL admins, not just those with device_token
         $this->sendNotification($admins, $title, $message, $type, $data);
     }
 
