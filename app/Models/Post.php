@@ -20,6 +20,7 @@ class Post extends Model
         'scheduled_date',
         'scheduled_time',
         'is_approved',
+        'id_approved',
         'approved_at',
         'client_approved',
         'client_approved_at',
@@ -41,6 +42,7 @@ class Post extends Model
 
     protected $casts = [
         'is_approved' => 'boolean',
+        'id_approved' => 'boolean',
         'approved_at' => 'datetime',
         'client_approved' => 'boolean',
         'client_approved_at' => 'datetime',
@@ -139,9 +141,10 @@ class Post extends Model
             'marketer_approved' => true,
             'marketer_approved_at' => now(),
             'is_approved' => true,
+            'id_approved' => true,
             'approved_at' => $this->approved_at ?? now(),
         ]);
-        
+
         $this->refresh();
         $this->checkFullApproval();
     }
@@ -160,9 +163,10 @@ class Post extends Model
             'marketer_approved' => true,
             'marketer_approved_at' => now(),
             'is_approved' => true,
+            'id_approved' => true,
             'approved_at' => $this->approved_at ?? now(),
         ]);
-        
+
         $this->refresh();
         $this->checkFullApproval();
     }
@@ -181,9 +185,10 @@ class Post extends Model
             'admin_approved' => true,
             'admin_approved_at' => now(),
             'is_approved' => true,
+            'id_approved' => true,
             'approved_at' => $this->approved_at ?? now(),
         ]);
-        
+
         $this->refresh();
         $this->checkFullApproval();
     }
