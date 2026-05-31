@@ -113,7 +113,20 @@ class NotificationController extends Controller
 
     public function getNotifications(Request $request)
     {
-        $user = $request->user();
+        $user = null;
+        foreach (['admin', 'client', 'employee', 'designer', 'marketer'] as $guard) {
+            if (auth()->guard($guard)->check()) {
+                $user = auth()->guard($guard)->user();
+                break;
+            }
+        }
+
+        if (!$user) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Unauthorized'
+            ], 401);
+        }
 
         $notifications = Notification::where('notifiable_id', $user->id)
             ->where('notifiable_type', get_class($user))
@@ -139,11 +152,24 @@ class NotificationController extends Controller
 
     public function markNotificationAsRead($id, Request $request)
     {
-        $client = $request->user();
+        $user = null;
+        foreach (['admin', 'client', 'employee', 'designer', 'marketer'] as $guard) {
+            if (auth()->guard($guard)->check()) {
+                $user = auth()->guard($guard)->user();
+                break;
+            }
+        }
+
+        if (!$user) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Unauthorized'
+            ], 401);
+        }
 
         $notification = Notification::where('id', $id)
-            ->where('notifiable_id', $client->id)
-            ->where('notifiable_type', get_class($client))
+            ->where('notifiable_id', $user->id)
+            ->where('notifiable_type', get_class($user))
             ->first();
 
         if (!$notification) {
@@ -163,10 +189,23 @@ class NotificationController extends Controller
 
     public function markAllNotificationsAsRead(Request $request)
     {
-        $client = $request->user();
+        $user = null;
+        foreach (['admin', 'client', 'employee', 'designer', 'marketer'] as $guard) {
+            if (auth()->guard($guard)->check()) {
+                $user = auth()->guard($guard)->user();
+                break;
+            }
+        }
 
-        Notification::where('notifiable_id', $client->id)
-            ->where('notifiable_type', get_class($client))
+        if (!$user) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Unauthorized'
+            ], 401);
+        }
+
+        Notification::where('notifiable_id', $user->id)
+            ->where('notifiable_type', get_class($user))
             ->update(['is_read' => true]);
 
         return response()->json([

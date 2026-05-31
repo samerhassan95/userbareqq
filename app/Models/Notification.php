@@ -25,8 +25,7 @@ class Notification extends Model
         return $this->belongsTo(NotificationTemplate::class, 'notification_template_id');
     }
     protected function getDataAttribute($value)
-{
-    return json_decode($value, true);
-}
-
+    {
+        return is_string($value) ? json_decode($value, true) : $value;
+    }
 }
