@@ -48,7 +48,7 @@ Route::middleware(['auth:admin,client,marketer,designer'])->group(function () {
 });
 
 // Shared Routes - Notifications (All Authenticated Roles)
-Route::middleware(['auth:admin,client,employee,designer,marketer'])->group(function () {
+Route::middleware(['auth:admin,client,designer,marketer'])->group(function () {
     Route::get('notifications', [NotificationController::class, 'getNotifications']);
     Route::post('notifications/{id}/read', [NotificationController::class, 'markNotificationAsRead']);
     Route::post('notifications/read-all', [NotificationController::class, 'markAllNotificationsAsRead']);

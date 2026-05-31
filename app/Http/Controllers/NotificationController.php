@@ -114,7 +114,7 @@ class NotificationController extends Controller
     public function getNotifications(Request $request)
     {
         $user = null;
-        foreach (['admin', 'client', 'employee', 'designer', 'marketer'] as $guard) {
+        foreach (['admin', 'client', 'designer', 'marketer'] as $guard) {
             if (auth()->guard($guard)->check()) {
                 $user = auth()->guard($guard)->user();
                 break;
@@ -153,7 +153,7 @@ class NotificationController extends Controller
     public function markNotificationAsRead($id, Request $request)
     {
         $user = null;
-        foreach (['admin', 'client', 'employee', 'designer', 'marketer'] as $guard) {
+        foreach (['admin', 'client', 'designer', 'marketer'] as $guard) {
             if (auth()->guard($guard)->check()) {
                 $user = auth()->guard($guard)->user();
                 break;
@@ -190,7 +190,7 @@ class NotificationController extends Controller
     public function markAllNotificationsAsRead(Request $request)
     {
         $user = null;
-        foreach (['admin', 'client', 'employee', 'designer', 'marketer'] as $guard) {
+        foreach (['admin', 'client', 'designer', 'marketer'] as $guard) {
             if (auth()->guard($guard)->check()) {
                 $user = auth()->guard($guard)->user();
                 break;

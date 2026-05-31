@@ -1,5 +1,5 @@
 -- Test Notifications Seed Script
--- Run this to create test notifications for all roles
+-- Run this to create test notifications for Admin, Client, Designer, and Marketer
 
 -- Clear existing test notifications (optional)
 -- DELETE FROM notifications WHERE title LIKE 'Test%';
@@ -31,13 +31,6 @@ VALUES
 (1, 'App\\Models\\Marketer', 'Welcome Marketer', 'Your marketer account is active', 0, NOW(), NOW()),
 (1, 'App\\Models\\Marketer', 'New Campaign', 'A new marketing campaign has started', 0, NOW(), NOW()),
 (1, 'App\\Models\\Marketer', 'Campaign Results', 'Your campaign results are ready', 1, NOW(), NOW());
-
--- Employee Notifications (assuming employee ID 1 exists)
-INSERT INTO notifications (notifiable_id, notifiable_type, title, message, is_read, created_at, updated_at)
-VALUES 
-(1, 'App\\Models\\Employee', 'Welcome Employee', 'Welcome to the team', 0, NOW(), NOW()),
-(1, 'App\\Models\\Employee', 'Meeting Reminder', 'You have a meeting at 3 PM', 0, NOW(), NOW()),
-(1, 'App\\Models\\Employee', 'Leave Approved', 'Your leave request has been approved', 1, NOW(), NOW());
 
 -- Verify the inserts
 SELECT 

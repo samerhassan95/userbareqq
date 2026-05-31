@@ -18,10 +18,6 @@ return new class extends Migration
         Schema::table('marketers', function (Blueprint $table) {
             $table->string('device_token')->nullable()->after('photo');
         });
-        
-        Schema::table('employees', function (Blueprint $table) {
-            $table->string('device_token')->nullable()->after('photo');
-        });
     }
 
     /**
@@ -34,10 +30,6 @@ return new class extends Migration
         });
         
         Schema::table('marketers', function (Blueprint $table) {
-            $table->dropColumn('device_token');
-        });
-        
-        Schema::table('employees', function (Blueprint $table) {
             $table->dropColumn('device_token');
         });
     }
