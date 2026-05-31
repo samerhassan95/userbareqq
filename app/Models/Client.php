@@ -50,6 +50,14 @@ class Client extends Authenticatable implements JWTSubject
         return $this->morphMany(TaskDiscussion::class, 'createdBy');
     }
 
+    /**
+     * Get all feedbacks this client gave on posts
+     */
+    public function feedbacks()
+    {
+        return $this->morphMany(PostFeedback::class, 'user');
+    }
+
     public function subscriptions()
     {
         return $this->hasMany(Subscription::class, 'client_id');

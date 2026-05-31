@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AdminPostController;
 use App\Http\Controllers\Client\ClientPostController;
 use App\Http\Controllers\Client\DesignerPostController;
 use App\Http\Controllers\Client\MarketerPostController;
+use App\Http\Controllers\PostFeedbackController;
 use Illuminate\Support\Facades\Route;
 
 // Admin Routes (Create & Edit)
@@ -14,10 +15,10 @@ Route::middleware('admin')->prefix('admin')->group(function () {
     Route::put('posts/{id}', [AdminPostController::class, 'update']);
     Route::post('posts/{id}', [AdminPostController::class, 'update']); // For form-data with image
     Route::delete('posts/{id}', [AdminPostController::class, 'destroy']);
-    
+
     // Approve post
     Route::post('posts/{id}/approve', [AdminPostController::class, 'approve']);
-    
+
     // Team management
     Route::post('posts/{id}/team', [AdminPostController::class, 'addTeamMembers']);
     Route::get('posts/{id}/team', [AdminPostController::class, 'getTeamMembers']);
@@ -30,7 +31,7 @@ Route::middleware(['auth:marketer'])->prefix('marketer')->group(function () {
     Route::post('posts', [MarketerPostController::class, 'store']);
     Route::put('posts/{id}', [MarketerPostController::class, 'update']);
     Route::post('posts/{id}', [MarketerPostController::class, 'update']); // For form-data
-    
+
     // Approve post
     Route::post('posts/{id}/approve', [MarketerPostController::class, 'approve']);
 });
@@ -49,4 +50,11 @@ Route::middleware(['client'])->prefix('client')->group(function () {
     Route::post('posts/{id}/feedback', [ClientPostController::class, 'addFeedback']);
     Route::post('posts/{id}/approve', [ClientPostController::class, 'approve']);
     Route::get('posts/{id}/feedbacks', [ClientPostController::class, 'getFeedbacks']);
+});
+
+// Shared Routes - Feedback for any authenticated role (Admin, Client, Marketer, Designer)
+// These routes are accessible to any user who is authenticated through any guard
+Route::middleware(['auth:admin,client,marketer,designer'])->group(function () {
+    Route::post('posts/{id}/feedback', [PostFeedbackController::class, 'addFeedback']);
+    Route::get('posts/{id}/feedbacks', [PostFeedbackController::class, 'getFeedbacks']);
 });

@@ -13,7 +13,8 @@ class PostFeedback extends Model
 
     protected $fillable = [
         'post_id',
-        'client_id',
+        'user_id',
+        'user_type',
         'comment',
     ];
 
@@ -26,10 +27,21 @@ class PostFeedback extends Model
     }
 
     /**
-     * Get the client who gave feedback
+     * Get the user who gave feedback (polymorphic - Admin, Client, Marketer, Designer)
+     */
+    public function user()
+    {
+        return $this->morphTo();
+    }
+
+    /**
+     * Backward compatibility: Get the client who gave feedback
      */
     public function client()
     {
-        return $this->belongsTo(Client::class);
+        if ($this->user_type === 'App\Models\Client') {
+            return $this->belongsTo(Client::class, 'user_id');
+        }
+        return null;
     }
 }

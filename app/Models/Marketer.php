@@ -58,4 +58,12 @@ class Marketer extends Authenticatable implements JWTSubject
     {
         return $this->belongsTo(Admin::class);
     }
+
+    /**
+     * Get all feedbacks this marketer gave on posts
+     */
+    public function feedbacks()
+    {
+        return $this->morphMany(PostFeedback::class, 'user');
+    }
 }

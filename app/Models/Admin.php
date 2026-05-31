@@ -6,8 +6,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens; 
-use Spatie\Translatable\HasTranslations; 
+use Laravel\Sanctum\HasApiTokens;
+use Spatie\Translatable\HasTranslations;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
@@ -18,7 +18,7 @@ class Admin extends Authenticatable implements JWTSubject
 
     protected $guarded = [];
     protected $table = 'admins';
-    
+
     protected $fillable = [
         'username',
         'email',
@@ -49,6 +49,14 @@ class Admin extends Authenticatable implements JWTSubject
         return $this->morphMany(Attachment::class, 'uploadedBy');
     }
 
+    /**
+     * Get all feedbacks this admin gave on posts
+     */
+    public function feedbacks()
+    {
+        return $this->morphMany(PostFeedback::class, 'user');
+    }
+
     public function isAdmin()
 {
     return true;
@@ -58,14 +66,14 @@ class Admin extends Authenticatable implements JWTSubject
     // {
     //     return $this->morphMany(Project::class, 'created_by');
     // }
-    
-    
+
+
     public function taskDiscussions(): MorphMany
     {
         return $this->morphMany(TaskDiscussion::class, 'createdBy');
     }
 
-    
+
     public function ticketReplies()
     {
         return $this->morphMany(TicketReply::class, 'creator');
