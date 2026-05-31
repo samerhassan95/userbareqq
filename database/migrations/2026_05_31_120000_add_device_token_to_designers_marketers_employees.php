@@ -11,13 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('designers', function (Blueprint $table) {
-            $table->string('device_token')->nullable()->after('photo');
-        });
+        // Check and add device_token to designers table
+        if (!Schema::hasColumn('designers', 'device_token')) {
+            Schema::table('designers', function (Blueprint $table) {
+                $table->string('device_token')->nullable()->after('photo');
+            });
+        }
         
-        Schema::table('marketers', function (Blueprint $table) {
-            $table->string('device_token')->nullable()->after('photo');
-        });
+        // Check and add device_token to marketers table
+        if (!Schema::hasColumn('marketers', 'device_token')) {
+            Schema::table('marketers', function (Blueprint $table) {
+                $table->string('device_token')->nullable()->after('photo');
+            });
+        }
     }
 
     /**
@@ -25,12 +31,16 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('designers', function (Blueprint $table) {
-            $table->dropColumn('device_token');
-        });
+        if (Schema::hasColumn('designers', 'device_token')) {
+            Schema::table('designers', function (Blueprint $table) {
+                $table->dropColumn('device_token');
+            });
+        }
         
-        Schema::table('marketers', function (Blueprint $table) {
-            $table->dropColumn('device_token');
-        });
+        if (Schema::hasColumn('marketers', 'device_token')) {
+            Schema::table('marketers', function (Blueprint $table) {
+                $table->dropColumn('device_token');
+            });
+        }
     }
 };
