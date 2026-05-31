@@ -2230,9 +2230,9 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/admin/posts/1/approve",
+							"raw": "{{base_url}}/posts/1/approve",
 							"host": ["{{base_url}}"],
-							"path": ["admin", "posts", "1", "approve"]
+							"path": ["posts", "1", "approve"]
 						},
 						"description": "Admin approves the post. Sets id_approved=true when any role (Admin, Client, Marketer) approves. Post needs approval from Client, Admin, and Marketer to be fully approved."
 					}
@@ -2463,9 +2463,9 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/marketer/posts/1/approve",
+							"raw": "{{base_url}}/posts/1/approve",
 							"host": ["{{base_url}}"],
-							"path": ["marketer", "posts", "1", "approve"]
+							"path": ["posts", "1", "approve"]
 						},
 						"description": "Marketer approves the post. Sets id_approved=true when any role (Admin, Client, Marketer) approves. Post needs approval from Client, Admin, and Marketer to be fully approved."
 					}
@@ -2691,9 +2691,9 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/client/posts/1/approve",
+							"raw": "{{base_url}}/posts/1/approve",
 							"host": ["{{base_url}}"],
-							"path": ["client", "posts", "1", "approve"]
+							"path": ["posts", "1", "approve"]
 						},
 						"description": "Client approves the post. Sets id_approved=true when any role (Admin, Client, Marketer) approves. Post needs approval from Client, Admin, and Marketer to be fully approved."
 					}

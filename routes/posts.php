@@ -15,8 +15,7 @@ Route::middleware('admin')->prefix('admin')->group(function () {
     Route::post('posts/{id}', [AdminPostController::class, 'update']); // For form-data with image
     Route::delete('posts/{id}', [AdminPostController::class, 'destroy']);
 
-    // Approve post
-    Route::post('posts/{id}/approve', [AdminPostController::class, 'approve']);
+    // Approve post removed (moved to shared)
 
     // Team management
     Route::post('posts/{id}/team', [AdminPostController::class, 'addTeamMembers']);
@@ -31,8 +30,7 @@ Route::middleware(['auth:marketer'])->prefix('marketer')->group(function () {
     Route::put('posts/{id}', [MarketerPostController::class, 'update']);
     Route::post('posts/{id}', [MarketerPostController::class, 'update']); // For form-data
 
-    // Approve post
-    Route::post('posts/{id}/approve', [MarketerPostController::class, 'approve']);
+    // Approve post removed (moved to shared)
 });
 
 // Designer Routes (Edit only) - Designer users
@@ -47,7 +45,6 @@ Route::middleware(['client'])->prefix('client')->group(function () {
     Route::get('posts', [ClientPostController::class, 'index']);
     Route::get('posts/{id}', [ClientPostController::class, 'show']);
     Route::post('posts/{id}/feedback', [ClientPostController::class, 'addFeedback']);
-    Route::post('posts/{id}/approve', [ClientPostController::class, 'approve']);
     Route::get('posts/{id}/feedbacks', [ClientPostController::class, 'getFeedbacks']);
 });
 
@@ -57,6 +54,7 @@ use App\Http\Controllers\PostController;
 
 Route::middleware(['auth:admin,client,marketer,designer'])->group(function () {
     Route::get('posts/{id}', [PostController::class, 'show']);
+    Route::post('posts/{id}/approve', [PostController::class, 'approve']);
     Route::post('posts/{id}/feedback', [PostFeedbackController::class, 'addFeedback']);
     Route::get('posts/{id}/feedbacks', [PostFeedbackController::class, 'getFeedbacks']);
 });

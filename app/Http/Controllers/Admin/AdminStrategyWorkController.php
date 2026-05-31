@@ -84,10 +84,10 @@ class AdminStrategyWorkController extends Controller
                             'id' => $feedback->id,
                             'comment' => $feedback->comment,
                             'created_at' => $feedback->created_at->format('Y-m-d H:i:s'),
-                            'client' => $feedback->client ? [
-                                'id' => $feedback->client->id,
-                                'name' => $feedback->client->name,
-                                'email' => $feedback->client->email,
+                            'user' => $feedback->user ? [
+                                'id' => $feedback->user->id,
+                                'name' => $feedback->user->name ?? $feedback->user->username ?? 'N/A',
+                                'email' => $feedback->user->email,
                             ] : null,
                         ];
                     })->toArray(),
