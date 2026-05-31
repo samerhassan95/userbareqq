@@ -2901,6 +2901,46 @@
 					}
 				}
 			]
+		},
+		{
+			"name": "Shared Strategies by Day (All Roles)",
+			"description": "Endpoint to retrieve all strategies with posts for a specific day. Accessible by Admin, Client, Marketer, and Designer.",
+			"item": [
+				{
+					"name": "Get Strategies & Posts by Day",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{client_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/strategies/day?date=2026-05-31&client_id=1",
+							"host": ["{{base_url}}"],
+							"path": ["strategies", "day"],
+							"query": [
+								{
+									"key": "date",
+									"value": "2026-05-31",
+									"description": "Required. Date in YYYY-MM-DD format"
+								},
+								{
+									"key": "client_id",
+									"value": "1",
+									"description": "Client ID. Required for Admin/Marketer/Designer. For Client users, this is ignored and their own ID is used."
+								}
+							]
+						},
+						"description": "Get all strategies and posts for a specific day and client. Includes:\n\n- All strategies scheduled for that day\n- All posts within each strategy with full details\n- Post approvals status (client_approved, admin_approved, marketer_approved, id_approved)\n- Post feedbacks with user details\n- Post team members\n- Creator and updater information\n- Client details\n\nAccessible by:\n- Admin: Can view any client's strategies by providing client_id\n- Marketer: Can view any client's strategies by providing client_id\n- Designer: Can view any client's strategies by providing client_id\n- Client: Can only view their own strategies (client_id parameter is ignored)"
+					}
+				}
+			]
 		}
 	]
 }

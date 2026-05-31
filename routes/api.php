@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Client\ClientAuthController;
 use App\Http\Controllers\Employee\EmployeeAuthController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\StrategyDayController;
 use App\Http\Controllers\UniversalAuthController;
 use Illuminate\Support\Facades\Route;
 
@@ -39,3 +40,8 @@ Route::prefix('employee')->group(function () {
 });
 
 Route::post('opay/callback', [PaymentController::class, 'opayCallback'])->name('opay.callback');
+
+// Shared Routes - Strategies by Day (All Authenticated Roles: Admin, Client, Marketer, Designer)
+Route::middleware(['auth:admin,client,marketer,designer'])->group(function () {
+    Route::get('strategies/day', [StrategyDayController::class, 'getStrategiesByDay']);
+});
