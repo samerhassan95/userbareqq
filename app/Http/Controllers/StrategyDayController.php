@@ -181,13 +181,7 @@ class StrategyDayController extends Controller
                 return $timeA - $timeB;
             });
 
-            $responseData = [
-                'date' => $date,
-                'user_type' => $userType,
-                'strategies' => $strategies,
-                'total_strategies' => count($strategies),
-                'total_posts' => $totalPosts,
-            ];
+            $responseData = [];
 
             if ($userType !== 'client') {
                 $responseData['client'] = [
@@ -196,6 +190,14 @@ class StrategyDayController extends Controller
                     'email' => $productOrders->first()?->client->email ?? null,
                 ];
             }
+
+            $responseData = array_merge($responseData, [
+                'date' => $date,
+                'user_type' => $userType,
+                'strategies' => $strategies,
+                'total_strategies' => count($strategies),
+                'total_posts' => $totalPosts,
+            ]);
 
             return response()->json([
                 'success' => true,
