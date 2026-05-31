@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use App\Models\PostFeedback;
+use App\Traits\SendsNotifications;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class PostFeedbackController extends Controller
 {
+    use SendsNotifications;
     /**
      * Add feedback to a post (Admin, Client, Marketer, Designer)
      */
@@ -68,6 +70,59 @@ class PostFeedbackController extends Controller
                 'user_type' => $userType,
                 'comment' => $request->comment,
             ]);
+
+            // Send notifications
+            try {
+                $currentUser = $this->getCurrentUser();
+                $post->load(['teamMembers.member', 'client']);
+                
+                // Notify team members (designers/marketers) - but not the one adding feedback
+                foreach ($post->teamMembers as $teamMember) {
+                    $member = $teamMember->member;
+                    if ($member && $member->id !== $currentUser->id) {
+                        $this->sendNotification(
+                            $member,
+                            'New Feedback',
+                            "{$currentUser->name} added feedback on post: {$post->title}",
+                            'feedback_added',
+                            [
+                                'post_id' => $post->id,
+                                'title' => $post->title,
+                                'feedback' => $feedback->comment
+                            ]
+                        );
+                    }
+                }
+                
+                // Notify client (if not the one adding feedback)
+                if ($post->client && (!auth()->guard('client')->check() || $post->client->id !== $currentUser->id)) {
+                    $this->sendNotification(
+                        $post->client,
+                        'New Feedback',
+                        "New feedback on post: {$post->title}",
+                        'feedback_added',
+                        [
+                            'post_id' => $post->id,
+                            'title' => $post->title
+                        ]
+                    );
+                }
+                
+                // Notify admin (if not the one adding feedback)
+                if (!auth()->guard('admin')->check()) {
+                    $this->notifyAdmins(
+                        'New Feedback',
+                        "Feedback on post: {$post->title}",
+                        'feedback_added',
+                        [
+                            'post_id' => $post->id,
+                            'title' => $post->title
+                        ]
+                    );
+                }
+            } catch (\Exception $e) {
+                \Log::error('Failed to send feedback notifications: ' . $e->getMessage());
+            }
 
             return response()->json([
                 'success' => true,

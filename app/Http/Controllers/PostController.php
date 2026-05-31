@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Traits\SendsNotifications;
 use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
+    use SendsNotifications;
     /**
      * Get single post for any role
      */
@@ -99,6 +101,60 @@ class PostController extends Controller
             $postData = $post->load(['createdBy', 'updatedBy', 'client']);
             if ($postData->image) {
                 $postData->image = asset('posts/' . $postData->image);
+            }
+
+            // Send notifications
+            try {
+                $currentUser = $this->getCurrentUser();
+                $post->load(['teamMembers.member']);
+                
+                // Notify team members (designers/marketers) - but not the one who approved
+                foreach ($post->teamMembers as $teamMember) {
+                    $member = $teamMember->member;
+                    if ($member && $member->id !== $currentUser->id) {
+                        $this->sendNotification(
+                            $member,
+                            'Post Approved! 🎉',
+                            "Post \"{$post->title}\" has been approved",
+                            'post_approved',
+                            [
+                                'post_id' => $post->id,
+                                'title' => $post->title
+                            ]
+                        );
+                    }
+                }
+                
+                // Notify client (if not the one approving)
+                if ($post->client && (!auth()->guard('client')->check() || $post->client->id !== $currentUser->id)) {
+                    $this->sendNotification(
+                        $post->client,
+                        'Post Approved',
+                        "Post \"{$post->title}\" has been approved",
+                        'post_approved',
+                        [
+                            'post_id' => $post->id,
+                            'title' => $post->title,
+                            'scheduled_at' => $post->scheduled_at
+                        ]
+                    );
+                }
+                
+                // Notify admin
+                if (!auth()->guard('admin')->check()) {
+                    $this->notifyAdmins(
+                        'Post Approved',
+                        "Post \"{$post->title}\" approved by {$currentUser->name}",
+                        'post_approved',
+                        [
+                            'post_id' => $post->id,
+                            'title' => $post->title,
+                            'approved_by' => $currentUser->name
+                        ]
+                    );
+                }
+            } catch (\Exception $e) {
+                \Log::error('Failed to send post approval notifications: ' . $e->getMessage());
             }
 
             return response()->json([

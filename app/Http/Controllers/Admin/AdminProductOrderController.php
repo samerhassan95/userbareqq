@@ -10,11 +10,14 @@ use App\Models\ProductOrder;
 use App\Models\Subscription;
 use App\Repositories\ProductOrderRepositoryInterface;
 use App\Services\ImageService;
+use App\Traits\SendsNotifications;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class AdminProductOrderController extends Controller
 {
+    use SendsNotifications;
+    
     protected $orderRepository;
 
     public function __construct(ProductOrderRepositoryInterface $orderRepository)
@@ -141,6 +144,19 @@ class AdminProductOrderController extends Controller
             $this->orderRepository->attachSubscription($order->id, $subscription->id);
         }
 
+        // Send notification to client
+        try {
+            $this->sendNotification(
+                $order->client,
+                'Payment Approved',
+                "Your payment for order #{$order->id} has been approved. Work will begin soon!",
+                'payment_approved',
+                ['order_id' => $order->id]
+            );
+        } catch (\Exception $e) {
+            \Log::error('Failed to send payment approval notification: ' . $e->getMessage());
+        }
+
         return ResponseHelper::success(
             new ProductOrderResource($order->fresh()),
             __('Payment approved successfully')
@@ -168,6 +184,30 @@ class AdminProductOrderController extends Controller
             'status' => $request->status,
             'admin_notes' => $request->admin_notes ?? $order->admin_notes,
         ]);
+
+        // Send notification to client
+        try {
+            $statusMessages = [
+                'pending_payment' => 'Waiting for payment',
+                'paid' => 'Payment confirmed',
+                'in_progress' => 'Work in progress',
+                'delivered' => 'Delivered',
+                'cancelled' => 'Cancelled'
+            ];
+            
+            $this->sendNotification(
+                $order->client,
+                'Order Status Updated',
+                "Your order #{$order->id} status: {$statusMessages[$request->status]}",
+                $request->status === 'delivered' ? 'order_completed' : 'order_status_changed',
+                [
+                    'order_id' => $order->id,
+                    'status' => $request->status
+                ]
+            );
+        } catch (\Exception $e) {
+            \Log::error('Failed to send status update notification: ' . $e->getMessage());
+        }
 
         return ResponseHelper::success(
             new ProductOrderResource($order->fresh()),
@@ -262,5 +302,85 @@ class AdminProductOrderController extends Controller
                 500
             );
         }
+    }
+
+    /**
+     * Assign team members to order
+     * POST /api/admin/product-orders/{id}/team
+     */
+    public function assignTeam(Request $request, $id)
+    {
+        $request->validate([
+            'designer_ids' => 'nullable|array',
+            'designer_ids.*' => 'exists:designers,id',
+            'marketer_ids' => 'nullable|array',
+            'marketer_ids.*' => 'exists:marketers,id',
+        ]);
+
+        $order = ProductOrder::with('client')->find($id);
+
+        if (!$order) {
+            return ResponseHelper::error(__('Order not found'), [], 404);
+        }
+
+        $designerIds = $request->designer_ids ?? [];
+        $marketerIds = $request->marketer_ids ?? [];
+
+        // Sync team members (assuming pivot table exists)
+        if (method_exists($order, 'designers')) {
+            $order->designers()->sync($designerIds);
+        }
+        if (method_exists($order, 'marketers')) {
+            $order->marketers()->sync($marketerIds);
+        }
+
+        // Send notifications
+        try {
+            // Notify designers
+            if (!empty($designerIds)) {
+                $designers = \App\Models\Designer::whereIn('id', $designerIds)->get();
+                $this->sendNotification(
+                    $designers,
+                    'New Project Assignment',
+                    "You have been assigned to {$order->client->name}'s project",
+                    'team_assigned_to_order',
+                    [
+                        'order_id' => $order->id,
+                        'client_name' => $order->client->name
+                    ]
+                );
+            }
+            
+            // Notify marketers
+            if (!empty($marketerIds)) {
+                $marketers = \App\Models\Marketer::whereIn('id', $marketerIds)->get();
+                $this->sendNotification(
+                    $marketers,
+                    'New Project Assignment',
+                    "You have been assigned to {$order->client->name}'s project",
+                    'team_assigned_to_order',
+                    [
+                        'order_id' => $order->id,
+                        'client_name' => $order->client->name
+                    ]
+                );
+            }
+            
+            // Notify client
+            $this->sendNotification(
+                $order->client,
+                'Team Assigned',
+                'Your team has been assigned to your project',
+                'team_assigned_notification_client',
+                ['order_id' => $order->id]
+            );
+        } catch (\Exception $e) {
+            \Log::error('Failed to send team assignment notifications: ' . $e->getMessage());
+        }
+
+        return ResponseHelper::success(
+            new ProductOrderResource($order->fresh()),
+            __('Team members assigned successfully')
+        );
     }
 }

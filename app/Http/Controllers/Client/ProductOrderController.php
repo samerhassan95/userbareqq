@@ -10,10 +10,13 @@ use App\Models\Invoice;
 use App\Models\Product;
 use App\Models\Subscription;
 use App\Repositories\ProductOrderRepositoryInterface;
+use App\Traits\SendsNotifications;
 use Carbon\Carbon;
 
 class ProductOrderController extends Controller
 {
+    use SendsNotifications;
+    
     protected $orderRepository;
 
     public function __construct(ProductOrderRepositoryInterface $orderRepository)
@@ -200,6 +203,32 @@ class ProductOrderController extends Controller
             if ($validated['product_role'] === 'strategy') {
                 $responseData['subscription_details'] = $durationDetails;
                 $responseData['included_tips_count'] = $product->strategyTips->count();
+            }
+
+            // Send notifications
+            try {
+                // Notify client
+                $this->sendNotification(
+                    $client,
+                    'Order Confirmed',
+                    "Your order #{$order->id} has been received and is being processed",
+                    'order_confirmed',
+                    ['order_id' => $order->id]
+                );
+                
+                // Notify all admins
+                $this->notifyAdmins(
+                    'New Order Received',
+                    "New order #{$order->id} from {$client->name}",
+                    'order_created',
+                    [
+                        'order_id' => $order->id,
+                        'client_id' => $client->id,
+                        'client_name' => $client->name
+                    ]
+                );
+            } catch (\Exception $e) {
+                \Log::error('Failed to send order notifications: ' . $e->getMessage());
             }
 
             \Log::info('Returning success response');

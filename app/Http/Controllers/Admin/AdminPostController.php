@@ -4,12 +4,14 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Post;
+use App\Traits\SendsNotifications;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class AdminPostController extends Controller
 {
+    use SendsNotifications;
     /**
      * Get all posts
      */
@@ -153,6 +155,62 @@ class AdminPostController extends Controller
 
             $post = Post::create($data);
 
+            // Send notifications
+            try {
+                $post->load('client');
+                
+                // Notify client
+                $this->sendNotification(
+                    $post->client,
+                    'New Post Created',
+                    "New post \"{$post->title}\" created for your review",
+                    'post_created',
+                    [
+                        'post_id' => $post->id,
+                        'title' => $post->title
+                    ]
+                );
+                
+                // Notify team members if post is linked to an order
+                if ($post->product_order_id) {
+                    $order = $post->productOrder;
+                    if ($order && method_exists($order, 'designers')) {
+                        $designers = $order->designers;
+                        if ($designers && $designers->count() > 0) {
+                            $this->sendNotification(
+                                $designers,
+                                'New Post',
+                                "New post \"{$post->title}\" needs your work",
+                                'post_created',
+                                [
+                                    'post_id' => $post->id,
+                                    'title' => $post->title,
+                                    'order_id' => $order->id
+                                ]
+                            );
+                        }
+                    }
+                    if ($order && method_exists($order, 'marketers')) {
+                        $marketers = $order->marketers;
+                        if ($marketers && $marketers->count() > 0) {
+                            $this->sendNotification(
+                                $marketers,
+                                'New Post',
+                                "New post \"{$post->title}\" needs your work",
+                                'post_created',
+                                [
+                                    'post_id' => $post->id,
+                                    'title' => $post->title,
+                                    'order_id' => $order->id
+                                ]
+                            );
+                        }
+                    }
+                }
+            } catch (\Exception $e) {
+                \Log::error('Failed to send post creation notifications: ' . $e->getMessage());
+            }
+
             // Add full image URL
             if ($post->image) {
                 $post->image = asset('posts/' . $post->image);
@@ -230,6 +288,25 @@ class AdminPostController extends Controller
             $data['updated_by_type'] = 'App\Models\Admin';
 
             $post->update($data);
+
+            // Send notifications
+            try {
+                $post->load('client');
+                
+                // Notify client
+                $this->sendNotification(
+                    $post->client,
+                    'Post Updated',
+                    "Post \"{$post->title}\" has been updated - ready for review",
+                    'post_updated',
+                    [
+                        'post_id' => $post->id,
+                        'title' => $post->title
+                    ]
+                );
+            } catch (\Exception $e) {
+                \Log::error('Failed to send post update notification: ' . $e->getMessage());
+            }
 
             // Add full image URL
             if ($post->image) {
@@ -345,6 +422,34 @@ class AdminPostController extends Controller
                     // Skip if duplicate
                     continue;
                 }
+            }
+
+            // Send notifications to newly added team members
+            try {
+                $post->load('client');
+                
+                foreach ($addedMembers as $memberData) {
+                    $memberType = $memberData['member_type'] === 'designer' 
+                        ? \App\Models\Designer::class 
+                        : \App\Models\Marketer::class;
+                    
+                    $member = $memberType::find($memberData['member_id']);
+                    
+                    if ($member) {
+                        $this->sendNotification(
+                            $member,
+                            'Post Assignment',
+                            "You have been assigned to work on post: {$post->title}",
+                            'post_assigned',
+                            [
+                                'post_id' => $post->id,
+                                'title' => $post->title
+                            ]
+                        );
+                    }
+                }
+            } catch (\Exception $e) {
+                \Log::error('Failed to send team assignment notifications: ' . $e->getMessage());
             }
 
             return response()->json([
