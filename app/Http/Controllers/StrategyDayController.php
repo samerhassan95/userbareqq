@@ -87,7 +87,7 @@ class StrategyDayController extends Controller
             $postsData = [];
 
             foreach ($posts as $post) {
-                $postsData[] = [
+                $postData = [
                     'id' => $post->id,
                     'title' => $post->title,
                     'title_ar' => $post->title_ar,
@@ -150,13 +150,18 @@ class StrategyDayController extends Controller
                         'attachments' => $post->strategyWork->attachments,
                         'notes' => $post->strategyWork->notes,
                     ] : null,
-                    'client' => $post->client ? [
+                ];
+
+                if ($userType !== 'client') {
+                    $postData['client'] = $post->client ? [
                         'id' => $post->client->id,
                         'name' => $post->client->name,
                         'email' => $post->client->email,
                         'image' => $post->client->photo ? asset($post->client->photo) : null,
-                    ] : null,
-                ];
+                    ] : null;
+                }
+
+                $postsData[] = $postData;
             }
 
             $responseData = [
