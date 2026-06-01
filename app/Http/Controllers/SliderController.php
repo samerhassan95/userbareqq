@@ -28,6 +28,8 @@ class SliderController extends Controller
 
     public function store(StoreSliderRequest $request): JsonResponse
     {
+        \Log::info('SliderController::store called');
+        
         $data = $request->validated();
         
         if ($request->hasFile('image')) {
@@ -35,6 +37,8 @@ class SliderController extends Controller
         }
         
         $slider = $this->sliderRepository->create($data);
+        
+        \Log::info('Slider created', ['id' => $slider->id]);
         
         return response()->json([
             'status' => true,
@@ -56,6 +60,8 @@ class SliderController extends Controller
 
     public function update(UpdateSliderRequest $request, $id): JsonResponse
     {
+        \Log::info('SliderController::update called', ['id' => $id]);
+        
         $data = [];
         
         $slider = $this->sliderRepository->findById($id);
@@ -70,6 +76,9 @@ class SliderController extends Controller
         
         if (!empty($data)) {
             $slider = $this->sliderRepository->update($id, $data);
+            \Log::info('Slider updated', ['id' => $id]);
+        } else {
+            \Log::warning('Update called but no data to update', ['id' => $id]);
         }
         
         return response()->json([

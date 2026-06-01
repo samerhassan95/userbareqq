@@ -64,9 +64,10 @@ Route::middleware(['auth:client'])->prefix('client')->group(function () {
 
 // Unified Sliders Routes (Public read, Admin write)
 Route::get('sliders', [\App\Http\Controllers\SliderController::class, 'index']);
-Route::get('sliders/{id}', [\App\Http\Controllers\SliderController::class, 'show']);
+Route::get('sliders/{id}', [\App\Http\Controllers\SliderController::class, 'show'])->where('id', '[0-9]+');
+
 Route::middleware(['admin'])->group(function () {
     Route::post('sliders', [\App\Http\Controllers\SliderController::class, 'store']);
-    Route::post('sliders/{id}', [\App\Http\Controllers\SliderController::class, 'update']);
-    Route::delete('sliders/{id}', [\App\Http\Controllers\SliderController::class, 'destroy']);
+    Route::post('sliders/{id}', [\App\Http\Controllers\SliderController::class, 'update'])->where('id', '[0-9]+');
+    Route::delete('sliders/{id}', [\App\Http\Controllers\SliderController::class, 'destroy'])->where('id', '[0-9]+');
 });
