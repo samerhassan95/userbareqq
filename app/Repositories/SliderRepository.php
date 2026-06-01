@@ -21,6 +21,13 @@ class SliderRepository implements SliderRepositoryInterface
         return Slider::with('product')->findOrFail($id);
     }
 
+    public function update($id, array $data)
+    {
+        $slider = Slider::findOrFail($id);
+        $slider->update($data);
+        return $slider->load('product');
+    }
+
     public function delete($id)
     {
         return Slider::destroy($id);

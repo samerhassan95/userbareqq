@@ -185,4 +185,12 @@ return [
     'post_approved_successfully' => 'Post approved successfully',
     'post_not_found' => 'Post not found',
     'validation_error' => 'Validation error',
+    
+    // Sliders
+    'sliders_retrieved_successfully' => 'Sliders retrieved successfully',
+    'slider_retrieved_successfully' => 'Slider retrieved successfully',
+    'slider_created_successfully' => 'Slider created successfully',
+    'slider_updated_successfully' => 'Slider updated successfully',
+    'slider_deleted_successfully' => 'Slider deleted successfully',
+    'slider_not_found' => 'Slider not found',
 ];

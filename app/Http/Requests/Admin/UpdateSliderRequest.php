@@ -1,0 +1,21 @@
+<?php
+
+namespace App\Http\Requests\Admin;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class UpdateSliderRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    public function rules(): array
+    {
+        return [
+            'product_id' => 'sometimes|exists:products,id',
+            'image' => 'sometimes|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ];
+    }
+}

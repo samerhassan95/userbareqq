@@ -6,11 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Slider extends Model
 {
-protected $fillable = ['product_id', 'image'];
-
-    protected $casts = [
-        'image' => 'array', // This converts the array to JSON for the DB automatically
-    ];
+    protected $fillable = ['product_id', 'image'];
 
     public function product()
     {

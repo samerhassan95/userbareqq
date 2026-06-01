@@ -680,6 +680,49 @@
 			]
 		},
 		{
+			"name": "Client - Sliders",
+			"item": [
+				{
+					"name": "Get All Sliders (Public)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}",
+								"description": "Language: en or ar"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/client/sliders",
+							"host": ["{{base_url}}"],
+							"path": ["client", "sliders"]
+						},
+						"description": "Get all sliders with their associated products. No authentication required."
+					}
+				},
+				{
+					"name": "Get Slider Details (Public)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}",
+								"description": "Language: en or ar"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/client/sliders/1",
+							"host": ["{{base_url}}"],
+							"path": ["client", "sliders", "1"]
+						},
+						"description": "Get details of a specific slider. No authentication required."
+					}
+				}
+			]
+		},
+		{
 			"name": "Client - Product Orders",
 			"item": [
 				{
@@ -3042,6 +3085,161 @@
 							]
 						},
 						"description": "Get all team members (designers and marketers combined) with optional search and pagination. Returns grouped data with designers and marketers arrays, plus a combined array."
+					}
+				}
+			]
+		},
+		{
+			"name": "Admin - Sliders",
+			"item": [
+				{
+					"name": "Get All Sliders",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/admin/sliders",
+							"host": ["{{base_url}}"],
+							"path": ["admin", "sliders"]
+						},
+						"description": "Get all sliders with their associated products"
+					}
+				},
+				{
+					"name": "Get Slider Details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/admin/sliders/1",
+							"host": ["{{base_url}}"],
+							"path": ["admin", "sliders", "1"]
+						},
+						"description": "Get details of a specific slider"
+					}
+				},
+				{
+					"name": "Create Slider",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "product_id",
+									"value": "1",
+									"type": "text",
+									"description": "Product ID (required)"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": [],
+									"description": "Slider image (required, jpeg/png/jpg/gif, max 2MB)"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/admin/sliders",
+							"host": ["{{base_url}}"],
+							"path": ["admin", "sliders"]
+						},
+						"description": "Create a new slider with image"
+					}
+				},
+				{
+					"name": "Update Slider",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "_method",
+									"value": "PUT",
+									"type": "text",
+									"description": "Method override for file upload"
+								},
+								{
+									"key": "product_id",
+									"value": "1",
+									"type": "text",
+									"description": "Product ID (optional)"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": [],
+									"description": "Slider image (optional, jpeg/png/jpg/gif, max 2MB)"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/admin/sliders/1",
+							"host": ["{{base_url}}"],
+							"path": ["admin", "sliders", "1"]
+						},
+						"description": "Update an existing slider. All fields are optional."
+					}
+				},
+				{
+					"name": "Delete Slider",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/admin/sliders/1",
+							"host": ["{{base_url}}"],
+							"path": ["admin", "sliders", "1"]
+						},
+						"description": "Delete a slider and its associated image"
 					}
 				}
 			]

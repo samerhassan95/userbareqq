@@ -185,4 +185,12 @@ return [
     'post_approved_successfully' => 'تم اعتماد المنشور بنجاح',
     'post_not_found' => 'المنشور غير موجود',
     'validation_error' => 'خطأ في التحقق من البيانات',
+    
+    // Sliders
+    'sliders_retrieved_successfully' => 'تم استرجاع السلايدرات بنجاح',
+    'slider_retrieved_successfully' => 'تم استرجاع السلايدر بنجاح',
+    'slider_created_successfully' => 'تم إنشاء السلايدر بنجاح',
+    'slider_updated_successfully' => 'تم تحديث السلايدر بنجاح',
+    'slider_deleted_successfully' => 'تم حذف السلايدر بنجاح',
+    'slider_not_found' => 'السلايدر غير موجود',
 ];
