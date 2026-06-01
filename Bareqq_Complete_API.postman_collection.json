@@ -698,7 +698,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["client", "sliders"]
 						},
-						"description": "Get all sliders with their associated products. No authentication required."
+						"description": "Get all standalone sliders. No authentication required."
 					}
 				},
 				{
@@ -717,7 +717,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["client", "sliders", "1"]
 						},
-						"description": "Get details of a specific slider. No authentication required."
+						"description": "Get details of a specific standalone slider. No authentication required."
 					}
 				}
 			]
@@ -3111,7 +3111,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["admin", "sliders"]
 						},
-						"description": "Get all sliders with their associated products"
+						"description": "Get all standalone sliders"
 					}
 				},
 				{
@@ -3154,12 +3154,6 @@
 							"mode": "formdata",
 							"formdata": [
 								{
-									"key": "product_id",
-									"value": "1",
-									"type": "text",
-									"description": "Product ID (required)"
-								},
-								{
 									"key": "image",
 									"type": "file",
 									"src": [],
@@ -3172,7 +3166,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["admin", "sliders"]
 						},
-						"description": "Create a new slider with image"
+						"description": "Create a new standalone slider with image only"
 					}
 				},
 				{
@@ -3199,12 +3193,6 @@
 									"description": "Method override for file upload"
 								},
 								{
-									"key": "product_id",
-									"value": "1",
-									"type": "text",
-									"description": "Product ID (optional)"
-								},
-								{
 									"key": "image",
 									"type": "file",
 									"src": [],
@@ -3217,7 +3205,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["admin", "sliders", "1"]
 						},
-						"description": "Update an existing slider. All fields are optional."
+						"description": "Update an existing slider image"
 					}
 				},
 				{

@@ -14,7 +14,6 @@ class UpdateSliderRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'product_id' => 'sometimes|exists:products,id',
             'image' => 'sometimes|image|mimes:jpeg,png,jpg,gif|max:2048',
         ];
     }

@@ -41,7 +41,7 @@ class SliderController extends Controller
         return response()->json([
             'status' => true,
             'message' => __('messages.slider_created_successfully'),
-            'data' => new SliderResource($slider->load('product')),
+            'data' => new SliderResource($slider),
         ], 201);
     }
 

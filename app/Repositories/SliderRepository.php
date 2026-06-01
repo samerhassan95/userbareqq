@@ -8,7 +8,7 @@ class SliderRepository implements SliderRepositoryInterface
 {
     public function all()
     {
-        return Slider::with('product')->get();
+        return Slider::all();
     }
 
     public function create(array $data)
@@ -18,14 +18,14 @@ class SliderRepository implements SliderRepositoryInterface
 
     public function findById($id)
     {
-        return Slider::with('product')->findOrFail($id);
+        return Slider::findOrFail($id);
     }
 
     public function update($id, array $data)
     {
         $slider = Slider::findOrFail($id);
         $slider->update($data);
-        return $slider->load('product');
+        return $slider;
     }
 
     public function delete($id)

@@ -1,7 +1,7 @@
 # Sliders API Implementation
 
 ## Overview
-Complete implementation of Sliders management system with Admin CRUD operations and public Client access.
+Complete implementation of standalone Sliders management system with Admin CRUD operations and public Client access. Sliders are simple image-only entities without product associations.
 
 ## Created Files
 
@@ -17,8 +17,8 @@ Complete implementation of Sliders management system with Admin CRUD operations 
 - `app/Http/Resources/SliderResource.php` - API response formatting
 
 ### Updated Files
-- `app/Models/Slider.php` - Removed incorrect array cast for image field
-- `app/Repositories/SliderRepository.php` - Added update method
+- `app/Models/Slider.php` - Simplified to standalone slider (removed product relationship)
+- `app/Repositories/SliderRepository.php` - Updated methods for standalone sliders
 - `app/Repositories/SliderRepositoryInterface.php` - Added update method signature
 - `routes/admin.php` - Added admin slider routes
 - `routes/client.php` - Added public slider routes
@@ -52,7 +52,6 @@ Accept-Language: en|ar
 Content-Type: multipart/form-data
 
 Body:
-- product_id: integer (required, must exist in products table)
 - image: file (required, jpeg/png/jpg/gif, max 2MB)
 ```
 
@@ -65,7 +64,6 @@ Content-Type: multipart/form-data
 
 Body:
 - _method: PUT (required for file upload)
-- product_id: integer (optional)
 - image: file (optional, jpeg/png/jpg/gif, max 2MB)
 ```
 
@@ -100,12 +98,6 @@ Accept-Language: en|ar
     "data": [
         {
             "id": 1,
-            "product_id": 1,
-            "product": {
-                "id": 1,
-                "name": "Product Name",
-                "name_ar": "اسم المنتج"
-            },
             "image": "https://user.bareqq.com/storage/sliders/image.jpg",
             "created_at": "2026-06-01 12:00:00",
             "updated_at": "2026-06-01 12:00:00"
@@ -125,18 +117,18 @@ Accept-Language: en|ar
 ## Features
 
 ### Admin Features
-- ✅ Create sliders with product association
+- ✅ Create standalone sliders (image only)
 - ✅ Upload slider images (automatic storage management)
-- ✅ Update slider details and images
+- ✅ Update slider images
 - ✅ Delete sliders (automatic image cleanup)
-- ✅ View all sliders with product details
+- ✅ View all sliders
 - ✅ View individual slider details
 
 ### Client Features
 - ✅ Public access to all sliders
 - ✅ View slider details
-- ✅ Product information included
 - ✅ Localized responses (English/Arabic)
+- ✅ No authentication required
 
 ## Image Handling
 - Images are stored in `storage/app/public/sliders/`
@@ -175,10 +167,10 @@ The Postman collection has been updated with:
 ## Testing
 
 ### Admin Tests
-1. Create a slider with valid product_id and image
+1. Create a slider with image
 2. Get all sliders
 3. Get specific slider details
-4. Update slider (change product or image)
+4. Update slider image
 5. Delete slider
 
 ### Client Tests
@@ -189,7 +181,9 @@ The Postman collection has been updated with:
 ## Database
 Uses existing `sliders` table:
 - `id` - Primary key
-- `product_id` - Foreign key to products table
+- `product_id` - Foreign key (nullable, not used in current implementation)
 - `image` - String (file path)
 - `created_at` - Timestamp
 - `updated_at` - Timestamp
+
+**Note:** The `product_id` column exists in the database but is not used. Sliders are standalone entities.
