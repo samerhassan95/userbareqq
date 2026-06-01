@@ -33,14 +33,9 @@ class FirebaseService
             if (file_exists($basePath)) {
                 $credentialsPath = $basePath;
             } else {
-                // Try storage path
-                $storagePath = storage_path('firebase/codgoo-firebase.json');
-                if (file_exists($storagePath)) {
-                    $credentialsPath = $storagePath;
-                } else {
-                    \Log::warning("Firebase credentials file not found. Firebase features will be disabled.");
-                    return;
-                }
+                \Log::warning("Firebase credentials file not found at: {$credentialsPath}");
+                \Log::warning("Firebase features will be disabled.");
+                return;
             }
         }
 
