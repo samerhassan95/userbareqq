@@ -14,7 +14,7 @@ class UpdateSliderRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'image' => 'sometimes|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'sometimes|image|mimes:jpeg,png,jpg,gif|max:10240', // 10MB
         ];
     }
 }
