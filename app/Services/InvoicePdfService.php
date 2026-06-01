@@ -67,13 +67,21 @@ class InvoicePdfService
      */
     public function getInvoicePdf(Invoice $invoice): string
     {
-        // If PDF doesn't exist or file is missing, generate it
-        if (!$invoice->pdf_path || !Storage::disk('public')->exists($invoice->pdf_path)) {
-            $invoice->pdf_path = $this->generateInvoicePdf($invoice);
-            $invoice->save();
+        // Refresh invoice from database to get latest pdf_path
+        $invoice->refresh();
+        
+        // Check if PDF path exists in database and file exists on disk
+        if ($invoice->pdf_path && Storage::disk('public')->exists($invoice->pdf_path)) {
+            // Return existing PDF
+            return Storage::disk('public')->path($invoice->pdf_path);
         }
         
-        return Storage::disk('public')->path($invoice->pdf_path);
+        // Generate new PDF if doesn't exist
+        $pdfPath = $this->generateInvoicePdf($invoice);
+        $invoice->pdf_path = $pdfPath;
+        $invoice->save();
+        
+        return Storage::disk('public')->path($pdfPath);
     }
     
     /**
