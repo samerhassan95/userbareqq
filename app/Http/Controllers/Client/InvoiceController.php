@@ -52,8 +52,8 @@ class InvoiceController extends Controller
                             'name' => $invoice->product->name ?? null,
                         ],
                         'has_pdf' => !empty($invoice->pdf_path),
-                        'download_url' => $invoice->pdf_path ? url("/api/client/invoices/{$invoice->id}/download") : null,
-                        'view_url' => $invoice->pdf_path ? url("/api/client/invoices/{$invoice->id}/view") : null,
+                        'download_url' => $invoice->pdf_path ? route('client.invoices.download', $invoice->id) : null,
+                        'view_url' => $invoice->pdf_path ? route('client.invoices.view', $invoice->id) : null,
                     ];
                 }),
                 'pagination' => [
@@ -108,8 +108,8 @@ class InvoiceController extends Controller
                         'description' => $invoice->product->description ?? null,
                     ],
                     'has_pdf' => !empty($invoice->pdf_path),
-                    'download_url' => $invoice->pdf_path ? url("/api/client/invoices/{$invoice->id}/download") : null,
-                    'view_url' => $invoice->pdf_path ? url("/api/client/invoices/{$invoice->id}/view") : null,
+                    'download_url' => $invoice->pdf_path ? route('client.invoices.download', $invoice->id) : null,
+                    'view_url' => $invoice->pdf_path ? route('client.invoices.view', $invoice->id) : null,
                 ]
             ]);
             

@@ -54,10 +54,10 @@ Route::middleware(['auth:admin,client,designer,marketer'])->group(function () {
     Route::post('notifications/read-all', [NotificationController::class, 'markAllNotificationsAsRead']);
 });
 
-// Client Invoice Routes
+// Client Invoice Routes (New PDF System)
 Route::middleware(['auth:client'])->prefix('client')->group(function () {
-    Route::get('invoices', [\App\Http\Controllers\Client\InvoiceController::class, 'index']);
-    Route::get('invoices/{id}', [\App\Http\Controllers\Client\InvoiceController::class, 'show']);
-    Route::get('invoices/{id}/download', [\App\Http\Controllers\Client\InvoiceController::class, 'download']);
-    Route::get('invoices/{id}/view', [\App\Http\Controllers\Client\InvoiceController::class, 'view']);
+    Route::get('invoices', [\App\Http\Controllers\Client\InvoiceController::class, 'index'])->name('client.invoices.index');
+    Route::get('invoices/{id}', [\App\Http\Controllers\Client\InvoiceController::class, 'show'])->name('client.invoices.show');
+    Route::get('invoices/{id}/download', [\App\Http\Controllers\Client\InvoiceController::class, 'download'])->name('client.invoices.download');
+    Route::get('invoices/{id}/view', [\App\Http\Controllers\Client\InvoiceController::class, 'view'])->name('client.invoices.view');
 });
