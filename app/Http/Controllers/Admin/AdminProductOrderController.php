@@ -106,10 +106,14 @@ class AdminProductOrderController extends Controller
         try {
             $pdfService = app(InvoicePdfService::class);
             $pdfPath = $pdfService->generateInvoicePdf($order->invoice);
-            $order->invoice->update(['pdf_path' => $pdfPath]);
+            
+            // Update invoice with PDF path
+            $invoice = Invoice::find($order->invoice->id);
+            $invoice->pdf_path = $pdfPath;
+            $invoice->save();
             
             \Log::info('Invoice PDF generated', [
-                'invoice_id' => $order->invoice->id,
+                'invoice_id' => $invoice->id,
                 'pdf_path' => $pdfPath
             ]);
         } catch (\Exception $e) {
