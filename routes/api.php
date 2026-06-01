@@ -61,3 +61,12 @@ Route::middleware(['auth:client'])->prefix('client')->group(function () {
     Route::get('invoices/{id}/download', [\App\Http\Controllers\Client\InvoiceController::class, 'download'])->name('client.invoices.download');
     Route::get('invoices/{id}/view', [\App\Http\Controllers\Client\InvoiceController::class, 'view'])->name('client.invoices.view');
 });
+
+// Unified Sliders Routes (Public read, Admin write)
+Route::get('sliders', [\App\Http\Controllers\SliderController::class, 'index']);
+Route::get('sliders/{id}', [\App\Http\Controllers\SliderController::class, 'show']);
+Route::middleware(['admin'])->group(function () {
+    Route::post('sliders', [\App\Http\Controllers\SliderController::class, 'store']);
+    Route::post('sliders/{id}', [\App\Http\Controllers\SliderController::class, 'update']);
+    Route::delete('sliders/{id}', [\App\Http\Controllers\SliderController::class, 'destroy']);
+});

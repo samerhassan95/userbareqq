@@ -1,88 +1,98 @@
 <?php
+
 namespace App\Http\Controllers;
 
-use App\Http\Requests\SliderRequest;
-use App\Http\Resources\ProductResource;
+use App\Http\Requests\Admin\StoreSliderRequest;
+use App\Http\Requests\Admin\UpdateSliderRequest;
 use App\Http\Resources\SliderResource;
-use App\Models\Slider;
 use App\Repositories\SliderRepositoryInterface;
 use App\Services\ImageService;
-use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 
 class SliderController extends Controller
 {
-    private $sliderRepository;
+    public function __construct(
+        private SliderRepositoryInterface $sliderRepository
+    ) {}
 
-    public function __construct(SliderRepositoryInterface $sliderRepository)
-    {
-        $this->sliderRepository = $sliderRepository;
-    }
-
-    /**
-     * Get all sliders.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+    public function index(): JsonResponse
     {
         $sliders = $this->sliderRepository->all();
-        return SliderResource::collection($sliders);
+        
+        return response()->json([
+            'status' => true,
+            'message' => __('messages.sliders_retrieved_successfully'),
+            'data' => SliderResource::collection($sliders),
+        ]);
     }
 
-    /**
-     * Store a new slider.
-     *
-     * @param SliderRequest $request
-     * @return \Illuminate\Http\Response
-     */
-public function store(SliderRequest $request)
-{
-    $paths = [];
-
-    // 1. Loop through the multiple files
-    if ($request->hasFile('image')) {
-        foreach ($request->file('image') as $file) {
-            // Upload each file and add path to the array
-            $paths[] = ImageService::upload($file, 'slider_products');
-        }
-    }
-
-    // 2. Create the slider with the array of paths
-    $slider = Slider::create([
-        'product_id' => $request->product_id,
-        'image'      => $paths, // This must be an array
-    ]);
-
-    return new SliderResource($slider);
-}
-
-    /**
-     * Show a specific slider with its product and image.
-     *
-     * @param Slider $slider
-     * @return \Illuminate\Http\Response
-     */
-public function show(Slider $slider)
-{
-    return response()->json([
-        'status' => true,
-        'data' => [
-            'id' => $slider->id,
-            'images' => array_map(fn($path) => asset($path), $slider->image ?? []),
-            'product' => new ProductResource($slider->product),
-        ],
-    ]);
-}
-
-    /**
-     * Delete a slider.
-     *
-     * @param int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
+    public function store(StoreSliderRequest $request): JsonResponse
     {
+        $data = $request->validated();
+        
+        if ($request->hasFile('image')) {
+            $data['image'] = ImageService::upload($request->file('image'), 'sliders');
+        }
+        
+        $slider = $this->sliderRepository->create($data);
+        
+        return response()->json([
+            'status' => true,
+            'message' => __('messages.slider_created_successfully'),
+            'data' => new SliderResource($slider),
+        ], 201);
+    }
+
+    public function show($id): JsonResponse
+    {
+        $slider = $this->sliderRepository->findById($id);
+        
+        return response()->json([
+            'status' => true,
+            'message' => __('messages.slider_retrieved_successfully'),
+            'data' => new SliderResource($slider),
+        ]);
+    }
+
+    public function update(UpdateSliderRequest $request, $id): JsonResponse
+    {
+        $data = [];
+        
+        $slider = $this->sliderRepository->findById($id);
+        
+        if ($request->hasFile('image')) {
+            // Delete old image
+            if ($slider->image) {
+                ImageService::delete($slider->image);
+            }
+            $data['image'] = ImageService::upload($request->file('image'), 'sliders');
+        }
+        
+        if (!empty($data)) {
+            $slider = $this->sliderRepository->update($id, $data);
+        }
+        
+        return response()->json([
+            'status' => true,
+            'message' => __('messages.slider_updated_successfully'),
+            'data' => new SliderResource($slider),
+        ]);
+    }
+
+    public function destroy($id): JsonResponse
+    {
+        $slider = $this->sliderRepository->findById($id);
+        
+        // Delete image
+        if ($slider->image) {
+            ImageService::delete($slider->image);
+        }
+        
         $this->sliderRepository->delete($id);
-        return response()->json(['message' => 'Slider deleted successfully']);
+        
+        return response()->json([
+            'status' => true,
+            'message' => __('messages.slider_deleted_successfully'),
+        ]);
     }
 }

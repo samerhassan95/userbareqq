@@ -680,49 +680,6 @@
 			]
 		},
 		{
-			"name": "Client - Sliders",
-			"item": [
-				{
-					"name": "Get All Sliders (Public)",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Accept-Language",
-								"value": "{{lang}}",
-								"description": "Language: en or ar"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/client/sliders",
-							"host": ["{{base_url}}"],
-							"path": ["client", "sliders"]
-						},
-						"description": "Get all standalone sliders. No authentication required."
-					}
-				},
-				{
-					"name": "Get Slider Details (Public)",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Accept-Language",
-								"value": "{{lang}}",
-								"description": "Language: en or ar"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/client/sliders/1",
-							"host": ["{{base_url}}"],
-							"path": ["client", "sliders", "1"]
-						},
-						"description": "Get details of a specific standalone slider. No authentication required."
-					}
-				}
-			]
-		},
-		{
 			"name": "Client - Product Orders",
 			"item": [
 				{
@@ -3090,54 +3047,47 @@
 			]
 		},
 		{
-			"name": "Admin - Sliders",
+			"name": "Sliders (Unified)",
+			"description": "Unified slider endpoints. Public read access, Admin write access.",
 			"item": [
 				{
-					"name": "Get All Sliders",
+					"name": "Get All Sliders (Public)",
 					"request": {
 						"method": "GET",
 						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{admin_token}}"
-							},
 							{
 								"key": "Accept-Language",
 								"value": "{{lang}}"
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/admin/sliders",
+							"raw": "{{base_url}}/sliders",
 							"host": ["{{base_url}}"],
-							"path": ["admin", "sliders"]
+							"path": ["sliders"]
 						},
-						"description": "Get all standalone sliders"
+						"description": "Get all sliders. No authentication required."
 					}
 				},
 				{
-					"name": "Get Slider Details",
+					"name": "Get Slider Details (Public)",
 					"request": {
 						"method": "GET",
 						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{admin_token}}"
-							},
 							{
 								"key": "Accept-Language",
 								"value": "{{lang}}"
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/admin/sliders/1",
+							"raw": "{{base_url}}/sliders/1",
 							"host": ["{{base_url}}"],
-							"path": ["admin", "sliders", "1"]
+							"path": ["sliders", "1"]
 						},
-						"description": "Get details of a specific slider"
+						"description": "Get details of a specific slider. No authentication required."
 					}
 				},
 				{
-					"name": "Create Slider",
+					"name": "Create Slider (Admin Only)",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -3162,15 +3112,15 @@
 							]
 						},
 						"url": {
-							"raw": "{{base_url}}/admin/sliders",
+							"raw": "{{base_url}}/sliders",
 							"host": ["{{base_url}}"],
-							"path": ["admin", "sliders"]
+							"path": ["sliders"]
 						},
-						"description": "Create a new standalone slider with image only"
+						"description": "Create a new slider. Admin authentication required."
 					}
 				},
 				{
-					"name": "Update Slider",
+					"name": "Update Slider (Admin Only)",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -3187,29 +3137,23 @@
 							"mode": "formdata",
 							"formdata": [
 								{
-									"key": "_method",
-									"value": "PUT",
-									"type": "text",
-									"description": "Method override for file upload"
-								},
-								{
 									"key": "image",
 									"type": "file",
 									"src": [],
-									"description": "Slider image (optional, jpeg/png/jpg/gif, max 2MB)"
+									"description": "Slider image (required, jpeg/png/jpg/gif, max 2MB)"
 								}
 							]
 						},
 						"url": {
-							"raw": "{{base_url}}/admin/sliders/1",
+							"raw": "{{base_url}}/sliders/1",
 							"host": ["{{base_url}}"],
-							"path": ["admin", "sliders", "1"]
+							"path": ["sliders", "1"]
 						},
-						"description": "Update an existing slider image"
+						"description": "Update slider image. Admin authentication required. Use POST with image file."
 					}
 				},
 				{
-					"name": "Delete Slider",
+					"name": "Delete Slider (Admin Only)",
 					"request": {
 						"method": "DELETE",
 						"header": [
@@ -3223,11 +3167,11 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/admin/sliders/1",
+							"raw": "{{base_url}}/sliders/1",
 							"host": ["{{base_url}}"],
-							"path": ["admin", "sliders", "1"]
+							"path": ["sliders", "1"]
 						},
-						"description": "Delete a slider and its associated image"
+						"description": "Delete a slider. Admin authentication required."
 					}
 				}
 			]

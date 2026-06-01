@@ -80,7 +80,4 @@ Route::middleware('admin')->group(function () {
     Route::get('designers', [\App\Http\Controllers\Admin\AdminTeamController::class, 'getDesigners']);
     Route::get('marketers', [\App\Http\Controllers\Admin\AdminTeamController::class, 'getMarketers']);
     Route::get('team-members', [\App\Http\Controllers\Admin\AdminTeamController::class, 'getAllTeamMembers']);
-    
-    // Sliders
-    Route::apiResource('sliders', \App\Http\Controllers\Admin\SliderController::class);
 });

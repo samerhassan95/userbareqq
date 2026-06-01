@@ -15,10 +15,6 @@ Route::apiResource('products', ProductController::class)->only(['index', 'show']
 ]);
 Route::get('our-products', [ProductController::class, 'ourProducts']);
 
-// Sliders (Public)
-Route::get('sliders', [\App\Http\Controllers\Client\SliderController::class, 'index']);
-Route::get('sliders/{id}', [\App\Http\Controllers\Client\SliderController::class, 'show']);
-
 Route::middleware(['client'])->group(function () {
     Route::get('profile', [ClientAuthController::class, 'getProfile']);
     Route::post('update-profile', [ClientAuthController::class, 'updateProfile']);
