@@ -53,3 +53,11 @@ Route::middleware(['auth:admin,client,designer,marketer'])->group(function () {
     Route::post('notifications/{id}/read', [NotificationController::class, 'markNotificationAsRead']);
     Route::post('notifications/read-all', [NotificationController::class, 'markAllNotificationsAsRead']);
 });
+
+// Client Invoice Routes
+Route::middleware(['auth:client'])->prefix('client')->group(function () {
+    Route::get('invoices', [\App\Http\Controllers\Client\InvoiceController::class, 'index']);
+    Route::get('invoices/{id}', [\App\Http\Controllers\Client\InvoiceController::class, 'show']);
+    Route::get('invoices/{id}/download', [\App\Http\Controllers\Client\InvoiceController::class, 'download']);
+    Route::get('invoices/{id}/view', [\App\Http\Controllers\Client\InvoiceController::class, 'view']);
+});

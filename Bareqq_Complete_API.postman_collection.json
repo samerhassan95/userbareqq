@@ -1049,7 +1049,100 @@
 			"name": "Client - Invoices",
 			"item": [
 				{
-					"name": "Get My Invoices",
+					"name": "Get My Invoices (New)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{client_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}",
+								"description": "Language: en or ar"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/client/invoices?per_page=20",
+							"host": ["{{base_url}}"],
+							"path": ["client", "invoices"],
+							"query": [
+								{
+									"key": "per_page",
+									"value": "20",
+									"description": "Items per page (optional)"
+								}
+							]
+						},
+						"description": "Get all invoices for authenticated client with pagination. Returns invoice details including PDF download links."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Invoice Details (New)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{client_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{lang}}",
+								"description": "Language: en or ar"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/client/invoices/1",
+							"host": ["{{base_url}}"],
+							"path": ["client", "invoices", "1"]
+						},
+						"description": "Get detailed information about a specific invoice including PDF download and view URLs."
+					},
+					"response": []
+				},
+				{
+					"name": "Download Invoice PDF",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{client_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/client/invoices/1/download",
+							"host": ["{{base_url}}"],
+							"path": ["client", "invoices", "1", "download"]
+						},
+						"description": "Download invoice as PDF file. PDF is automatically generated if it doesn't exist."
+					},
+					"response": []
+				},
+				{
+					"name": "View Invoice PDF (in browser)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{client_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/client/invoices/1/view",
+							"host": ["{{base_url}}"],
+							"path": ["client", "invoices", "1", "view"]
+						},
+						"description": "View invoice PDF in browser (inline display). PDF is automatically generated if it doesn't exist."
+					},
+					"response": []
+				},
+				{
+					"name": "Get My Invoices (Old - Deprecated)",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -1067,11 +1160,13 @@
 							"raw": "{{base_url}}/client/client-invoices",
 							"host": ["{{base_url}}"],
 							"path": ["client", "client-invoices"]
-						}
-					}
+						},
+						"description": "⚠️ DEPRECATED: Use 'Get My Invoices (New)' instead"
+					},
+					"response": []
 				},
 				{
-					"name": "Get Invoice Details",
+					"name": "Get Invoice Details (Old - Deprecated)",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -1089,8 +1184,10 @@
 							"raw": "{{base_url}}/client/invoice-details/1",
 							"host": ["{{base_url}}"],
 							"path": ["client", "invoice-details", "1"]
-						}
-					}
+						},
+						"description": "⚠️ DEPRECATED: Use 'Get Invoice Details (New)' instead"
+					},
+					"response": []
 				},
 				{
 					"name": "Upload Payment Proof (Fallback - via Invoice)",
@@ -1116,8 +1213,10 @@
 							"raw": "{{base_url}}/client/invoices/1/upload-payment-proof",
 							"host": ["{{base_url}}"],
 							"path": ["client", "invoices", "1", "upload-payment-proof"]
-						}
-					}
+						},
+						"description": "Upload payment proof for an invoice. Usually done via product order endpoint."
+					},
+					"response": []
 				}
 			]
 		},

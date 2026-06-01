@@ -10,6 +10,7 @@ use App\Models\ProductOrder;
 use App\Models\Subscription;
 use App\Repositories\ProductOrderRepositoryInterface;
 use App\Services\ImageService;
+use App\Services\InvoicePdfService;
 use App\Traits\SendsNotifications;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -100,6 +101,21 @@ class AdminProductOrderController extends Controller
 
         // Update invoice status to paid
         $order->invoice->update(['status' => 'paid']);
+
+        // Generate PDF invoice
+        try {
+            $pdfService = app(InvoicePdfService::class);
+            $pdfPath = $pdfService->generateInvoicePdf($order->invoice);
+            $order->invoice->update(['pdf_path' => $pdfPath]);
+            
+            \Log::info('Invoice PDF generated', [
+                'invoice_id' => $order->invoice->id,
+                'pdf_path' => $pdfPath
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Failed to generate invoice PDF: ' . $e->getMessage());
+            // Continue even if PDF generation fails
+        }
 
         // Update order status to paid
         $this->orderRepository->updateStatus($order->id, 'paid');
