@@ -10,7 +10,7 @@ return [
     | You can store this file in a secure location, such as the `storage/app` directory.
     |
     */
-    'credentials' => env('FIREBASE_CREDENTIALS', storage_path('firebase/codgoo-firebase.json')),
+    'credentials' => env('FIREBASE_CREDENTIALS', storage_path('firebase/bareqq-575f1-firebase-adminsdk-fbsvc-de8ddf261d.json')),
 
     /*
     |--------------------------------------------------------------------------
