@@ -13,8 +13,7 @@ use Illuminate\Http\JsonResponse;
 class SliderController extends Controller
 {
     public function __construct(
-        private SliderRepositoryInterface $sliderRepository,
-        private ImageService $imageService
+        private SliderRepositoryInterface $sliderRepository
     ) {}
 
     public function index(): JsonResponse
@@ -33,7 +32,7 @@ class SliderController extends Controller
         $data = $request->validated();
         
         if ($request->hasFile('image')) {
-            $data['image'] = $this->imageService->uploadImage($request->file('image'), 'sliders');
+            $data['image'] = ImageService::upload($request->file('image'), 'sliders');
         }
         
         $slider = $this->sliderRepository->create($data);
@@ -65,9 +64,9 @@ class SliderController extends Controller
         if ($request->hasFile('image')) {
             // Delete old image
             if ($slider->image) {
-                $this->imageService->deleteImage($slider->image);
+                ImageService::delete($slider->image);
             }
-            $data['image'] = $this->imageService->uploadImage($request->file('image'), 'sliders');
+            $data['image'] = ImageService::upload($request->file('image'), 'sliders');
         }
         
         $slider = $this->sliderRepository->update($id, $data);
@@ -85,7 +84,7 @@ class SliderController extends Controller
         
         // Delete image
         if ($slider->image) {
-            $this->imageService->deleteImage($slider->image);
+            ImageService::delete($slider->image);
         }
         
         $this->sliderRepository->delete($id);
