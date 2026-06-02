@@ -55,7 +55,7 @@ class MeetingController extends Controller
     public function show(string $id)
     {
         try {
-            $meeting = Meeting::with(['project'])->findOrFail($id);
+            $meeting = Meeting::with(['strategy.product', 'employees'])->findOrFail($id);
 
             return response()->json([
                 'status' => true,
@@ -256,7 +256,7 @@ $slot = AvailableSlot::findOrFail($validated['slot_id']);
     public function getMeetingById($id, Request $request)
     {
         $user = $request->user();
-        $meeting = Meeting::with('project')->find($id);
+        $meeting = Meeting::with(['strategy.product', 'employees'])->find($id);
 
         if (!$meeting) {
             return response()->json([
@@ -269,9 +269,9 @@ $slot = AvailableSlot::findOrFail($validated['slot_id']);
             'status' => true,
             'data' => [
                 'meeting' => new MeetingResource($meeting),
-                'project' => $meeting->project ? [
-                    'id' => $meeting->project->id,
-                    'name' => $meeting->project->name,
+                'strategy' => $meeting->strategy ? [
+                    'id' => $meeting->strategy->id,
+                    'name' => $meeting->strategy->product ? $meeting->strategy->product->name : null,
                 ] : null,
             ],
         ]);
@@ -344,8 +344,7 @@ public function update(MeetingRequest $request, $id)
         'description'  => $request->description ?? $meeting->description,
         'start_time'   => $request->start_time ?? $meeting->start_time,
         'end_time'     => $request->end_time ?? $meeting->end_time,
-        'project_id'   => $request->project_id ?? $meeting->project_id,
-        'task_id'      => $request->task_id ?? $meeting->task_id,
+        'strategy_id'  => $request->strategy_id ?? $meeting->strategy_id,
         'jitsi_url'    => $request->jitsi_url ?? $meeting->jitsi_url,
         'status'       => $status ?? $meeting->status,
     ]);
@@ -408,17 +407,14 @@ public function getClientMeetings(Request $request)
 {
     $user = auth()->user();
 
-    $query = Meeting::with(['project', 'employees:id,name,image'])
+    $query = Meeting::with(['strategy.product', 'employees:id,name,image'])
         ->where('client_id', $user->id);
 
     // 🔍 Optional search filter
     if ($request->filled('search')) {
         $search = $request->search;
         $query->where(function ($q) use ($search) {
-            $q->where('meeting_name', 'LIKE', "%$search%")
-              ->orWhereHas('project', function ($projectQuery) use ($search) {
-                  $projectQuery->where('name', 'LIKE', "%$search%");
-              });
+            $q->where('meeting_name', 'LIKE', "%$search%");
         });
     }
 
@@ -429,12 +425,7 @@ public function getClientMeetings(Request $request)
 
     // ✅ Filter by date range
     if ($request->filled('from_date') && $request->filled('to_date')) {
-        $query->whereBetween('start_time', [$request->from_date, $request->to_date]);
-    }
-
-    // 🔹 NEW: Filter by task_id
-    if ($request->filled('task_id')) {
-        $query->where('task_id', $request->task_id);
+        $query->whereBetween('date', [$request->from_date, $request->to_date]);
     }
 
     $meetings = $query
@@ -448,8 +439,7 @@ public function getClientMeetings(Request $request)
                 'id' => $meeting->id,
                 'meeting_name' => $meeting->meeting_name,
                 'description' => $meeting->description,
-                'project_name' => $meeting->project?->name,
-                'task_id' => $meeting->task_id, // include task_id for frontend reference
+                'strategy_name' => $meeting->strategy && $meeting->strategy->product ? $meeting->strategy->product->name : null,
                 'start_time' => $meeting->start_time,
                 'end_time' => $meeting->end_time,
                 'status' => $meeting->status ?: 'request_sent',
@@ -458,7 +448,6 @@ public function getClientMeetings(Request $request)
                 'notes' => $meeting->notes,
                 'can_add_notes' => $canAddNotes,
                 'has_notes' => !empty($meeting->notes),
-
 
                 // Optional employee info
                 'team' => $meeting->employees->map(function ($emp) {
@@ -523,10 +512,9 @@ public function saveNotes(Request $request, Meeting $meeting)
         $user = auth()->user();
 
         $meeting = Meeting::with([
-            'project:id,name',
+            'strategy.product',
             'logs',
             'client:id,name',
-            'slot',
             'employees:id,name,image'
         ])
             ->where('client_id', $user->id)
@@ -545,8 +533,8 @@ public function saveNotes(Request $request, Meeting $meeting)
             'data' => [
                 'id' => $meeting->id,
                 'meeting_name' => $meeting->meeting_name,
-                'project_name' => $meeting->project?->name,
-                'date' => $meeting->slot?->date,
+                'strategy_name' => $meeting->strategy && $meeting->strategy->product ? $meeting->strategy->product->name : null,
+                'date' => $meeting->date,
                 'time' => [
                     'start' => $meeting->start_time,
                     'end' => $meeting->end_time
@@ -696,7 +684,7 @@ public function cancelMeeting(Request $request, $id)
 public function joinMeeting(Request $request, $id)
 {
     $user = auth()->user();
-    $meeting = Meeting::with(['employees', 'client', 'project'])->find($id);
+    $meeting = Meeting::with(['employees', 'client', 'strategy.product'])->find($id);
 
     if (!$meeting) {
         return response()->json([
@@ -736,7 +724,7 @@ public function joinMeeting(Request $request, $id)
             'meeting_id' => $meeting->id,
             'meeting_name' => $meeting->meeting_name,
             'jitsi_url' => $meeting->jitsi_url,
-            'project_name' => $meeting->project?->name,
+            'strategy_name' => $meeting->strategy && $meeting->strategy->product ? $meeting->strategy->product->name : null,
             'start_time' => $meeting->start_time,
             'end_time' => $meeting->end_time,
             'status' => $meeting->status,
