@@ -4815,7 +4815,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n  \"slot_id\": 1,\n  \"meeting_name\": \"Project Kickoff\",\n  \"description\": \"Kickoff call for new project\",\n  \"strategy_id\": 12\n}",
+                            "raw": "{\n  \"slot_id\": 1718034480,\n  \"meeting_name\": \"Project Kickoff\",\n  \"description\": \"Kickoff call for new project\",\n  \"strategy_id\": 8\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"

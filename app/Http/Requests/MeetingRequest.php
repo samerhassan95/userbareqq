@@ -14,7 +14,7 @@ class MeetingRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-            'slot_id'      => ['required', 'exists:available_slots,id'],
+            'slot_id'      => ['required', 'integer'], // Accept timestamp or database ID
             'meeting_name' => ['required', 'string', 'max:255'],
             'strategy_id'  => ['nullable', 'exists:product_orders,id'],
             'description'  => ['nullable', 'string', 'max:1000'],

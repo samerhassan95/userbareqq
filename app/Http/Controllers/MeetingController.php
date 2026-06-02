@@ -85,25 +85,40 @@ public function store(MeetingRequest $request)
     }
 
     $validated = $request->validated();
+    $slotId = $validated['slot_id'];
 
-    // 2️⃣ Retrieve slot details automatically from slot_id
-    $slot = AvailableSlot::find($validated['slot_id']);
-    
+    // 2️⃣ Try to retrieve slot from database first
+    $slot = AvailableSlot::find($slotId);
+
+    // 3️⃣ If not in database, treat as timestamp (virtual slot)
     if (!$slot) {
-        return response()->json([
-            'status' => false,
-            'message' => 'Invalid slot ID. Slot not found.'
-        ], 404);
+        try {
+            // Assume slot_id is a Unix timestamp
+            $slotTime = \Carbon\Carbon::createFromTimestamp($slotId);
+            $dateStr = $slotTime->format('Y-m-d');
+            $startTime = $slotTime->format('H:i:s');
+            $endTime = $slotTime->copy()->addHour()->format('H:i:s');
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Invalid slot_id. Must be a valid timestamp or database slot ID.'
+            ], 404);
+        }
+    } else {
+        // Use database slot data
+        $dateStr = $slot->date;
+        $startTime = $slot->start_time;
+        $endTime = $slot->end_time;
     }
 
-    // 3️⃣ Check if time slot is already booked
-    $overlappingMeeting = Meeting::where('slot_id', $validated['slot_id'])
-        ->where('date', $slot->date)
-        ->where(function ($query) use ($slot) {
-            $query->where(function ($q) use ($slot) {
-                // Check if the slot time overlaps with existing meetings
-                $q->where('start_time', '<', $slot->end_time)
-                  ->where('end_time', '>', $slot->start_time);
+    // 4️⃣ Check if time slot is already booked
+    $overlappingMeeting = Meeting::where('date', $dateStr)
+        ->whereNotIn('status', ['canceled', 'cancelled'])
+        ->where(function ($query) use ($startTime, $endTime) {
+            $query->where(function ($q) use ($startTime, $endTime) {
+                // Check if the time overlaps with existing meetings
+                $q->where('start_time', '<', $endTime)
+                  ->where('end_time', '>', $startTime);
             });
         })
         ->exists();
@@ -115,21 +130,21 @@ public function store(MeetingRequest $request)
         ], 409); // 409 Conflict
     }
 
-    // 4️⃣ Create meeting with auto-populated date/time from slot
+    // 5️⃣ Create meeting with auto-populated date/time
     $meeting = $this->repository->create([
-        'slot_id'      => $validated['slot_id'],
+        'slot_id'      => $slotId,
         'client_id'    => $user->id,
         'meeting_name' => $validated['meeting_name'],
         'description'  => $validated['description'] ?? null,
-        'date'         => $slot->date,
-        'start_time'   => $slot->start_time,
-        'end_time'     => $slot->end_time,
+        'date'         => $dateStr,
+        'start_time'   => $startTime,
+        'end_time'     => $endTime,
         'strategy_id'  => $validated['strategy_id'] ?? null,
         'jitsi_url'    => config('services.jitsi.base_url', 'https://meet.jit.si') . '/meeting-' . uniqid(),
         'status'       => 'Request Sent',
     ]);
 
-    // 5️⃣ Notify relevant users
+    // 6️⃣ Notify relevant users
     $this->sendMeetingCreatedNotification($meeting);
 
     return response()->json([

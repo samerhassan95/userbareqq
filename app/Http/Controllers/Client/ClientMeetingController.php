@@ -158,11 +158,9 @@ class ClientMeetingController extends Controller
 
         // ----------------------------------------------------------------
         // 1. Validate required fields
-        //    Only slot_id, meeting_name, and description are required
-        //    date, start_time, end_time will be auto-populated from slot
         // ----------------------------------------------------------------
         $validator = Validator::make($request->all(), [
-            'slot_id'      => 'required|exists:available_slots,id',
+            'slot_id'      => 'required|integer',
             'meeting_name' => 'required|string',
             'description'  => 'nullable|string',
             'strategy_id'  => 'nullable|exists:product_orders,id',
@@ -175,29 +173,50 @@ class ClientMeetingController extends Controller
             ], 422);
         }
 
-        // ----------------------------------------------------------------
-        // 2. Retrieve slot details automatically from slot_id
-        // ----------------------------------------------------------------
-        $slot = \App\Models\AvailableSlot::find($request->slot_id);
+        $slotId = $request->slot_id;
         
+        // ----------------------------------------------------------------
+        // 2. Try to get slot from database first
+        // ----------------------------------------------------------------
+        $slot = \App\Models\AvailableSlot::find($slotId);
+        
+        // ----------------------------------------------------------------
+        // 3. If not in database, treat as timestamp (virtual slot)
+        // ----------------------------------------------------------------
         if (!$slot) {
-            return response()->json([
-                'status'  => false,
-                'message' => 'Invalid slot ID. Slot not found.'
-            ], 404);
+            try {
+                // Assume slot_id is a Unix timestamp
+                $slotTime = Carbon::createFromTimestamp($slotId);
+                $dateStr = $slotTime->format('Y-m-d');
+                $startTime = $slotTime->format('H:i');
+                $endTime = $slotTime->copy()->addHour()->format('H:i');
+            } catch (\Exception $e) {
+                return response()->json([
+                    'status'  => false,
+                    'message' => 'Invalid slot_id. Must be a valid timestamp or database slot ID.'
+                ], 404);
+            }
+        } else {
+            // Use database slot data
+            $dateStr = $slot->date;
+            $startTime = $slot->start_time;
+            $endTime = $slot->end_time;
         }
 
         // ----------------------------------------------------------------
-        // 3. The app may send 'project_id' - map to strategy_id
+        // 4. The app may send 'project_id' - map to strategy_id
         // ----------------------------------------------------------------
         $strategyId = $request->input('strategy_id') ?? $request->input('project_id');
 
         // ----------------------------------------------------------------
-        // 4. Overlap check – no double-booking at the same time
+        // 5. Overlap check – no double-booking at the same time
         // ----------------------------------------------------------------
-        $overlapping = Meeting::where('slot_id', $request->slot_id)
+        $overlapping = Meeting::where('date', $dateStr)
             ->whereNotIn('status', ['canceled', 'cancelled'])
-            ->exists();
+            ->where(function ($q) use ($startTime, $endTime) {
+                $q->where('start_time', '<', $endTime)
+                  ->where('end_time', '>', $startTime);
+            })->exists();
 
         if ($overlapping) {
             return response()->json([
@@ -207,17 +226,17 @@ class ClientMeetingController extends Controller
         }
 
         // ----------------------------------------------------------------
-        // 5. Persist the meeting with auto-populated date/time from slot
+        // 6. Persist the meeting with auto-populated date/time
         // ----------------------------------------------------------------
         $meeting = Meeting::create([
             'client_id'    => $user->id,
             'strategy_id'  => $strategyId,
-            'slot_id'      => $request->slot_id,
+            'slot_id'      => $slotId,
             'meeting_name' => $request->meeting_name,
             'description'  => $request->description,
-            'date'         => $slot->date,
-            'start_time'   => $slot->start_time,
-            'end_time'     => $slot->end_time,
+            'date'         => $dateStr,
+            'start_time'   => $startTime,
+            'end_time'     => $endTime,
             'jitsi_url'    => config('services.jitsi.base_url', 'https://meet.jit.si') . '/meeting-' . uniqid(),
             'status'       => 'waiting',
         ]);
