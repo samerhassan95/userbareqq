@@ -1,4 +1,4 @@
-﻿{
+{
     "info": {
         "_postman_id": "bareqq-complete-api-2026",
         "name": "Bareqq Complete API Collection",
@@ -4446,7 +4446,9 @@
                             "host": [
                                 "{{base_url}}"
                             ],
-                            "path": ["meetings"
+                            "path": [
+                                "admin",
+                                "meetings"
                             ],
                             "query": [
                                 {
@@ -4488,7 +4490,9 @@
                             "host": [
                                 "{{base_url}}"
                             ],
-                            "path": ["meetings",
+                            "path": [
+                                "admin",
+                                "meetings",
                                 "1"
                             ]
                         },
@@ -4527,12 +4531,14 @@
                             "host": [
                                 "{{base_url}}"
                             ],
-                            "path": ["meetings",
+                            "path": [
+                                "admin",
+                                "meetings",
                                 "1",
                                 "status"
                             ]
                         },
-                        "description": "Update meeting status. Valid statuses:\n- waiting: Initial state\n- request_sent: Default state\n- confirmed: Meeting approved\n- completed: Meeting finished\n- canceled: Meeting cancelled\n\nStatus Flow:\nwaiting/request_sent â†’ confirmed â†’ completed\n                   â†ک canceled\n\nNote: Cannot re-open completed/canceled meetings. Changing status triggers notification to client."
+                        "description": "Update meeting status. Valid statuses:\n- waiting: Initial state\n- request_sent: Default state\n- confirmed: Meeting approved\n- completed: Meeting finished\n- canceled: Meeting cancelled\n\nStatus Flow:\nwaiting/request_sent → confirmed → completed\n                   ↘ canceled\n\nNote: Cannot re-open completed/canceled meetings. Changing status triggers notification to client."
                     }
                 },
                 {
@@ -4567,7 +4573,9 @@
                             "host": [
                                 "{{base_url}}"
                             ],
-                            "path": ["meetings",
+                            "path": [
+                                "admin",
+                                "meetings",
                                 "1",
                                 "status"
                             ]
@@ -4607,7 +4615,9 @@
                             "host": [
                                 "{{base_url}}"
                             ],
-                            "path": ["meetings",
+                            "path": [
+                                "admin",
+                                "meetings",
                                 "1",
                                 "team"
                             ]
@@ -4634,7 +4644,9 @@
                             "host": [
                                 "{{base_url}}"
                             ],
-                            "path": ["meetings",
+                            "path": [
+                                "admin",
+                                "meetings",
                                 "1",
                                 "team",
                                 "1"
@@ -4662,7 +4674,9 @@
                             "host": [
                                 "{{base_url}}"
                             ],
-                            "path": ["meetings",
+                            "path": [
+                                "admin",
+                                "meetings",
                                 "1",
                                 "team",
                                 "sync-from-strategy"
@@ -4687,7 +4701,7 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/api/meetings",
+                            "raw": "{{base_url}}/api/client/meetings",
                             "host": [
                                 "{{base_url}}"
                             ],
@@ -4710,7 +4724,7 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/api/meetings/filter?status=waiting",
+                            "raw": "{{base_url}}/api/client/meetings/filter?status=waiting",
                             "host": [
                                 "{{base_url}}"
                             ],
@@ -4740,7 +4754,7 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/api/meetings/1/join",
+                            "raw": "{{base_url}}/api/client/meetings/1/join",
                             "host": [
                                 "{{base_url}}"
                             ],
@@ -4778,7 +4792,7 @@
                             }
                         },
                         "url": {
-                            "raw": "{{base_url}}/api/meetings",
+                            "raw": "{{base_url}}/api/client/meetings",
                             "host": [
                                 "{{base_url}}"
                             ],
@@ -4801,7 +4815,7 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/api/meetings/1",
+                            "raw": "{{base_url}}/api/client/meetings/1",
                             "host": [
                                 "{{base_url}}"
                             ],
@@ -4825,7 +4839,7 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/api/meetings/available-slots?date=2026-06-15",
+                            "raw": "{{base_url}}/api/client/available-slots?date=2026-06-15",
                             "host": [
                                 "{{base_url}}"
                             ],
@@ -4854,7 +4868,7 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/api/meetings/unbooked-slots",
+                            "raw": "{{base_url}}/api/client/unbooked-slots",
                             "host": [
                                 "{{base_url}}"
                             ],
