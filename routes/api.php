@@ -68,6 +68,13 @@ Route::middleware(['auth:admin,client,designer,marketer,employee'])->prefix('pro
 // Unified Meetings Routes (Admin + Client - Token-based authorization)
 // ═══════════════════════════════════════════════════════════════════
 Route::middleware(['auth:admin,client'])->prefix('meetings')->group(function () {
+    // Slots management (MUST come before {id} route to avoid conflicts)
+    Route::get('available-slots', [ClientMeetingController::class, 'availableSlots']);
+    Route::get('unbooked-slots', [ClientMeetingController::class, 'unbookedSlots']);
+    
+    // Filter endpoint (MUST come before {id} route)
+    Route::get('filter', [ClientMeetingController::class, 'filter']);
+    
     // Admin-only operations (team management, status changes)
     Route::post('{id}/team', [AdminMeetingController::class, 'addTeamMembers']);
     Route::delete('{id}/team/{teamMemberId}', [AdminMeetingController::class, 'removeTeamMember']);
@@ -76,17 +83,12 @@ Route::middleware(['auth:admin,client'])->prefix('meetings')->group(function () 
 
     // Shared read operations (both admin and client can use)
     Route::get('', [AdminMeetingController::class, 'index']);  // Admin lists all, Client sees their own in controller
-    Route::get('{id}', [AdminMeetingController::class, 'show']);
+    Route::get('{id}', [AdminMeetingController::class, 'show']); // MUST come after specific routes
+    Route::get('{meetingId}/join', [ClientMeetingController::class, 'join']);
 
     // Client-specific operations
     Route::post('', [ClientMeetingController::class, 'store']);
     Route::delete('{meetingId}', [ClientMeetingController::class, 'destroy']);
-    Route::get('{meetingId}/join', [ClientMeetingController::class, 'join']);
-    Route::get('filter', [ClientMeetingController::class, 'filter']);
-
-    // Slots management (both admin and client)
-    Route::get('available-slots', [ClientMeetingController::class, 'availableSlots']);
-    Route::get('unbooked-slots', [ClientMeetingController::class, 'unbookedSlots']);
 });
 
 // Client Invoice Routes (New PDF System)
