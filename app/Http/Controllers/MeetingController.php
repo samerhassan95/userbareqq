@@ -55,7 +55,7 @@ class MeetingController extends Controller
     public function show(string $id)
     {
         try {
-            $meeting = Meeting::with(['strategy.product', 'employees'])->findOrFail($id);
+            $meeting = Meeting::with(['strategy.product'])->findOrFail($id);
 
             return response()->json([
                 'status' => true,
@@ -256,7 +256,7 @@ $slot = AvailableSlot::findOrFail($validated['slot_id']);
     public function getMeetingById($id, Request $request)
     {
         $user = $request->user();
-        $meeting = Meeting::with(['strategy.product', 'employees'])->find($id);
+        $meeting = Meeting::with(['strategy.product'])->find($id);
 
         if (!$meeting) {
             return response()->json([
@@ -407,7 +407,7 @@ public function getClientMeetings(Request $request)
 {
     $user = auth()->user();
 
-    $query = Meeting::with(['strategy.product', 'employees:id,name,image'])
+    $query = Meeting::with(['strategy.product'])
         ->where('client_id', $user->id);
 
     // 🔍 Optional search filter
@@ -449,14 +449,8 @@ public function getClientMeetings(Request $request)
                 'can_add_notes' => $canAddNotes,
                 'has_notes' => !empty($meeting->notes),
 
-                // Optional employee info
-                'team' => $meeting->employees->map(function ($emp) {
-                    return [
-                        'id' => $emp->id,
-                        'name' => $emp->name,
-                        'image' => $emp->image ? asset('uploads/employees/' . $emp->image) : null,
-                    ];
-                }),
+                // team info omitted — employees table not yet on server
+                'team' => [],
             ];
         });
 
@@ -515,7 +509,6 @@ public function saveNotes(Request $request, Meeting $meeting)
             'strategy.product',
             'logs',
             'client:id,name',
-            'employees:id,name,image'
         ])
             ->where('client_id', $user->id)
             ->find($id);
@@ -546,13 +539,7 @@ public function saveNotes(Request $request, Meeting $meeting)
 
                 'notes' => $meeting->description ? explode("\n", trim($meeting->description)) : [],
 
-                'employees' => $meeting->employees->map(function ($emp) {
-                    return [
-                        'id' => $emp->id,
-                        'name' => $emp->name,
-                        'image' => $emp->image ? asset('uploads/employees/' . $emp->image) : null,
-                    ];
-                }),
+                'employees' => [], // employees table not yet on server
 
                 'action_log' => $meeting->logs->map(function ($log) {
                     return [
@@ -684,7 +671,7 @@ public function cancelMeeting(Request $request, $id)
 public function joinMeeting(Request $request, $id)
 {
     $user = auth()->user();
-    $meeting = Meeting::with(['employees', 'client', 'strategy.product'])->find($id);
+    $meeting = Meeting::with(['client', 'strategy.product'])->find($id);
 
     if (!$meeting) {
         return response()->json([
@@ -693,9 +680,8 @@ public function joinMeeting(Request $request, $id)
         ], 404);
     }
 
-    // Authorization: only client, admin, or assigned employee can join
-    $isEmployee = $meeting->employees->contains('id', $user->id);
-    if ($meeting->client_id !== $user->id && !($user instanceof \App\Models\Admin) && !$isEmployee) {
+    // Authorization: only client or admin can join
+    if ($meeting->client_id !== $user->id && !($user instanceof \App\Models\Admin)) {
         return response()->json([
             'status' => false,
             'message' => 'Unauthorized to join this meeting.',

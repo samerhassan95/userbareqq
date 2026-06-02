@@ -12,34 +12,68 @@ use Carbon\Carbon;
 class ClientMeetingController extends Controller
 {
     /**
+     * Resolve team member records (designers / marketers) from a loaded
+     * collection of MeetingTeamMember pivot rows.
+     */
+    private function resolveTeam($teamMembers): array
+    {
+        if (!$teamMembers || $teamMembers->isEmpty()) {
+            return [];
+        }
+
+        // Group by type to batch-load each table once
+        $designerIds = $teamMembers->where('employee_type', 'designer')->pluck('employee_id');
+        $marketerIds  = $teamMembers->where('employee_type', 'marketer')->pluck('employee_id');
+
+        $designers = $designerIds->isNotEmpty()
+            ? \App\Models\Designer::whereIn('id', $designerIds)->get()->keyBy('id')
+            : collect();
+
+        $marketers = $marketerIds->isNotEmpty()
+            ? \App\Models\Marketer::whereIn('id', $marketerIds)->get()->keyBy('id')
+            : collect();
+
+        $team = [];
+        foreach ($teamMembers as $member) {
+            $person = $member->employee_type === 'designer'
+                ? $designers->get($member->employee_id)
+                : $marketers->get($member->employee_id);
+
+            if ($person) {
+                $team[] = [
+                    'id'    => $person->id,
+                    'name'  => $person->username ?? $person->name ?? '',
+                    'image' => $person->photo ?? null,
+                    'type'  => $member->employee_type,
+                ];
+            }
+        }
+        return $team;
+    }
+
+    /**
      * Helper to format a meeting item according to API contract
      */
     private function formatMeeting($meeting)
     {
         return [
-            'id' => $meeting->id,
-            'slot_id' => $meeting->slot_id ?? 0,
-            'client_id' => $meeting->client_id,
-            'description' => $meeting->description ?? '',
+            'id'           => $meeting->id,
+            'slot_id'      => $meeting->slot_id ?? 0,
+            'client_id'    => $meeting->client_id,
+            'description'  => $meeting->description ?? '',
             'meeting_date' => $meeting->date ? $meeting->date->format('Y-m-d') : null,
             'meeting_name' => $meeting->meeting_name,
-            'start_time' => Carbon::parse($meeting->start_time)->format('H:i'),
-            'end_time' => Carbon::parse($meeting->end_time)->format('H:i'),
-            'jitsi_url' => $meeting->jitsi_url ?? '',
-            'status' => strtolower($meeting->status ?? 'waiting'),
-            'strategy' => $meeting->strategy ? [
-                'id' => $meeting->strategy->id,
+            'start_time'   => Carbon::parse($meeting->start_time)->format('H:i'),
+            'end_time'     => Carbon::parse($meeting->end_time)->format('H:i'),
+            'jitsi_url'    => $meeting->jitsi_url ?? '',
+            'status'       => strtolower($meeting->status ?? 'waiting'),
+            'project'      => $meeting->strategy ? [
+                'id'   => $meeting->strategy->id,
                 'name' => $meeting->strategy->product ? $meeting->strategy->product->name : 'Unknown Product'
             ] : null,
-            'team' => $meeting->employees ? $meeting->employees->map(function ($emp) {
-                return [
-                    'id' => $emp->id,
-                    'name' => $emp->name,
-                    'image' => $emp->image ? asset('uploads/employees/' . $emp->image) : null,
-                ];
-            })->toArray() : [],
-            'created_at' => $meeting->created_at ? $meeting->created_at->format('Y-m-d H:i:s') : null,
-            'updated_at' => $meeting->updated_at ? $meeting->updated_at->format('Y-m-d H:i:s') : null,
+            'team'         => $this->resolveTeam($meeting->relationLoaded('teamMembers') ? $meeting->teamMembers : collect()),
+            'created_at'   => $meeting->created_at ? $meeting->created_at->format('Y-m-d H:i:s') : null,
+            'updated_at'   => $meeting->updated_at ? $meeting->updated_at->format('Y-m-d H:i:s') : null,
         ];
     }
 
@@ -49,7 +83,7 @@ class ClientMeetingController extends Controller
     public function index(Request $request)
     {
         $user = auth()->user();
-        $meetings = Meeting::with(['strategy.product', 'employees'])
+        $meetings = Meeting::with(['strategy.product', 'teamMembers'])
             ->where('client_id', $user->id)
             ->orderByDesc('date')
             ->orderByDesc('start_time')
@@ -68,13 +102,12 @@ class ClientMeetingController extends Controller
         $user = auth()->user();
         $status = $request->query('status');
 
-        $query = Meeting::with(['strategy.product', 'employees'])
+        $query = Meeting::with(['strategy.product', 'teamMembers'])
             ->where('client_id', $user->id)
             ->orderByDesc('date')
             ->orderByDesc('start_time');
 
         if ($status) {
-            // Map common statuses if needed, though exact string matching is usually fine
             $query->where('status', 'like', "%$status%");
         }
 
@@ -91,7 +124,7 @@ class ClientMeetingController extends Controller
     public function join(Request $request, $meetingId)
     {
         $user = auth()->user();
-        $meeting = Meeting::with('strategy.product')->where('client_id', $user->id)->find($meetingId);
+        $meeting = Meeting::with(['strategy.product', 'teamMembers'])->where('client_id', $user->id)->find($meetingId);
 
         if (!$meeting) {
             return response()->json([
@@ -108,7 +141,7 @@ class ClientMeetingController extends Controller
                 'meeting_id' => $meeting->id,
                 'meeting_name' => $meeting->meeting_name,
                 'jitsi_url' => $meeting->jitsi_url ?? '',
-                'strategy_name' => $meeting->strategy && $meeting->strategy->product ? $meeting->strategy->product->name : 'Unknown Product',
+                'project_name' => $meeting->strategy && $meeting->strategy->product ? $meeting->strategy->product->name : 'Unknown Product',
                 'start_time' => Carbon::parse($meeting->start_time)->format('H:i'),
                 'end_time' => Carbon::parse($meeting->end_time)->format('H:i'),
                 'status' => strtolower($meeting->status)
@@ -123,28 +156,15 @@ class ClientMeetingController extends Controller
     {
         $user = auth()->user();
 
-        $validator = Validator::make($request->all(), [
-            'start_time' => 'required|date_format:H:i',
-            'end_time' => 'required|date_format:H:i|after:start_time',
-            'meeting_name' => 'required|string',
-            'description' => 'required|string',
-            'strategy_id' => 'nullable|exists:product_orders,id',
-            'date' => 'required|date|after_or_equal:today' // The app might send slot_id, but since we use static slots we need date. Let's assume the client passes date or we derive it.
-        ]);
-
-        // Note: The API doc says the app expects slot_id. But since we bypass AvailableSlot, 
-        // the client might not send date directly if it relies on slot_id. 
-        // We will assume 'date' is provided or we can extract it if needed.
-        
-        // Wait, the API doc for POST client/meetings says:
-        // { "slot_id": 7, "client_id": 33, "start_time": "10:00", "project_id": "99", "meeting_name": "Project Kickoff", "description": "Kickoff call", "end_time": "10:30" }
-        // We don't have 'date' in the POST body. How do we get the date? 
-        // In the static slots implementation, we can encode the date in the slot_id (e.g., timestamp) or just require 'date'. 
-        // Since we are replacing the old system, we will use 'date' if available, otherwise we use the slot_id as a unix timestamp.
+        // ----------------------------------------------------------------
+        // 1. Resolve date early (before validation) because the app does
+        //    NOT send a 'date' field – it sends 'slot_id' which we treat
+        //    as a unix timestamp generated by our availableSlots endpoint.
+        // ----------------------------------------------------------------
+        $slotId  = $request->input('slot_id');
         $dateStr = $request->input('date');
-        $slotId = $request->input('slot_id');
+
         if (!$dateStr && $slotId) {
-            // Let's assume slot_id is the unix timestamp for the start of the slot
             try {
                 $dateStr = Carbon::createFromTimestamp($slotId)->format('Y-m-d');
             } catch (\Exception $e) {
@@ -154,46 +174,74 @@ class ClientMeetingController extends Controller
             $dateStr = Carbon::today()->format('Y-m-d');
         }
 
+        // ----------------------------------------------------------------
+        // 2. The app sends 'project_id' (and optionally 'task_id').
+        //    Map project_id -> strategy_id so we can look up product_orders.
+        // ----------------------------------------------------------------
+        $strategyId = $request->input('strategy_id') ?? $request->input('project_id');
+
+        // ----------------------------------------------------------------
+        // 3. Validate the fields we care about.
+        //    'date' is NOT required from the body (derived above).
+        //    'task_id' and 'project_id' are allowed but ignored.
+        // ----------------------------------------------------------------
+        $validator = Validator::make(
+            array_merge($request->all(), ['_resolved_date' => $dateStr]),
+            [
+                'start_time'     => 'required|date_format:H:i',
+                'end_time'       => 'required|date_format:H:i|after:start_time',
+                'meeting_name'   => 'required|string',
+                'description'    => 'required|string',
+                '_resolved_date' => 'required|date|after_or_equal:today',
+            ]
+        );
+
         if ($validator->fails()) {
             return response()->json([
-                'status' => false,
+                'status'  => false,
                 'message' => $validator->errors()->first()
             ], 422);
         }
 
-        // Check if there is already a meeting at this time
+        // ----------------------------------------------------------------
+        // 4. Overlap check – no double-booking at the same time.
+        // ----------------------------------------------------------------
         $overlapping = Meeting::where('date', $dateStr)
+            ->whereNotIn('status', ['canceled', 'cancelled'])
             ->where(function ($q) use ($request) {
-                $q->where(function ($query) use ($request) {
-                    $query->where('start_time', '<', $request->end_time)
-                          ->where('end_time', '>', $request->start_time);
-                });
+                $q->where('start_time', '<', $request->end_time)
+                  ->where('end_time', '>', $request->start_time);
             })->exists();
 
         if ($overlapping) {
             return response()->json([
-                'status' => false,
+                'status'  => false,
                 'message' => 'This time slot is already booked. Please choose another time.'
             ], 409);
         }
 
+        // ----------------------------------------------------------------
+        // 5. Persist the meeting.
+        // ----------------------------------------------------------------
         $meeting = Meeting::create([
-            'client_id' => $user->id,
-            'strategy_id' => $request->strategy_id,
-            'slot_id' => $slotId,
+            'client_id'   => $user->id,
+            'strategy_id' => $strategyId,
+            'slot_id'     => $slotId,
             'meeting_name' => $request->meeting_name,
             'description' => $request->description,
-            'date' => $dateStr,
-            'start_time' => $request->start_time,
-            'end_time' => $request->end_time,
-            'jitsi_url' => config('services.jitsi.base_url', 'https://meet.jit.si') . '/meeting-' . uniqid(),
-            'status' => 'waiting' // As per app requirement "waiting"
+            'date'        => $dateStr,
+            'start_time'  => $request->start_time,
+            'end_time'    => $request->end_time,
+            'jitsi_url'   => config('services.jitsi.base_url', 'https://meet.jit.si') . '/meeting-' . uniqid(),
+            'status'      => 'waiting',
         ]);
 
+        $meeting->load('strategy.product');
+
         return response()->json([
-            'status' => true,
+            'status'  => true,
             'message' => 'Meeting created successfully',
-            'data' => $this->formatMeeting($meeting)
+            'data'    => $this->formatMeeting($meeting)
         ]);
     }
 
