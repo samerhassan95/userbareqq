@@ -17,8 +17,11 @@ return new class extends Migration
             $table->unsignedBigInteger('employee_id');
             $table->timestamps();
 
+            // Only FK to meetings (which was created via migration and has proper InnoDB)
             $table->foreign('meeting_id')->references('id')->on('meetings')->onDelete('cascade');
-            $table->foreign('employee_id')->references('id')->on('employees')->onDelete('cascade');
+
+            // No FK to employees — that table was created manually on server
+            $table->index('employee_id');
 
             $table->unique(['meeting_id', 'employee_id']);
         });
