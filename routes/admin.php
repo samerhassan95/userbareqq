@@ -80,4 +80,17 @@ Route::middleware('admin')->group(function () {
     Route::get('designers', [\App\Http\Controllers\Admin\AdminTeamController::class, 'getDesigners']);
     Route::get('marketers', [\App\Http\Controllers\Admin\AdminTeamController::class, 'getMarketers']);
     Route::get('team-members', [\App\Http\Controllers\Admin\AdminTeamController::class, 'getAllTeamMembers']);
+
+    // ── Meetings Management ──────────────────────────────────────────
+    Route::get('meetings',                                          [\App\Http\Controllers\Admin\AdminMeetingController::class, 'index']);
+    Route::get('meetings/{id}',                                     [\App\Http\Controllers\Admin\AdminMeetingController::class, 'show']);
+    Route::put('meetings/{id}/status',                              [\App\Http\Controllers\Admin\AdminMeetingController::class, 'updateStatus']);
+
+    // Team member management for a meeting
+    Route::post('meetings/{id}/team',                               [\App\Http\Controllers\Admin\AdminMeetingController::class, 'addTeamMembers']);
+    Route::delete('meetings/{id}/team/{teamMemberId}',              [\App\Http\Controllers\Admin\AdminMeetingController::class, 'removeTeamMember']);
+
+    // Auto-sync team from the strategy order's post assignments
+    Route::post('meetings/{id}/team/sync-from-strategy',           [\App\Http\Controllers\Admin\AdminMeetingController::class, 'syncTeamFromStrategy']);
 });
+

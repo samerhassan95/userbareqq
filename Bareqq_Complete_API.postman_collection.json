@@ -4250,6 +4250,270 @@
             ]
         },
         {
+            "name": "Admin - Meetings",
+            "description": "Admin meeting management endpoints. Includes team member assignment, auto-sync from posts, and status management.",
+            "item": [
+                {
+                    "name": "Get All Meetings",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "{{lang}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/admin/meetings?status=&strategy_id=&date=",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "admin",
+                                "meetings"
+                            ],
+                            "query": [
+                                {
+                                    "key": "status",
+                                    "value": "",
+                                    "description": "Filter by status: waiting, request_sent, confirmed, completed, canceled"
+                                },
+                                {
+                                    "key": "strategy_id",
+                                    "value": "",
+                                    "description": "Filter by strategy order ID"
+                                },
+                                {
+                                    "key": "date",
+                                    "value": "",
+                                    "description": "Filter by meeting date (YYYY-MM-DD)"
+                                }
+                            ]
+                        },
+                        "description": "Get all meetings with optional filters. Returns full meeting details including team members, client info, and strategy details."
+                    }
+                },
+                {
+                    "name": "Get Meeting Details",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "{{lang}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/admin/meetings/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "admin",
+                                "meetings",
+                                "1"
+                            ]
+                        },
+                        "description": "Get detailed information about a specific meeting including team members, timestamps, and related strategy."
+                    }
+                },
+                {
+                    "name": "Update Meeting Status",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "{{lang}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"status\": \"confirmed\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/admin/meetings/1/status",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "admin",
+                                "meetings",
+                                "1",
+                                "status"
+                            ]
+                        },
+                        "description": "Update meeting status. Valid statuses:\n- waiting: Initial state\n- request_sent: Default state\n- confirmed: Meeting approved\n- completed: Meeting finished\n- canceled: Meeting cancelled\n\nStatus Flow:\nwaiting/request_sent → confirmed → completed\n                   ↘ canceled\n\nNote: Cannot re-open completed/canceled meetings. Changing status triggers notification to client."
+                    }
+                },
+                {
+                    "name": "Cancel Meeting",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "{{lang}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"status\": \"canceled\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/admin/meetings/1/status",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "admin",
+                                "meetings",
+                                "1",
+                                "status"
+                            ]
+                        },
+                        "description": "Cancel a meeting by setting status to 'canceled'. Client will be notified via Firebase notification. Canceled meetings cannot be re-opened."
+                    }
+                },
+                {
+                    "name": "Add Team Members to Meeting",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "{{lang}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"members\": [\n        {\n            \"type\": \"designer\",\n            \"id\": 1\n        },\n        {\n            \"type\": \"marketer\",\n            \"id\": 2\n        }\n    ]\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/admin/meetings/1/team",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "admin",
+                                "meetings",
+                                "1",
+                                "team"
+                            ]
+                        },
+                        "description": "Manually add team members (designers/marketers) to a specific meeting. Returns added members and skipped duplicates.\n\nRequest body:\n- members (array, required):\n  - type: 'designer' or 'marketer' (required)\n  - id: employee ID (required)\n\nNote: Duplicate members are automatically skipped.\nReturns:\n- added: Array of successfully added members\n- skipped: Array of members that were not added (reasons: not found, already in team)"
+                    }
+                },
+                {
+                    "name": "Remove Team Member from Meeting",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "{{lang}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/admin/meetings/1/team/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "admin",
+                                "meetings",
+                                "1",
+                                "team",
+                                "1"
+                            ]
+                        },
+                        "description": "Remove a specific team member from a meeting.\n\nPath parameters:\n- meetingId: The meeting ID\n- teamMemberId: The meeting team member record ID (not the employee ID)"
+                    }
+                },
+                {
+                    "name": "Auto-Sync Team from Strategy Posts",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "{{lang}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/admin/meetings/1/team/sync-from-strategy",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "admin",
+                                "meetings",
+                                "1",
+                                "team",
+                                "sync-from-strategy"
+                            ]
+                        },
+                        "description": "Automatically synchronize team members for this meeting from all posts assigned to the meeting's strategy order.\n\nHow it works:\n1. Fetches all posts linked to the meeting's strategy order\n2. Extracts all designers and marketers assigned to those posts\n3. Adds them as team members to the meeting (avoids duplicates)\n\nThis ensures that all team members who worked on strategy posts automatically become team members for any meetings related to that strategy.\n\nReturns:\n- synced: Array of newly added team members\n- skipped: Array of members already in team\n\nNote: This is idempotent - safe to call multiple times without creating duplicates."
+                    }
+                }
+            ]
+        },
+        {
             "name": "Client Meetings",
             "item": [
                 {
