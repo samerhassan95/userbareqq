@@ -86,87 +86,56 @@ public function store(MeetingRequest $request)
 
     $validated = $request->validated();
 
-    // 2️⃣ Validate project belongs to authenticated client
-    $project = Project::where('id', $validated['project_id'])
-        ->where('client_id', $user->id)
-        ->first();
-
-    if (!$project) {
+    // 2️⃣ Retrieve slot details automatically from slot_id
+    $slot = AvailableSlot::find($validated['slot_id']);
+    
+    if (!$slot) {
         return response()->json([
             'status' => false,
-            'message' => 'Project not found or access denied'
+            'message' => 'Invalid slot ID. Slot not found.'
         ], 404);
     }
 
-    // 3️⃣ Validate task belongs to project (if task_id is provided)
-    $taskId = $validated['task_id'] ?? null;
-    if ($taskId) {
-        $task = Task::where('id', $taskId)
-            ->whereHas('milestone', function ($q) use ($project) {
-                $q->where('project_id', $project->id);
-            })
-            ->first();
-
-        if (!$task) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Task not found or does not belong to this project'
-            ], 404);
-        }
-    }
-
-
-$slot = AvailableSlot::findOrFail($validated['slot_id']);
-
-
-    // 🔒 4️⃣ Check if time slot is already booked
+    // 3️⃣ Check if time slot is already booked
     $overlappingMeeting = Meeting::where('slot_id', $validated['slot_id'])
         ->where('date', $slot->date)
-        ->where(function ($query) use ($validated) {
-            $query->where(function ($q) use ($validated) {
-                // New meeting starts during existing meeting
-                $q->where('start_time', '<', $validated['end_time'])
-                  ->where('end_time', '>', $validated['start_time']);
+        ->where(function ($query) use ($slot) {
+            $query->where(function ($q) use ($slot) {
+                // Check if the slot time overlaps with existing meetings
+                $q->where('start_time', '<', $slot->end_time)
+                  ->where('end_time', '>', $slot->start_time);
             });
         })
         ->exists();
 
-
-        if ($overlappingMeeting) {
+    if ($overlappingMeeting) {
         return response()->json([
             'status' => false,
             'message' => 'This time slot is already booked. Please choose another time.'
         ], 409); // 409 Conflict
     }
 
-
-    // 4️⃣ Create meeting
+    // 4️⃣ Create meeting with auto-populated date/time from slot
     $meeting = $this->repository->create([
         'slot_id'      => $validated['slot_id'],
         'client_id'    => $user->id,
         'meeting_name' => $validated['meeting_name'],
         'description'  => $validated['description'] ?? null,
         'date'         => $slot->date,
-        'start_time'   => $validated['start_time'],
-        'end_time'     => $validated['end_time'],
-        'project_id'   => $project->id,
-        'task_id'      => $taskId, // optional
-        'jitsi_url'    => config('services.jitsi.base_url') . '/meeting-' . uniqid(),
+        'start_time'   => $slot->start_time,
+        'end_time'     => $slot->end_time,
+        'strategy_id'  => $validated['strategy_id'] ?? null,
+        'jitsi_url'    => config('services.jitsi.base_url', 'https://meet.jit.si') . '/meeting-' . uniqid(),
         'status'       => 'Request Sent',
     ]);
 
-    // 5️⃣ Attach employees (optional)
-    if (!empty($validated['employee_ids'])) {
-        $meeting->employees()->sync($validated['employee_ids']);
-    }
-
-    // 6️⃣ Notify relevant users
+    // 5️⃣ Notify relevant users
     $this->sendMeetingCreatedNotification($meeting);
 
     return response()->json([
         'status'  => true,
         'message' => 'Meeting request sent successfully',
-        'data'    => new MeetingResource($meeting->load('employees')),
+        'data'    => new MeetingResource($meeting),
     ], 201);
 }
 

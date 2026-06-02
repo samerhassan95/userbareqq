@@ -4670,6 +4670,57 @@
                         },
                         "description": "Automatically synchronize team members for this meeting from all posts assigned to the meeting's strategy order.\n\nHow it works:\n1. Fetches all posts linked to the meeting's strategy order\n2. Extracts all designers and marketers assigned to those posts\n3. Adds them as team members to the meeting (avoids duplicates)\n\nThis ensures that all team members who worked on strategy posts automatically become team members for any meetings related to that strategy.\n\nReturns:\n- synced: Array of newly added team members\n- skipped: Array of members already in team\n\nNote: This is idempotent - safe to call multiple times without creating duplicates."
                     }
+                },
+                {
+                    "name": "Available Slots (Admin)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/meetings/available-slots?date=2026-06-15",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api", "meetings", "available-slots"
+                            ],
+                            "query": [
+                                {
+                                    "key": "date",
+                                    "value": "2026-06-15",
+                                    "description": "Date in YYYY-MM-DD format"
+                                }
+                            ]
+                        },
+                        "description": "Get available time slots for a specific date. Admin can use this to view available slots when creating or managing meetings.\n\nNote: This endpoint is accessible by both admin and client tokens."
+                    }
+                },
+                {
+                    "name": "Unbooked Slots (Admin)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/meetings/unbooked-slots",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api", "meetings", "unbooked-slots"
+                            ]
+                        },
+                        "description": "Get all unbooked slots for the next 7 days. Useful for viewing availability at a glance.\n\nNote: This endpoint is accessible by both admin and client tokens."
+                    }
                 }
             ]
         },
@@ -4692,9 +4743,7 @@
                                 "{{base_url}}"
                             ],
                             "path": [
-                                "api",
-                                "client",
-                                "meetings"
+                                "api", "meetings"
                             ]
                         }
                     }
@@ -4715,9 +4764,7 @@
                                 "{{base_url}}"
                             ],
                             "path": [
-                                "api",
-                                "client",
-                                "meetings",
+                                "api", "meetings",
                                 "filter"
                             ],
                             "query": [
@@ -4745,9 +4792,7 @@
                                 "{{base_url}}"
                             ],
                             "path": [
-                                "api",
-                                "client",
-                                "meetings",
+                                "api", "meetings",
                                 "1",
                                 "join"
                             ]
@@ -4770,7 +4815,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n  \"date\": \"2026-06-15\",\n  \"start_time\": \"10:00\",\n  \"strategy_id\": 12,\n  \"meeting_name\": \"Project Kickoff\",\n  \"description\": \"Kickoff call\",\n  \"end_time\": \"11:00\"\n}",
+                            "raw": "{\n  \"slot_id\": 1,\n  \"meeting_name\": \"Project Kickoff\",\n  \"description\": \"Kickoff call for new project\",\n  \"strategy_id\": 12\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -4783,9 +4828,7 @@
                                 "{{base_url}}"
                             ],
                             "path": [
-                                "api",
-                                "client",
-                                "meetings"
+                                "api", "meetings"
                             ]
                         }
                     }
@@ -4806,9 +4849,7 @@
                                 "{{base_url}}"
                             ],
                             "path": [
-                                "api",
-                                "client",
-                                "meetings",
+                                "api", "meetings",
                                 "1"
                             ]
                         }
@@ -4830,9 +4871,7 @@
                                 "{{base_url}}"
                             ],
                             "path": [
-                                "api",
-                                "client",
-                                "available-slots"
+                                "api", "meetings", "available-slots"
                             ],
                             "query": [
                                 {
@@ -4840,7 +4879,8 @@
                                     "value": "2026-06-15"
                                 }
                             ]
-                        }
+                        },
+                        "description": "Get available time slots for a specific date. Returns slots that are not yet booked.\n\nNote: This endpoint is accessible by both admin and client tokens.\n\nUse the slot_id from this response when creating a meeting."
                     }
                 },
                 {
@@ -4859,11 +4899,10 @@
                                 "{{base_url}}"
                             ],
                             "path": [
-                                "api",
-                                "client",
-                                "unbooked-slots"
+                                "api", "meetings", "unbooked-slots"
                             ]
-                        }
+                        },
+                        "description": "Get all unbooked slots for the next 7 days. Useful for viewing availability at a glance.\n\nNote: This endpoint is accessible by both admin and client tokens."
                     }
                 }
             ]

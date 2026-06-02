@@ -14,16 +14,17 @@ class MeetingRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-            'start_time'   => ['required', 'date_format:H:i'],
-            'end_time'     => ['required', 'date_format:H:i'],
+            'slot_id'      => ['required', 'exists:available_slots,id'],
             'meeting_name' => ['required', 'string', 'max:255'],
             'strategy_id'  => ['nullable', 'exists:product_orders,id'],
             'description'  => ['nullable', 'string', 'max:1000'],
-            'date'         => ['nullable', 'date'],
-            'slot_id'      => ['nullable'],
             'jitsi_url'    => ['nullable', 'string'],
             'status'       => ['nullable', 'string'],
             'notes'        => ['nullable', 'string'],
+            // These fields will be auto-populated from slot_id
+            'start_time'   => ['nullable', 'date_format:H:i'],
+            'end_time'     => ['nullable', 'date_format:H:i'],
+            'date'         => ['nullable', 'date'],
         ];
 
         if ($this->isMethod('put') || $this->isMethod('patch')) {
