@@ -9,6 +9,7 @@ use App\Models\Meeting;
 use App\Models\MeetingTeamMember;
 use App\Models\Post;
 use App\Models\PostTeamMember;
+use App\Traits\SendsNotificationsV2;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -17,6 +18,7 @@ use Illuminate\Support\Facades\Validator;
 
 class AdminMeetingController extends Controller
 {
+    use SendsNotificationsV2;
     // ---------------------------------------------------------------
     // Allowed status values and their transitions
     // ---------------------------------------------------------------
@@ -248,6 +250,12 @@ class AdminMeetingController extends Controller
                 ];
             }
             DB::commit();
+
+            // Send notifications to newly added team members
+            if (!empty($added)) {
+                $this->notifyTeamMembersAdded($meeting, $added);
+            }
+
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('AdminMeetingController::addTeamMembers error: ' . $e->getMessage());
@@ -282,7 +290,17 @@ class AdminMeetingController extends Controller
             return response()->json(['status' => false, 'message' => 'Team member not found in this meeting'], 404);
         }
 
+        // Get the person before deleting to send notification
+        $person = $member->employee_type === 'designer'
+            ? Designer::find($member->employee_id)
+            : Marketer::find($member->employee_id);
+
         $member->delete();
+
+        // Notify the removed team member
+        if ($person) {
+            $this->notifyTeamMemberRemoved($meeting, $person);
+        }
 
         return response()->json([
             'status'  => true,
@@ -348,6 +366,12 @@ class AdminMeetingController extends Controller
             }
 
             DB::commit();
+
+            // Notify all team members of auto-sync if members were synced
+            if (!empty($synced)) {
+                $this->notifyTeamSynced($meeting);
+            }
+
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('AdminMeetingController::syncTeamFromStrategy error: ' . $e->getMessage());
@@ -383,28 +407,147 @@ class AdminMeetingController extends Controller
     {
         try {
             $client = $meeting->client;
-            if (!$client || !$client->device_token) return;
+            if (!$client) return;
 
-            $template = \App\Models\NotificationTemplate::where('type', 'meeting_status_updated')->first();
-            if (!$template) return;
+            // Get the appropriate template based on status
+            $templateType = 'meeting_status_updated';
+            if ($meeting->status === 'confirmed') {
+                $templateType = 'meeting_confirmed';
+            } elseif ($meeting->status === 'completed') {
+                $templateType = 'meeting_completed';
+            } elseif ($meeting->status === 'canceled') {
+                $templateType = 'meeting_canceled';
+            }
 
-            $title   = $template->title;
-            $message = str_replace(
-                ['{meeting_name}', '{status}'],
-                [$meeting->meeting_name, ucfirst($meeting->status)],
-                $template->message
+            // Prepare replacements for template
+            $replacements = [
+                'meeting_name' => $meeting->meeting_name,
+                'status' => ucfirst($meeting->status),
+                'date' => $meeting->date ? Carbon::parse($meeting->date)->format('Y-m-d') : 'TBD',
+                'time' => $meeting->start_time ? Carbon::parse($meeting->start_time)->format('H:i') : 'TBD',
+            ];
+
+            // Send notification using language-aware system
+            $this->sendNotificationV2(
+                $client,
+                $templateType,
+                $replacements,
+                [
+                    'meeting_id'        => (string) $meeting->id,
+                    'notification_type' => $templateType,
+                    'status'            => $meeting->status,
+                ]
             );
 
-            app(\App\Services\FirebaseService::class)
-                ->sendNotification($client->device_token, $title, $message, [
-                    'meeting_id'        => (string) $meeting->id,
-                    'notification_type' => 'meeting_status_updated',
-                ]);
-
-            app(\App\Repositories\NotificationRepository::class)
-                ->createNotification($client, $title, $message, $client->device_token, 'meeting_status_updated');
         } catch (\Exception $e) {
             Log::error('AdminMeetingController: Firebase notification failed: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Notify team members when they are added to a meeting
+     */
+    private function notifyTeamMembersAdded(Meeting $meeting, array $addedMembers): void
+    {
+        foreach ($addedMembers as $member) {
+            try {
+                $type = $member['type'];
+                $empId = $member['id'];
+
+                $person = $type === 'designer'
+                    ? Designer::find($empId)
+                    : Marketer::find($empId);
+
+                if (!$person) continue;
+
+                $replacements = [
+                    'meeting_name' => $meeting->meeting_name,
+                    'date' => $meeting->date ? Carbon::parse($meeting->date)->format('Y-m-d') : 'TBD',
+                ];
+
+                $this->sendNotificationV2(
+                    $person,
+                    'meeting_team_member_added',
+                    $replacements,
+                    [
+                        'meeting_id'        => (string) $meeting->id,
+                        'notification_type' => 'meeting_team_member_added',
+                    ]
+                );
+            } catch (\Exception $e) {
+                Log::error('Failed to notify team member of addition to meeting', [
+                    'meeting_id' => $meeting->id,
+                    'member_id' => $member['id'] ?? null,
+                    'error' => $e->getMessage()
+                ]);
+            }
+        }
+    }
+
+    /**
+     * Notify team members when they are removed from a meeting
+     */
+    private function notifyTeamMemberRemoved(Meeting $meeting, Designer|Marketer $person): void
+    {
+        try {
+            $replacements = [
+                'meeting_name' => $meeting->meeting_name,
+            ];
+
+            $this->sendNotificationV2(
+                $person,
+                'meeting_team_member_removed',
+                $replacements,
+                [
+                    'meeting_id'        => (string) $meeting->id,
+                    'notification_type' => 'meeting_team_member_removed',
+                ]
+            );
+        } catch (\Exception $e) {
+            Log::error('Failed to notify team member of removal from meeting', [
+                'meeting_id' => $meeting->id,
+                'person_id' => $person->id ?? null,
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Notify all team members when auto-sync happens
+     */
+    private function notifyTeamSynced(Meeting $meeting): void
+    {
+        try {
+            $teamMembers = MeetingTeamMember::where('meeting_id', $meeting->id)->get();
+
+            $designerIds = $teamMembers->where('employee_type', 'designer')->pluck('employee_id');
+            $marketerIds = $teamMembers->where('employee_type', 'marketer')->pluck('employee_id');
+
+            $designers = $designerIds->isNotEmpty() ? Designer::whereIn('id', $designerIds)->get() : collect();
+            $marketers = $marketerIds->isNotEmpty() ? Marketer::whereIn('id', $marketerIds)->get() : collect();
+
+            $allMembers = $designers->merge($marketers);
+
+            $replacements = [
+                'meeting_name' => $meeting->meeting_name,
+            ];
+
+            if ($allMembers->isNotEmpty()) {
+                $this->sendNotificationV2(
+                    $allMembers->toArray(),
+                    'meeting_team_synced',
+                    $replacements,
+                    [
+                        'meeting_id'        => (string) $meeting->id,
+                        'notification_type' => 'meeting_team_synced',
+                    ]
+                );
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to notify team of sync', [
+                'meeting_id' => $meeting->id,
+                'error' => $e->getMessage()
+            ]);
         }
     }
 }

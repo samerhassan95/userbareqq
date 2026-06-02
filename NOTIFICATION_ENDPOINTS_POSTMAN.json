@@ -1,0 +1,213 @@
+{
+  "info": {
+    "name": "Device Token & Language + Meeting Notifications",
+    "description": "New endpoints for device token management, language preferences, and comprehensive meeting notifications",
+    "version": "1.0.0"
+  },
+  "item": [
+    {
+      "name": "Profile & Settings (All Roles)",
+      "item": [
+        {
+          "name": "Update Device Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"device_token\": \"d1Lxd3tAbcXyZ123fcmTokenHere\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/profile/device-token",
+              "host": ["{{base_url}}"],
+              "path": ["api", "profile", "device-token"]
+            },
+            "description": "Update Firebase device token anytime. Can be called after login or when token changes.\n\n**Use Cases:**\n- Update FCM token from mobile app\n- User reinstalls app\n- Device token expires\n- Switching devices\n\n**Parameters:**\n- `device_token` (required): Firebase Cloud Messaging token\n\n**Response:**\nReturns user info with old/new token (masked)"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"device_token\": \"token123\"}"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"status\": true,\n  \"message\": \"Device token updated successfully\",\n  \"data\": {\n    \"user_id\": 1,\n    \"type\": \"App\\\\Models\\\\Client\",\n    \"old_token\": \"oldTokenStarts...\",\n    \"new_token\": \"newTokenStarts...\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Language Preference",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"language\": \"ar\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/profile/language",
+              "host": ["{{base_url}}"],
+              "path": ["api", "profile", "language"]
+            },
+            "description": "Update notification language preference (English or Arabic).\n\nWhen notifications are sent, the system will use the user's preferred language:\n- EN (English): Uses `title` and `message` from templates\n- AR (Arabic): Uses `title_ar` and `message_ar` from templates\n\n**Parameters:**\n- `language` (required): 'en' or 'ar'\n\n**Response:**\nReturns user info with old/new language"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"language\": \"ar\"}"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"status\": true,\n  \"message\": \"Language preference updated successfully\",\n  \"data\": {\n    \"user_id\": 1,\n    \"type\": \"App\\\\Models\\\\Client\",\n    \"old_language\": \"en\",\n    \"new_language\": \"ar\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Notification Settings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/profile/notification-settings",
+              "host": ["{{base_url}}"],
+              "path": ["api", "profile", "notification-settings"]
+            },
+            "description": "Get current device token and language settings for authenticated user.\n\n**Response:**\nReturns:\n- `device_token`: First 20 chars + '...' (masked for security)\n- `has_token`: Boolean indicating if token exists\n- `language`: Current language preference (en or ar)"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": []
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"status\": true,\n  \"message\": \"Notification settings retrieved\",\n  \"data\": {\n    \"user_id\": 1,\n    \"type\": \"App\\\\Models\\\\Client\",\n    \"device_token\": \"d1Lxd3tAbcXyZ12...\",\n    \"has_token\": true,\n    \"language\": \"ar\"\n  }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Meeting Notifications Coverage",
+      "item": [
+        {
+          "name": "Meeting Created Notification",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/documentation/meetings/notifications/created",
+              "host": ["{{base_url}}"],
+              "path": ["api", "documentation", "meetings", "notifications", "created"]
+            },
+            "description": "**Triggered:** When admin creates a new meeting\n**Recipients:** Client\n**Template:** meeting_created\n\n**EN:**\n- Title: \"New Meeting Scheduled\"\n- Message: \"Meeting {meeting_name} has been scheduled for {date} at {time}\"\n\n**AR:**\n- Title: \"اجتماع جديد مجدول\"\n- Message: \"تم جدولة الاجتماع {meeting_name} لتاريخ {date} الساعة {time}\"\n\n**Firebase Data:**\n```json\n{\n  \"meeting_id\": \"5\",\n  \"notification_type\": \"meeting_created\",\n  \"language\": \"en\"\n}\n```"
+          }
+        },
+        {
+          "name": "Meeting Status Changed Notification",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/documentation/meetings/notifications/status-changed",
+              "host": ["{{base_url}}"],
+              "path": ["api", "documentation", "meetings", "notifications", "status-changed"]
+            },
+            "description": "**Triggered:** When admin updates meeting status\n**Recipients:** Client\n**Template:** meeting_status_updated / meeting_confirmed / meeting_completed / meeting_canceled\n\nDifferent templates based on status:\n- `waiting`/`request_sent` → uses `meeting_status_updated`\n- `confirmed` → uses `meeting_confirmed` (specific message)\n- `completed` → uses `meeting_completed`\n- `canceled` → uses `meeting_canceled`\n\n**EN:**\n- Title: \"Meeting Status Updated\" (or status-specific)\n- Message: \"Meeting {meeting_name} status changed to: {status}\"\n\n**AR:**\n- Title: \"تحديث حالة الاجتماع\"\n- Message: \"تم تغيير حالة الاجتماع {meeting_name} إلى: {status}\"\n\n**Status-Specific Variations:**\n\n**CONFIRMED:**\n- EN: \"Your meeting {meeting_name} has been confirmed for {date} at {time}\"\n- AR: \"تم تأكيد اجتماعك {meeting_name} في {date} الساعة {time}\"\n\n**COMPLETED:**\n- EN: \"Meeting {meeting_name} has been marked as completed\"\n- AR: \"تم وضع علامة على الاجتماع {meeting_name} كمكتمل\"\n\n**CANCELED:**\n- EN: \"Meeting {meeting_name} has been canceled\"\n- AR: \"تم إلغاء الاجتماع {meeting_name}\""
+          }
+        },
+        {
+          "name": "Team Member Added to Meeting Notification",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/documentation/meetings/notifications/team-added",
+              "host": ["{{base_url}}"],
+              "path": ["api", "documentation", "meetings", "notifications", "team-added"]
+            },
+            "description": "**Triggered:** When admin adds a designer/marketer to a meeting\n**Recipients:** The added team member (designer/marketer)\n**Template:** meeting_team_member_added\n**Endpoint:** POST /admin/meetings/{id}/team\n\n**EN:**\n- Title: \"Assigned to Meeting\"\n- Message: \"You have been assigned to meeting {meeting_name} on {date}\"\n\n**AR:**\n- Title: \"تعيينك في اجتماع\"\n- Message: \"تم تعيينك في الاجتماع {meeting_name} في {date}\"\n\n**Firebase Data:**\n```json\n{\n  \"meeting_id\": \"5\",\n  \"notification_type\": \"meeting_team_member_added\",\n  \"language\": \"ar\"\n}\n```"
+          }
+        },
+        {
+          "name": "Team Member Removed from Meeting Notification",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/documentation/meetings/notifications/team-removed",
+              "host": ["{{base_url}}"],
+              "path": ["api", "documentation", "meetings", "notifications", "team-removed"]
+            },
+            "description": "**Triggered:** When admin removes a designer/marketer from a meeting\n**Recipients:** The removed team member (designer/marketer)\n**Template:** meeting_team_member_removed\n**Endpoint:** DELETE /admin/meetings/{id}/team/{teamMemberId}\n\n**EN:**\n- Title: \"Removed from Meeting\"\n- Message: \"You have been removed from meeting {meeting_name}\"\n\n**AR:**\n- Title: \"إزالتك من اجتماع\"\n- Message: \"تم إزالتك من الاجتماع {meeting_name}\"\n\n**Firebase Data:**\n```json\n{\n  \"meeting_id\": \"5\",\n  \"notification_type\": \"meeting_team_member_removed\",\n  \"language\": \"en\"\n}\n```"
+          }
+        },
+        {
+          "name": "Team Auto-Synced from Strategy Notification",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/documentation/meetings/notifications/team-synced",
+              "host": ["{{base_url}}"],
+              "path": ["api", "documentation", "meetings", "notifications", "team-synced"]
+            },
+            "description": "**Triggered:** When admin calls sync-from-strategy endpoint\n**Recipients:** All team members that are auto-synced from posts (designers/marketers)\n**Template:** meeting_team_synced\n**Endpoint:** POST /admin/meetings/{id}/team/sync-from-strategy\n\nThis endpoint extracts team members from PostTeamMember (posts assigned to the strategy order) and syncs them to the meeting.\n\n**EN:**\n- Title: \"Team Auto-Synced\"\n- Message: \"Team members have been automatically synced for meeting {meeting_name}\"\n\n**AR:**\n- Title: \"مزامنة الفريق التلقائية\"\n- Message: \"تم مزامنة أعضاء الفريق تلقائياً للاجتماع {meeting_name}\"\n\n**Use Case:**\nWhen a strategy order has multiple posts with assigned team members, call this to automatically add those team members to the meeting instead of manually adding each one.\n\n**Firebase Data:**\n```json\n{\n  \"meeting_id\": \"5\",\n  \"notification_type\": \"meeting_team_synced\",\n  \"language\": \"ar\"\n}\n```"
+          }
+        }
+      ]
+    }
+  ]
+}

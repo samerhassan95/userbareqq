@@ -6,6 +6,7 @@ use App\Http\Controllers\Employee\EmployeeAuthController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\StrategyDayController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\DeviceTokenController;
 use App\Http\Controllers\UniversalAuthController;
 use Illuminate\Support\Facades\Route;
 
@@ -52,6 +53,13 @@ Route::middleware(['auth:admin,client,designer,marketer'])->group(function () {
     Route::get('notifications', [NotificationController::class, 'getNotifications']);
     Route::post('notifications/{id}/read', [NotificationController::class, 'markNotificationAsRead']);
     Route::post('notifications/read-all', [NotificationController::class, 'markAllNotificationsAsRead']);
+});
+
+// Shared Routes - Profile/Device Settings (All Authenticated Roles)
+Route::middleware(['auth:admin,client,designer,marketer,employee'])->prefix('profile')->group(function () {
+    Route::post('device-token', [DeviceTokenController::class, 'updateDeviceToken']);
+    Route::post('language', [DeviceTokenController::class, 'updateLanguage']);
+    Route::get('notification-settings', [DeviceTokenController::class, 'getNotificationSettings']);
 });
 
 // Client Invoice Routes (New PDF System)

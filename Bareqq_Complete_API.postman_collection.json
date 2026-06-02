@@ -4250,6 +4250,180 @@
             ]
         },
         {
+            "name": "Profile & Settings (All Roles)",
+            "description": "User profile management endpoints for device token and language preferences. Available to all authenticated roles: Admin, Client, Designer, Marketer, Employee.",
+            "item": [
+                {
+                    "name": "Update Device Token",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"device_token\": \"d1Lxd3tAbcXyZ123fcmTokenHere\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/profile/device-token",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "profile",
+                                "device-token"
+                            ]
+                        },
+                        "description": "Update Firebase device token anytime. Can be called after login or when token changes.\n\n**Use Cases:**\n- Update FCM token from mobile app\n- User reinstalls app\n- Device token expires\n- Switching devices\n\n**Parameters:**\n- `device_token` (required): Firebase Cloud Messaging token\n\n**Response:**\nReturns user info with old/new token (masked)"
+                    },
+                    "response": [
+                        {
+                            "name": "Success",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\"device_token\": \"token123\"}"
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [],
+                            "cookie": [],
+                            "body": "{\n  \"status\": true,\n  \"message\": \"Device token updated successfully\",\n  \"data\": {\n    \"user_id\": 1,\n    \"type\": \"App\\\\Models\\\\Client\",\n    \"old_token\": \"oldTokenStarts...\",\n    \"new_token\": \"newTokenStarts...\"\n  }\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Update Language Preference",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"language\": \"ar\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/profile/language",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "profile",
+                                "language"
+                            ]
+                        },
+                        "description": "Update notification language preference (English or Arabic).\n\nWhen notifications are sent, the system will use the user's preferred language:\n- EN (English): Uses `title` and `message` from templates\n- AR (Arabic): Uses `title_ar` and `message_ar` from templates\n\n**Parameters:**\n- `language` (required): 'en' or 'ar'\n\n**Response:**\nReturns user info with old/new language"
+                    },
+                    "response": [
+                        {
+                            "name": "Success",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\"language\": \"ar\"}"
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [],
+                            "cookie": [],
+                            "body": "{\n  \"status\": true,\n  \"message\": \"Language preference updated successfully\",\n  \"data\": {\n    \"user_id\": 1,\n    \"type\": \"App\\\\Models\\\\Client\",\n    \"old_language\": \"en\",\n    \"new_language\": \"ar\"\n  }\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Get Notification Settings",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/profile/notification-settings",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "profile",
+                                "notification-settings"
+                            ]
+                        },
+                        "description": "Get current device token and language settings for authenticated user.\n\n**Response:**\nReturns:\n- `device_token`: First 20 chars + '...' (masked for security)\n- `has_token`: Boolean indicating if token exists\n- `language`: Current language preference (en or ar)"
+                    },
+                    "response": [
+                        {
+                            "name": "Success",
+                            "originalRequest": {
+                                "method": "GET",
+                                "header": []
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [],
+                            "cookie": [],
+                            "body": "{\n  \"status\": true,\n  \"message\": \"Notification settings retrieved\",\n  \"data\": {\n    \"user_id\": 1,\n    \"type\": \"App\\\\Models\\\\Client\",\n    \"device_token\": \"d1Lxd3tAbcXyZ12...\",\n    \"has_token\": true,\n    \"language\": \"ar\"\n  }\n}"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "name": "Admin - Meetings",
             "description": "Admin meeting management endpoints. Includes team member assignment, auto-sync from posts, and status management.",
             "item": [
