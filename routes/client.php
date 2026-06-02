@@ -41,4 +41,13 @@ Route::middleware(['client'])->group(function () {
     
     // Strategy Works Routes
     Route::get('product-orders/{orderId}/works', [StrategyWorkController::class, 'index']);
+
+    // Meetings Routes
+    Route::get('meetings', [\App\Http\Controllers\Client\ClientMeetingController::class, 'index']);
+    Route::get('meetings/filter', [\App\Http\Controllers\Client\ClientMeetingController::class, 'filter']);
+    Route::get('meetings/{meetingId}/join', [\App\Http\Controllers\Client\ClientMeetingController::class, 'join']);
+    Route::post('meetings', [\App\Http\Controllers\Client\ClientMeetingController::class, 'store']);
+    Route::delete('meetings/{meetingId}', [\App\Http\Controllers\Client\ClientMeetingController::class, 'destroy']);
+    Route::get('available-slots', [\App\Http\Controllers\Client\ClientMeetingController::class, 'availableSlots']);
+    Route::get('unbooked-slots', [\App\Http\Controllers\Client\ClientMeetingController::class, 'unbookedSlots']);
 });

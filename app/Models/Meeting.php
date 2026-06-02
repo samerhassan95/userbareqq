@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Meeting extends Model
 {
-    protected $fillable = ['slot_id', 'start_time', 'end_time', 'jitsi_url', 'meeting_name', 'project_id','status', 'description','client_id','task_id','date','notes'];
+    protected $fillable = ['slot_id', 'start_time', 'end_time', 'jitsi_url', 'meeting_name', 'strategy_id','status', 'description','client_id','date','notes'];
         protected $casts = [
         'date' => 'date', // ✅ optional but recommended
     ];
@@ -21,9 +21,9 @@ class Meeting extends Model
         return $this->belongsTo(Client::class, 'client_id');
     }
 
-    public function project()
+    public function strategy()
     {
-        return $this->belongsTo(Project::class, 'project_id');
+        return $this->belongsTo(ProductOrder::class, 'strategy_id');
     }
     public function logs()
     {
@@ -34,9 +34,4 @@ public function employees()
     return $this->belongsToMany(Employee::class, 'meeting_employees', 'meeting_id', 'employee_id');
 }
 
-
-    public function task()
-    {
-        return $this->belongsTo(Task::class);
-    }
 }
