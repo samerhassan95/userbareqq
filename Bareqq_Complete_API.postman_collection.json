@@ -697,7 +697,7 @@
                                 }
                             ],
                             "cookie": [],
-                            "body": "{\n    \"status\": true,\n    \"message\": \"Profile updated successfully.\",\n    \"data\": {\n        \"client\": {\n            \"id\": 1,\n            \"username\": \"johndoe\",\n            \"phone\": \"1234567890\",\n            \"email\": \"john@example.com\",\n            \"name\": \"Updated Name\",\n            \"photo\": \"http://yourapp.com/client_photos/image123.jpg\",\n            \"company_name\": \"My Company\",\n            \"website\": \"https://example.com\",\n            \"address\": \"123 Main St\",\n            \"city\": \"New York\",\n            \"country\": \"USA\"\n        },\n        \"token\": \"eyJ0eXAiOiJKV1QiLCJh...\",\n        \"type\": \"client\"\n    }\n}"
+                            "body": "{\n    \"status\": true,\n    \"message\": \"Profile updated successfully.\",\n    \"data\": {\n        \"client\": {\n            \"id\": 1,\n            \"username\": \"johndoe\",\n            \"phone\": \"1234567890\",\n            \"email\": \"john@example.com\",\n            \"name\": \"Updated Name\",\n            \"image\": \"http://yourapp.com/client_photos/image123.jpg\",\n            \"company_name\": \"My Company\",\n            \"website\": \"https://example.com\",\n            \"address\": \"123 Main St\",\n            \"city\": \"New York\",\n            \"country\": \"USA\"\n        },\n        \"token\": \"eyJ0eXAiOiJKV1QiLCJh...\",\n        \"type\": \"client\"\n    }\n}"
                         }
                     ]
                 },

@@ -236,14 +236,16 @@ class ClientAuthController extends Controller
             return response()->json(['status' => false, 'message' => 'Unauthorized', 'data' => null], 401);
         }
 
-    if ($client->photo) {
-        $client->photo = asset($client->photo);
-    }
+        // Convert client to array and rename photo to image
+        $clientData = $client->makeHidden(['password', 'remember_token'])->toArray();
+        $clientData['image'] = $client->photo ? asset($client->photo) : null;
+        unset($clientData['photo']);
+
         return response()->json([
             'status' => true,
             'message' => 'Profile retrieved successfully.',
             'data' => [
-                'client' => $client->makeHidden(['password', 'remember_token']),
+                'client' => $clientData,
                 'token' => JWTAuth::fromUser($client),
                 'type' => 'client'
             ],
@@ -294,10 +296,10 @@ class ClientAuthController extends Controller
         // Refresh client data to get updated photo
         $client->refresh();
 
-        // Add full URL to photo if exists
-        if ($client->photo) {
-            $client->photo = asset($client->photo);
-        }
+        // Convert client to array and rename photo to image
+        $clientData = $client->makeHidden(['password', 'remember_token'])->toArray();
+        $clientData['image'] = $client->photo ? asset($client->photo) : null;
+        unset($clientData['photo']);
 
         // return refreshed token
         $claims = [
@@ -310,7 +312,7 @@ class ClientAuthController extends Controller
             'status' => true,
             'message' => 'Profile updated successfully.',
             'data' => [
-                'client' => $client->makeHidden(['password', 'remember_token']),
+                'client' => $clientData,
                 'token' => $token,
                 'type' => 'client'
             ],
@@ -439,6 +441,11 @@ class ClientAuthController extends Controller
             $client->save();
             Cache::forget('otp_change_email_' . $client->id);
 
+            // Convert client to array and rename photo to image
+            $clientData = $client->makeHidden(['password', 'remember_token'])->toArray();
+            $clientData['image'] = $client->photo ? asset($client->photo) : null;
+            unset($clientData['photo']);
+
             $claims = ['type' => 'client', 'role' => $client->role ?? 'client'];
             $token = JWTAuth::claims($claims)->fromUser($client);
 
@@ -446,7 +453,7 @@ class ClientAuthController extends Controller
                 'status' => true,
                 'message' => 'Email updated successfully.',
                 'data' => [
-                    'client' => $client->makeHidden(['password', 'remember_token']),
+                    'client' => $clientData,
                     'token' => $token,
                     'type' => 'client'
                 ],
@@ -517,6 +524,11 @@ class ClientAuthController extends Controller
         $client->photo = $photoPath ?? $client->photo;
         $client->save();
 
+        // Convert client to array and rename photo to image
+        $clientData = $client->makeHidden(['password', 'remember_token'])->toArray();
+        $clientData['image'] = $client->photo ? asset($client->photo) : null;
+        unset($clientData['photo']);
+
         $claims = ['type' => 'client', 'role' => $client->role ?? 'client'];
         $token = JWTAuth::claims($claims)->fromUser($client);
 
@@ -524,7 +536,7 @@ class ClientAuthController extends Controller
             'status' => true,
             'message' => 'Profile updated successfully.',
             'data' => [
-                'client' => $client->makeHidden(['password', 'remember_token']),
+                'client' => $clientData,
                 'token' => $token,
                 'type' => 'client'
             ],
@@ -625,7 +637,7 @@ class ClientAuthController extends Controller
                     'phone'        => $client->phone,
                     'email'        => $client->email,
                     'name'         => $client->name,
-                    'photo'        => $client->photo ? asset($client->photo) : null,
+                    'image'        => $client->photo ? asset($client->photo) : null,
                     'company_name' => $client->company_name,
                     'website'      => $client->website,
                     'address'      => $client->address,

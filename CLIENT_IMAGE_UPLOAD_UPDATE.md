@@ -6,11 +6,11 @@
 **Endpoint:** `POST {{base_url}}/client/update-profile`
 
 #### Changes:
-- Changed image field name from `photo` to `image` in the request body
+- Request field name: `image` (for uploading profile picture)
+- Response field name: `image` (returns full URL)
 - Increased max image size from 2MB to 10MB (10240 KB)
-- Added support for image upload in update-profile
-- Added full URL generation for the uploaded image in the response
 - Request now uses `multipart/form-data` instead of JSON
+- Database column remains `photo` (no migration needed)
 
 #### Request Body Parameters:
 - **Content-Type:** `multipart/form-data`
@@ -40,7 +40,7 @@
       "name": "John Doe",
       "email": "john@example.com",
       "phone": "1234567890",
-      "photo": "http://yourapp.com/client_photos/image123.jpg",
+      "image": "http://yourapp.com/client_photos/image123.jpg",
       "company_name": "ABC Corp",
       "website": "https://example.com",
       "address": "123 Main St",
@@ -89,20 +89,57 @@
 }
 ```
 
+### 3. Get Profile Endpoint
+**Endpoint:** `GET {{base_url}}/client/profile`
+
+#### Response uses `image` field:
+```json
+{
+  "status": true,
+  "message": "Profile retrieved successfully.",
+  "data": {
+    "client": {
+      "id": 1,
+      "username": "johndoe",
+      "name": "John Doe",
+      "email": "john@example.com",
+      "phone": "1234567890",
+      "image": "http://yourapp.com/client_photos/image123.jpg",
+      ...
+    },
+    "token": "eyJ0eXAiOiJKV1QiLCJh...",
+    "type": "client"
+  }
+}
+```
+
+## All Endpoints Updated
+
+The following endpoints now return `image` instead of `photo`:
+
+| Endpoint | Method | Field in Response |
+|----------|--------|-------------------|
+| `/client/login` | POST | `client.image` |
+| `/client/profile` | GET | `data.client.image` |
+| `/client/update-profile` | POST | `data.client.image` |
+| `/client/change-profile` | POST | `data.client.image` |
+| `/client/change-email` | POST | `data.client.image` (after OTP verification) |
+| `/client/verify-otp` | POST | `data.client.image` |
+
 ## Postman Collection Updates
 
 The `Bareqq_Complete_API.postman_collection.json` has been updated with:
 
 ### Client Login Endpoint:
 - Added `device_token` to request body example
+- Response example shows `image` field (not `photo`)
 - Added description explaining the image field
-- Added success response example showing image URL
 
 ### Client Update Profile Endpoint:
 - Changed from JSON to form-data format
-- Added `image` field as file upload
+- Request uses `image` field for file upload
+- Response example shows `image` field (not `photo`)
 - All optional fields are disabled by default in the collection
-- Added success response example with image URL
 - Added description about max file size (10MB)
 
 ## Testing Guide
@@ -111,7 +148,7 @@ The `Bareqq_Complete_API.postman_collection.json` has been updated with:
 
 **Using Postman:**
 1. Import the updated collection
-2. Open "Client Auth" → "Update Profile"
+2. Open "Client - Profile" → "Update Profile"
 3. Select the `image` field
 4. Choose an image file (max 10MB)
 5. Enable any other fields you want to update
@@ -119,7 +156,7 @@ The `Bareqq_Complete_API.postman_collection.json` has been updated with:
 
 **Expected Response:**
 - Status: 200
-- Image URL should be present in `data.client.photo`
+- `image` field should contain full URL in `data.client.image`
 - Image should be accessible via the returned URL
 
 ### 2. Test Login Response
@@ -133,6 +170,17 @@ The `Bareqq_Complete_API.postman_collection.json` has been updated with:
 - Status: 200
 - `client.image` field should contain full URL or null
 - Image URL should be accessible if present
+
+### 3. Test Get Profile
+
+**Using Postman:**
+1. Open "Client - Profile" → "Get Profile"
+2. Ensure you have a valid token
+3. Send the request
+
+**Expected Response:**
+- Status: 200
+- `data.client.image` field should contain full URL or null
 
 ## Deployment Steps
 
@@ -163,32 +211,52 @@ php artisan route:clear
 
 1. **app/Http/Controllers/Client/ClientAuthController.php**
    - Updated `register()` - increased photo max size to 10MB
-   - Updated `updateProfile()` - changed field name to `image`, increased max to 10MB
-   - Updated `changeProfile()` - increased photo max size to 10MB  
-   - Updated `login()` - added `image` field with full URL in response
-   - Added proper image URL generation with `asset()` helper
+   - Updated `updateProfile()` - request field `image`, response key `image`, max 10MB
+   - Updated `changeProfile()` - increased photo max size to 10MB, response key `image`
+   - Updated `getProfile()` - response key `image`
+   - Updated `changeEmail()` - response key `image`
+   - Updated `login()` - response key `image` 
+   - Updated `respondWithToken()` - response key `image`
+   - All responses now use `image` key instead of `photo`
 
 2. **Bareqq_Complete_API.postman_collection.json**
-   - Updated "Client Login" endpoint with response example including image field
-   - Updated "Update Profile" endpoint to use form-data with image upload
+   - Updated "Client Login" endpoint response example to use `image` field
+   - Updated "Update Profile" endpoint to use form-data with `image` upload
+   - Updated response examples to use `image` instead of `photo`
    - Added descriptions and example responses
 
-## Notes
+## Important Notes
 
-- The field name in the database remains `photo` (no migration needed)
-- Request body uses `image` key for clarity
-- Response includes full URL for easy frontend consumption
+- **Database column remains `photo`** (no migration needed)
+- **Request body uses `image`** key for file upload
+- **All responses use `image`** key with full URL
 - Existing photos will still work - no data migration required
 - **Maximum file size increased to 10MB** (was 2MB)
 - Supported formats: jpeg, png, jpg, gif, svg
 - Images are stored in `public/client_photos/` directory
-- Both endpoints properly handle missing images (returns null)
+- All endpoints properly handle missing images (returns null)
+- Frontend should now use `image` field instead of `photo`
 
 ## Image Size Limits
 
-| Endpoint | Field Name | Max Size | Previous Size |
-|----------|------------|----------|---------------|
-| Register | photo | 10MB | 2MB |
-| Update Profile | image | 10MB | 2MB |
-| Change Profile | photo | 10MB | 2MB |
+| Endpoint | Request Field | Response Field | Max Size | Previous Size |
+|----------|--------------|----------------|----------|---------------|
+| Register | photo | image | 10MB | 2MB |
+| Update Profile | image | image | 10MB | 2MB |
+| Change Profile | photo | image | 10MB | 2MB |
+| Login | - | image | - | - |
+| Get Profile | - | image | - | - |
+
+## Frontend Integration
+
+Update your frontend code to use `image` instead of `photo`:
+
+```javascript
+// Before
+const photoUrl = response.data.client.photo;
+
+// After
+const imageUrl = response.data.client.image;
+```
+
 
