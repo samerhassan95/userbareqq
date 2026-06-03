@@ -90,12 +90,21 @@ class AdminMeetingController extends Controller
     // ---------------------------------------------------------------
     // GET admin/meetings
     // List all meetings with optional filters
+    // Admin: sees all meetings
+    // Client: sees only their own meetings
     // ---------------------------------------------------------------
     public function index(Request $request)
     {
+        $user = auth()->user();
+        
         $query = Meeting::with(['strategy.product', 'client', 'teamMembers'])
             ->orderByDesc('date')
             ->orderByDesc('start_time');
+
+        // If user is a client, filter by their meetings only
+        if ($user && $user instanceof \App\Models\Client) {
+            $query->where('client_id', $user->id);
+        }
 
         if ($request->filled('status')) {
             $query->where('status', 'like', '%' . $request->status . '%');
