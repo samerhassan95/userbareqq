@@ -42,7 +42,7 @@ class ClientAuthController extends Controller
                 }
             }],
             'password' => 'required|min:6|max:255',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:10240',
             'email' => 'required|email|unique:clients,email',
             'company_name' => 'nullable|string|max:255',
             'website' => 'nullable|url|max:255',
@@ -160,7 +160,9 @@ class ClientAuthController extends Controller
                 'name' => $client->name,
                 'email' => $client->email,
                 'role' => $client->role ?? 'client',
-                'phone' => $client->phone],// Changed this line            ],
+                'phone' => $client->phone,
+                'image' => $client->photo ? asset($client->photo) : null,
+            ],
             'subscriptions' => $activeBundles->map(fn($bundle) => [
                 'id' => $bundle->id,
                 'bundle_package_id' => $bundle->bundle_package_id,
@@ -266,7 +268,7 @@ class ClientAuthController extends Controller
             'email' => 'sometimes|required|email|max:255|unique:clients,email,' . $client->id,
             'phone' => 'sometimes|required|string|max:255|unique:clients,phone,' . $client->id,
             'name' => 'sometimes|required|string|max:255',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:10240',
             'company_name' => 'nullable|string|max:255',
             'website' => 'nullable|url|max:255',
             'address' => 'nullable|string|max:255',
@@ -274,7 +276,7 @@ class ClientAuthController extends Controller
             'country' => 'nullable|string|max:255',
         ]);
 
-        $photoPath = $request->hasFile('photo') ? (new ImageService())->upload($request->file('photo'), 'client_photos') : null;
+        $photoPath = $request->hasFile('image') ? ImageService::upload($request->file('image'), 'client_photos') : null;
 
         $client->update([
             'username' => $request->username ?? $client->username,
@@ -288,6 +290,14 @@ class ClientAuthController extends Controller
             'city' => $request->city ?? $client->city,
             'country' => $request->country ?? $client->country,
         ]);
+
+        // Refresh client data to get updated photo
+        $client->refresh();
+
+        // Add full URL to photo if exists
+        if ($client->photo) {
+            $client->photo = asset($client->photo);
+        }
 
         // return refreshed token
         $claims = [
@@ -491,7 +501,7 @@ class ClientAuthController extends Controller
 
         $validator = Validator::make($request->all(), [
             'name' => 'sometimes|required|string|max:255',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:10240',
         ]);
 
         if ($validator->fails()) {

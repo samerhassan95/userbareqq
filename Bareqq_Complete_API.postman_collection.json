@@ -380,7 +380,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"email\": \"test@client.com\",\n    \"password\": \"password123\"\n}"
+                            "raw": "{\n    \"email\": \"test@client.com\",\n    \"password\": \"password123\",\n    \"device_token\": \"optional_device_token_here\"\n}"
                         },
                         "url": {
                             "raw": "{{base_url}}/client/login",
@@ -391,8 +391,48 @@
                                 "client",
                                 "login"
                             ]
+                        },
+                        "description": "Login endpoint for clients. Returns user data including profile image URL. The 'image' field will be null if no photo uploaded."
+                    },
+                    "response": [
+                        {
+                            "name": "Success Response",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"email\": \"test@client.com\",\n    \"password\": \"password123\"\n}"
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/client/login",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "client",
+                                        "login"
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "cookie": [],
+                            "body": "{\n    \"status\": true,\n    \"message\": \"Login successful.\",\n    \"token\": \"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...\",\n    \"token_type\": \"bearer\",\n    \"expires_in\": 3600,\n    \"client\": {\n        \"id\": 1,\n        \"name\": \"John Doe\",\n        \"email\": \"test@client.com\",\n        \"role\": \"client\",\n        \"phone\": \"1234567890\",\n        \"image\": \"http://yourapp.com/client_photos/image123.jpg\"\n    },\n    \"subscriptions\": []\n}"
                         }
-                    }
+                    ]
                 },
                 {
                     "name": "Client Logout",
@@ -539,15 +579,64 @@
                             {
                                 "key": "Authorization",
                                 "value": "Bearer {{client_token}}"
-                            },
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
                             }
                         ],
                         "body": {
-                            "mode": "raw",
-                            "raw": "{\n    \"name\": \"Updated Name\",\n    \"phone\": \"01234567890\",\n    \"company_name\": \"My Company\",\n    \"website\": \"https://example.com\"\n}"
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "name",
+                                    "value": "Updated Name",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "image",
+                                    "type": "file",
+                                    "src": []
+                                },
+                                {
+                                    "key": "phone",
+                                    "value": "01234567890",
+                                    "type": "text",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "email",
+                                    "value": "updated@example.com",
+                                    "type": "text",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "company_name",
+                                    "value": "My Company",
+                                    "type": "text",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "website",
+                                    "value": "https://example.com",
+                                    "type": "text",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "address",
+                                    "value": "123 Main St",
+                                    "type": "text",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "city",
+                                    "value": "New York",
+                                    "type": "text",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "country",
+                                    "value": "USA",
+                                    "type": "text",
+                                    "disabled": true
+                                }
+                            ]
                         },
                         "url": {
                             "raw": "{{base_url}}/client/update-profile",
@@ -558,8 +647,59 @@
                                 "client",
                                 "update-profile"
                             ]
+                        },
+                        "description": "Update client profile. The 'image' field accepts image files (max 10MB). All fields are optional. Returns updated profile with full image URL."
+                    },
+                    "response": [
+                        {
+                            "name": "Success Response",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Authorization",
+                                        "value": "Bearer {{client_token}}"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "formdata",
+                                    "formdata": [
+                                        {
+                                            "key": "name",
+                                            "value": "Updated Name",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "image",
+                                            "type": "file",
+                                            "src": []
+                                        }
+                                    ]
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/client/update-profile",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "client",
+                                        "update-profile"
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "cookie": [],
+                            "body": "{\n    \"status\": true,\n    \"message\": \"Profile updated successfully.\",\n    \"data\": {\n        \"client\": {\n            \"id\": 1,\n            \"username\": \"johndoe\",\n            \"phone\": \"1234567890\",\n            \"email\": \"john@example.com\",\n            \"name\": \"Updated Name\",\n            \"photo\": \"http://yourapp.com/client_photos/image123.jpg\",\n            \"company_name\": \"My Company\",\n            \"website\": \"https://example.com\",\n            \"address\": \"123 Main St\",\n            \"city\": \"New York\",\n            \"country\": \"USA\"\n        },\n        \"token\": \"eyJ0eXAiOiJKV1QiLCJh...\",\n        \"type\": \"client\"\n    }\n}"
                         }
-                    }
+                    ]
                 },
                 {
                     "name": "Change Password",
